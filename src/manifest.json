@@ -12,10 +12,11 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*.mozilla.org/*"],
+      "matches": ["<all_urls>"],
       "js": ["content_script.js"]
     }
   ],
+  "permissions": ["activeTab", "tabs"],
   "browser_action": {
     "default_icon": {
       "48": "icons/stylish-reader-48.png",
