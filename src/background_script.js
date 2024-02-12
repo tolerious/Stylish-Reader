@@ -4,4 +4,3 @@ function extensionIconClicked() {
   });
 }
 browser.browserAction.onClicked.addListener(extensionIconClicked);
-
