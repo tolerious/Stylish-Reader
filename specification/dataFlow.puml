@@ -1,0 +1,17 @@
+@startuml data flow
+title Data Flow Diagram
+
+actor User as user
+participant extension as e
+participant background.js as bg
+participant popup.html as popup
+participant "offical website" as web
+
+user->e: click
+loop
+e->bg: onClicked Listener
+bg->bg: check login state
+end
+bg->popup: showPopup(not login)
+popup->web: redirect to official website
+@enduml

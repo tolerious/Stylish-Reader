@@ -85,3 +85,12 @@ async function extensionIconClicked() {
 }
 
 browser.browserAction.onClicked.addListener(extensionIconClicked);
+browser.runtime.onMessage.addListener((message) => {
+  if (message.type === "popup") {
+    console.log(message.data);
+  }
+  if (message.type === "popup-error") {
+    //TODO: Can have a Notification or error message on the popup page
+    console.error("Service not available.");
+  }
+});
