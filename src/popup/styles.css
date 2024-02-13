@@ -85,3 +85,9 @@ button:active {
 .register-link a:hover {
   color: #e60057;
 }
+
+.error-message {
+  color: #ff0000;
+  margin-top: 10px;
+  font-size: 14px;
+}
