@@ -1,0 +1,87 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.login-form {
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+h1 {
+  background: linear-gradient(90deg, #fc0463, #fc086c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+input {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+  border: none;
+  border-bottom: 2px solid #f80061;
+  outline: none;
+  transition: border-bottom-color 0.3s ease;
+  color: #333333;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+}
+
+input:focus {
+  border-bottom-color: #f80061;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  background-color: #f80061;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* 添加 box-shadow 过渡效果 */
+}
+
+button:hover {
+  background-color: #e60057;
+}
+
+button:active {
+  background-color: #fd0072;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* 按下时的立体化偏移效果 */
+}
+
+.forgot-password {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #666666;
+}
+
+.forgot-password:hover {
+  color: #f80061;
+  cursor: pointer;
+}
+
+.register-link {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #666666;
+}
+
+.register-link a {
+  color: #f80061;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.register-link a:hover {
+  color: #e60057;
+}
