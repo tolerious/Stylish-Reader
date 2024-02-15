@@ -1,5 +1,7 @@
 // background.js
 
+let server_url = "http://localhost:3000";
+
 function getCurrentTabId() {
   return new Promise((resolve) => {
     browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -16,7 +18,7 @@ function getCurrentTabUrl() {
   });
 }
 
-async function notifyPopup(messageObject) {
+async function notifyContentScript(messageObject) {
   const tabId = await getCurrentTabId();
   browser.tabs.sendMessage(tabId, messageObject);
 }
@@ -75,12 +77,24 @@ function openPopup() {
   });
 }
 
+async function saveArticle() {
+  const headers = new Headers();
+  const token = await getLoginToken();
+  headers.append("Authorization", `Bearer ${token}`);
+  headers.append("Content-Type", "application/json");
+  return fetch(`${server_url}/article`, {
+    method: "POST",
+    headers: headers,
+    body: JSON.stringify({ link: await getCurrentTabUrl() }),
+  });
+}
+
 async function pingPong() {
   const headers = new Headers();
   const token = await getLoginToken();
   headers.append("Authorization", `Bearer ${token}`);
   headers.append("Content-Type", "application/json");
-  return fetch("http://localhost:3000/logic/pingpong", {
+  return fetch(`${server_url}/logic/pingpong`, {
     method: "GET",
     headers: headers,
   });
@@ -96,6 +110,12 @@ async function extensionIconClicked() {
     let j = await t.json();
     if (t.ok && j.code === 200) {
       console.log("Login state is valid.");
+      let t = await saveArticle();
+      let j = await t.json();
+      // Notify content script
+      if (t.ok && j.code === 200) {
+        notifyContentScript({ actionType: "saveArticleSuccess" });
+      }
     } else {
       browser.tabs.create({ url: "popup/popup.html" });
     }

@@ -1,3 +1,4 @@
+let server_url = "http://localhost:3000";
 $(document).ready(function () {
   function setErrorMessage(message) {
     $("#error-message").text(message);
@@ -12,7 +13,7 @@ $(document).ready(function () {
       return;
     }
     $.ajax({
-      url: "http://localhost:3000/logic/login",
+      url: `${server_url}/logic/login`,
       method: "POST",
       // timeout: 1500,
       data: { username, password },
@@ -31,7 +32,7 @@ $(document).ready(function () {
   });
   $("button[type='register']").click(function () {
     $.ajax({
-      url: "http://localhost:3000/logic/login",
+      url: `${server_url}/logic/login`,
       method: "POST",
       // timeout: 1500,
       data: { username, password },

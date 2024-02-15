@@ -16,6 +16,11 @@
       "js": ["content_script.js"]
     }
   ],
+  "web_accessible_resources": [
+    "assets/stylish-reader-48.png",
+    "assets/right-arrow.png",
+    "assets/cancel-button.png"
+  ],
   "permissions": ["activeTab", "tabs", "storage"],
   "browser_action": {
     "default_icon": {
