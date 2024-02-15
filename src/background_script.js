@@ -16,6 +16,11 @@ function getCurrentTabUrl() {
   });
 }
 
+async function notifyPopup(messageObject) {
+  const tabId = await getCurrentTabId();
+  browser.tabs.sendMessage(tabId, messageObject);
+}
+
 async function notifyClickEvent() {
   const tabId = await getCurrentTabId();
   const url = await getCurrentTabUrl();
@@ -56,14 +61,13 @@ function setLoginToken(token) {
 function getLoginToken() {
   return new Promise((resolve) => {
     browser.storage.local.get("stylish-reader-token").then((res) => {
-      resolve(res.token);
+      resolve(res["stylish-reader-token"]);
     });
   });
 }
 
 function openPopup() {
   browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    console.log(tabs[0]);
     browser.browserAction.setPopup({
       windowId: tabs[0].windowId,
       popup: "popup/popup.html",
@@ -71,26 +75,49 @@ function openPopup() {
   });
 }
 
+async function pingPone() {
+  const headers = new Headers();
+  const token = await getLoginToken();
+  headers.append("Authorization", `Bearer ${token}`);
+  headers.append("Content-Type", "application/json");
+  fetch("http://localhost:3000/logic/pingpong", {
+    method: "GET",
+    headers: headers,
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      if (data.code !== 200) {
+        browser.tabs.create({ url: "popup/popup.html" });
+      }
+    })
+    .catch((error) => {
+      // TODO: I'm considering the right way to handle this error
+      console.log(error);
+    });
+}
 async function extensionIconClicked() {
-  console.log("extension clicked...");
   let t = await getLoginToken();
   if (t === undefined || t === null || t === "") {
     // Need login logic here...
-    t = "no token found";
-    openPopup();
+    browser.tabs.create({ url: "popup/popup.html" });
+  } else {
+    // already login, ping pong to server using token
+    pingPone();
   }
-
-  console.log(t);
-  notifyClickEvent();
 }
 
 browser.browserAction.onClicked.addListener(extensionIconClicked);
-browser.runtime.onMessage.addListener((message) => {
+
+// Listen for messages from popup
+browser.runtime.onMessage.addListener(async (message) => {
   if (message.type === "popup") {
-    console.log(message.data);
-  }
-  if (message.type === "popup-error") {
-    //TODO: Can have a Notification or error message on the popup page
-    console.error("Service not available.");
+    setLoginToken(message.data.data.token);
+    let tabId = await getCurrentTabId();
+    browser.tabs.remove(tabId);
   }
 });
