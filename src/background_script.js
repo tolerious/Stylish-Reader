@@ -75,30 +75,15 @@ function openPopup() {
   });
 }
 
-async function pingPone() {
+async function pingPong() {
   const headers = new Headers();
   const token = await getLoginToken();
   headers.append("Authorization", `Bearer ${token}`);
   headers.append("Content-Type", "application/json");
-  fetch("http://localhost:3000/logic/pingpong", {
+  return fetch("http://localhost:3000/logic/pingpong", {
     method: "GET",
     headers: headers,
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.json();
-    })
-    .then((data) => {
-      if (data.code !== 200) {
-        browser.tabs.create({ url: "popup/popup.html" });
-      }
-    })
-    .catch((error) => {
-      // TODO: I'm considering the right way to handle this error
-      console.log(error);
-    });
+  });
 }
 async function extensionIconClicked() {
   let t = await getLoginToken();
@@ -107,7 +92,13 @@ async function extensionIconClicked() {
     browser.tabs.create({ url: "popup/popup.html" });
   } else {
     // already login, ping pong to server using token
-    pingPone();
+    let t = await pingPong();
+    let j = await t.json();
+    if (t.ok && j.code === 200) {
+      console.log("Login state is valid.");
+    } else {
+      browser.tabs.create({ url: "popup/popup.html" });
+    }
   }
 }
 
