@@ -1,7 +1,9 @@
 // background.js
 
+// 服务器地址
 let server_url = "http://localhost:3000";
 
+// 获取当前标签页的ID
 function getCurrentTabId() {
   return new Promise((resolve) => {
     browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -10,6 +12,7 @@ function getCurrentTabId() {
   });
 }
 
+// 获取当前标签页的URL
 function getCurrentTabUrl() {
   return new Promise((resolve) => {
     browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -18,11 +21,13 @@ function getCurrentTabUrl() {
   });
 }
 
+// 向 content script 发送消息
 async function notifyContentScript(messageObject) {
   const tabId = await getCurrentTabId();
   browser.tabs.sendMessage(tabId, messageObject);
 }
 
+// 通知 content script 扩展图标被点击
 async function notifyClickEvent() {
   const tabId = await getCurrentTabId();
   const url = await getCurrentTabUrl();
@@ -34,10 +39,12 @@ async function notifyClickEvent() {
   });
 }
 
+// 处理 content script 发来的消息
 function handleResponse(message) {
   console.log(message);
 }
 
+// 处理错误
 function handleError(error) {
   console.log(`Error: ${error}`);
 }
@@ -60,6 +67,7 @@ function setLoginToken(token) {
   });
 }
 
+// 获取登录token
 function getLoginToken() {
   return new Promise((resolve) => {
     browser.storage.local.get("stylish-reader-token").then((res) => {
@@ -68,15 +76,7 @@ function getLoginToken() {
   });
 }
 
-function openPopup() {
-  browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    browser.browserAction.setPopup({
-      windowId: tabs[0].windowId,
-      popup: "popup/popup.html",
-    });
-  });
-}
-
+// 保存文章
 async function saveArticle() {
   const headers = new Headers();
   const token = await getLoginToken();
@@ -89,6 +89,7 @@ async function saveArticle() {
   });
 }
 
+// 测试本地token是否有效
 async function pingPong() {
   const headers = new Headers();
   const token = await getLoginToken();
@@ -99,11 +100,13 @@ async function pingPong() {
     headers: headers,
   });
 }
+
+// 扩展图标被点击
 async function extensionIconClicked() {
   let t = await getLoginToken();
   if (t === undefined || t === null || t === "") {
     // Need login logic here...
-    browser.tabs.create({ url: "popup/popup.html" });
+    browser.tabs.create({ url: "pages/login.html" });
   } else {
     // already login, ping pong to server using token
     let t = await pingPong();
@@ -117,16 +120,16 @@ async function extensionIconClicked() {
         notifyContentScript({ actionType: "saveArticleSuccess" });
       }
     } else {
-      browser.tabs.create({ url: "popup/popup.html" });
+      browser.tabs.create({ url: "pages/login.html" });
     }
   }
 }
 
 browser.browserAction.onClicked.addListener(extensionIconClicked);
 
-// Listen for messages from popup
+// Listen for messages from pages
 browser.runtime.onMessage.addListener(async (message) => {
-  if (message.type === "popup") {
+  if (message.type === "login-success") {
     setLoginToken(message.data.data.token);
     let tabId = await getCurrentTabId();
     browser.tabs.remove(tabId);

@@ -20,7 +20,7 @@ $(document).ready(function () {
       success: function (res) {
         if (res.code === 200) {
           setErrorMessage("Login success.");
-          browser.runtime.sendMessage({ type: "popup", data: res });
+          browser.runtime.sendMessage({ type: "login-success", data: res });
         } else {
           setErrorMessage(res.msg);
         }
