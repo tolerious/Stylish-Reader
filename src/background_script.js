@@ -127,7 +127,7 @@ async function extensionIconClicked() {
 
 browser.browserAction.onClicked.addListener(extensionIconClicked);
 
-// Listen for messages from pages
+// Listen for messages from pages(Mozilla://file pages, not web pages)
 browser.runtime.onMessage.addListener(async (message) => {
   if (message.type === "login-success") {
     setLoginToken(message.data.data.token);
