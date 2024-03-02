@@ -28,14 +28,15 @@ async function notifyContentScript(messageObject) {
 }
 
 // 通知 content script 扩展图标被点击
-async function notifyClickEvent() {
+async function notifyClickEvent(type = "show", message = "default") {
   const tabId = await getCurrentTabId();
   const url = await getCurrentTabUrl();
 
   browser.tabs.sendMessage(tabId, {
     tabId,
     url,
-    message: "extension clicked",
+    type,
+    message,
   });
 }
 
@@ -117,7 +118,7 @@ async function extensionIconClicked() {
       let j = await t.json();
       // Notify content script
       if (t.ok && j.code === 200) {
-        notifyContentScript({ actionType: "saveArticleSuccess" });
+        // notifyContentScript({ type: "saveArticleSuccess" });
       }
     } else {
       browser.tabs.create({ url: "pages/login.html" });
@@ -127,11 +128,20 @@ async function extensionIconClicked() {
 
 browser.browserAction.onClicked.addListener(extensionIconClicked);
 
-// Listen for messages from pages(Mozilla://file pages, not web pages)
+// Listen for messages from pages(Mozilla://file pages, not web pages) and content scripts
 browser.runtime.onMessage.addListener(async (message) => {
   if (message.type === "login-success") {
     setLoginToken(message.data.data.token);
     let tabId = await getCurrentTabId();
     browser.tabs.remove(tabId);
+  }
+});
+
+// 监听tab的url是否发生变化，发生变化了就通知content script
+browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  // 检查URL是否改变
+  if (changeInfo.url) {
+    // 在这里执行你想要的操作
+    notifyContentScript({ type: "urlChanged", url: changeInfo.url });
   }
 });

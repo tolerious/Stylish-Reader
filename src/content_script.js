@@ -1,21 +1,37 @@
 // Put all the javascript code here, that you want to execute after page load.
 
+let supportedDomains = ["www.ted.com"];
+
+// 判断是否已经添加了stylish-reader-icon
+let hasAppendedStylishIcon = false;
+
 // 监听来自background的消息
 browser.runtime.onMessage.addListener((message) => {
   console.log(message);
-  if (message.actionType === "saveArticleSuccess") {
-    if (checkStylishBarIsExist()) {
-      removeStylishBar();
-    }
-    createBar();
-    createTopBarScript();
+  switch (message.type) {
+    case "show":
+      console.log("enter show");
+      break;
+    case "saveArticleSuccess":
+      if (checkStylishBarIsExist()) {
+        removeStylishBar();
+      }
+      createBar();
+      createTopBarScript();
+      break;
+    case "urlChanged":
+      // url发生变化了以后去执行逻辑
+      if (message.url) {
+      }
+      break;
+    default:
+      break;
   }
 });
 
 // 检查stylish-reader-bar是否存在
 function checkStylishBarIsExist() {
   const stylishReaderBar = document.getElementById("stylish-reader-bar");
-  console.log(stylishReaderBar);
   return stylishReaderBar !== null;
 }
 
@@ -132,4 +148,88 @@ function createTopBarScript() {
 
   // 将 <script> 元素插入到页面的 <head> 元素中
   document.head.appendChild(scriptElement);
+}
+
+// 获取当前网页的domain
+function getCurrentDomain() {
+  let domain = "";
+  let url = window.location.href;
+  if (url.indexOf("://") > -1) {
+    domain = url.split("/")[2];
+  } else {
+    domain = url.split("/")[0];
+  }
+  domain = domain.split(":")[0];
+  return domain;
+}
+
+function executedWhenPageLoad() {
+  // 这里是处理在访问受支持的视频网站的时候，向video元素添加Stylish Reader按钮
+  if (supportedDomains.includes(getCurrentDomain())) {
+    console.log("Supported domain");
+    removeAllStylishReaderButtonOnTed();
+    createStylishReaderButtonOnTed();
+  }
+  browser.runtime.sendMessage({ type: "page-load" });
+}
+
+executedWhenPageLoad();
+// ----------------- TED website related -----------------
+function removeAllStylishReaderButtonOnTed() {
+  // 找到所有类名为"node"的元素
+  const elements = document.querySelectorAll(".stylish-reader-button");
+
+  // 遍历这些元素
+  elements.forEach(function (element) {
+    // 从其父元素中删除当前元素
+    element.parentNode.removeChild(element);
+  });
+}
+function createSponsorMask() {
+  const video = document.querySelector("video");
+  video.addEventListener("timeupdate", function (e) {
+    let input = document.querySelector(".video-player-range-input");
+    if (input !== null) {
+      // 真正的视频开始播放了
+      console.log(`现在视频播放到了: ${input.value} 秒`);
+    } else {
+      console.log("广告时间");
+    }
+  });
+}
+
+function createStylishReaderButtonOnTed() {
+  let tedPlayer = document.getElementById("talk-title");
+  let button = document.createElement("button");
+  button.className = "stylish-reader-button"; // 设置按钮的类名
+  button.id = "stylish-reader-button"; // 设置按钮的id
+  button.textContent = "Stylish Reader"; // 设置按钮文本
+  // 设置按钮的样式
+  button.style.backgroundColor = "#FAFAFA"; // 背景颜色
+  button.style.color = "#F80061"; // 文字颜色
+  button.style.fontWeight = "bold"; // 字体粗细
+  button.style.border = "2px solid #E0E0E0"; // 边框样式
+  button.style.padding = "10px 20px"; // 内边距
+  button.style.fontSize = "16px"; // 字体大小
+  button.style.cursor = "pointer"; // 鼠标悬停时的指针样式
+  button.style.transition = "background-color 0.3s, border-color 0.3s"; // 过渡效果
+
+  // 添加点击事件监听器
+  button.addEventListener("mousedown", function () {
+    console.log("clicked...");
+    createSponsorMask();
+    this.style.backgroundColor = "#E0E0E0"; // 点击时的背景颜色
+    this.style.borderColor = "#C0C0C0"; // 点击时的边框颜色
+  });
+
+  button.addEventListener("mouseup", function () {
+    this.style.backgroundColor = "#FAFAFA"; // 松开鼠标时恢复背景颜色
+    this.style.borderColor = "#E0E0E0"; // 松开鼠标时恢复边框颜色
+  });
+
+  button.addEventListener("mouseout", function () {
+    this.style.backgroundColor = "#FAFAFA"; // 鼠标离开时恢复背景颜色
+    this.style.borderColor = "#E0E0E0"; // 鼠标离开时恢复边框颜色
+  });
+  tedPlayer.appendChild(button);
 }
