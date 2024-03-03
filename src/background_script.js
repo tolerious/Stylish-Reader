@@ -114,8 +114,8 @@ async function extensionIconClicked() {
     let j = await t.json();
     if (t.ok && j.code === 200) {
       console.log("Login state is valid.");
-      let t = await saveArticle();
-      let j = await t.json();
+      // let t = await saveArticle();
+      // let j = await t.json();
       // Notify content script
       if (t.ok && j.code === 200) {
         // notifyContentScript({ type: "saveArticleSuccess" });

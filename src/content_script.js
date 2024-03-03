@@ -1,7 +1,7 @@
 // Put all the javascript code here, that you want to execute after page load.
 
 let supportedDomains = ["www.ted.com"];
-
+let hasTranslation = false;
 // 判断是否已经添加了stylish-reader-icon
 let hasAppendedStylishIcon = false;
 
@@ -204,6 +204,14 @@ function removeAllStylishReaderButtonOnTed() {
     element.parentNode.removeChild(element);
   });
 }
+
+function removeHightLightAddedByUs() {
+  const hightLightNodes = document.querySelectorAll(".stylish-highlight");
+  hightLightNodes.forEach((node) => {
+    node.classList.remove("bg-yellow-500", "bg-opacity-25");
+  });
+}
+
 function addVideoEventListener() {
   const video = document.querySelector("video");
   video.addEventListener("timeupdate", function (e) {
@@ -211,6 +219,26 @@ function addVideoEventListener() {
     if (input !== null) {
       // 真正的视频开始播放了
       // console.log(`现在视频播放到了: ${input.value} 秒`);
+      if (!hasTranslation) {
+        return;
+      }
+      removeHightLightAddedByUs();
+      const divElement = document.querySelector(
+        '[data-testid="paragraphs-container"]'
+      );
+      const targetElement = findChildElementByClass(
+        divElement,
+        "bg-yellow-500"
+      );
+      if (targetElement === null) {
+        return;
+      }
+      let id = targetElement.id.replace("original", "clone");
+      const div = document.getElementById(id);
+      if (div === null) {
+        return;
+      }
+      div.classList.add("bg-yellow-500", "bg-opacity-25");
     } else {
       // console.log("广告时间");
     }
@@ -249,12 +277,30 @@ function getTranslation() {
   });
 }
 
+function findChildElementByClass(element, className) {
+  if (element.classList.contains(className)) {
+    return element;
+  }
+
+  for (const childElement of element.children) {
+    const foundElement = findChildElementByClass(childElement, className);
+    if (foundElement) {
+      return foundElement;
+    }
+  }
+
+  return null;
+}
+
 async function traverseParagraphsContainerElement() {
   let translationResult = await getTranslation();
   const translation = translationResult.data.translation;
   if (translation === null) {
+    hasTranslation = false;
     alert("没有中文翻译");
     return;
+  } else {
+    hasTranslation = true;
   }
   // paragraphs 是一个数组，每个元素是一个段落
   const paragraphs = translation.paragraphs;
@@ -267,10 +313,20 @@ async function traverseParagraphsContainerElement() {
     // contentParagraph就是除去显示时间的那个节点
     let divClassWFull = node.childNodes[1];
     let divClassWFullClone = divClassWFull.cloneNode(true);
-    divClassWFullClone.id = "stylish-reader-paragraph";
+    divClassWFullClone.id = `stylish-copied-div=${index}`;
+    let originSpanClassTextTextPrimary = divClassWFull.childNodes[0];
     let spanClassTextTextPrimary = divClassWFullClone.childNodes[0];
+    // 给每个原始的div节点加上id
+    originSpanClassTextTextPrimary.childNodes.forEach(
+      (childNode, indicator) => {
+        childNode.id = `stylish-reader-highlight-original-${index}-${indicator}`;
+      }
+    );
+    // 遍历这个节点，找到具体是哪个孩子节点拥有这个类
     spanClassTextTextPrimary.childNodes.forEach((childNode, indicator) => {
       // 这里的childNode就是每一个小小的cues
+      childNode.id = `stylish-reader-highlight-clone-${index}-${indicator}`;
+      childNode.classList.add("stylish-highlight");
       childNode.childNodes[0].textContent =
         paragraphs[index].cues[indicator].text;
     });
@@ -296,7 +352,7 @@ function createStylishReaderButtonOnTed() {
   getReadTranscriptButtonAndClick();
 
   button.addEventListener("mousedown", function () {
-    // addVideoEventListener();
+    addVideoEventListener();
     traverseParagraphsContainerElement();
     this.style.backgroundColor = "#E0E0E0"; // 点击时的背景颜色
     this.style.borderColor = "#C0C0C0"; // 点击时的边框颜色
