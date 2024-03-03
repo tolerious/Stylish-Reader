@@ -7,10 +7,8 @@ let hasAppendedStylishIcon = false;
 
 // 监听来自background的消息
 browser.runtime.onMessage.addListener((message) => {
-  console.log(message);
   switch (message.type) {
     case "show":
-      console.log("enter show");
       break;
     case "saveArticleSuccess":
       if (checkStylishBarIsExist()) {
@@ -22,6 +20,7 @@ browser.runtime.onMessage.addListener((message) => {
     case "urlChanged":
       // url发生变化了以后去执行逻辑
       if (message.url) {
+        executedWhenPageLoad();
       }
       break;
     default:
@@ -175,6 +174,26 @@ function executedWhenPageLoad() {
 
 executedWhenPageLoad();
 // ----------------- TED website related -----------------
+function getReadTranscriptButtonAndClick() {
+  const divElement = document.querySelector(
+    '[data-testid="paragraphs-container"]'
+  );
+  if (divElement !== null) {
+    return;
+  }
+  // 获取所有按钮元素
+  const buttons = document.querySelectorAll("button");
+
+  // 遍历每个按钮
+  buttons.forEach(function (button) {
+    // 检查按钮文本是否为 "Read transcript"
+    if (button.textContent === "Read transcript") {
+      // 找到了匹配的按钮，可以进行你想要的操作
+      button.click();
+      // 如果只需要第一个匹配的按钮，可以在这里返回或者进行其他操作
+    }
+  });
+}
 function removeAllStylishReaderButtonOnTed() {
   // 找到所有类名为"node"的元素
   const elements = document.querySelectorAll(".stylish-reader-button");
@@ -185,19 +204,79 @@ function removeAllStylishReaderButtonOnTed() {
     element.parentNode.removeChild(element);
   });
 }
-function createSponsorMask() {
+function addVideoEventListener() {
   const video = document.querySelector("video");
   video.addEventListener("timeupdate", function (e) {
     let input = document.querySelector(".video-player-range-input");
     if (input !== null) {
       // 真正的视频开始播放了
-      console.log(`现在视频播放到了: ${input.value} 秒`);
+      // console.log(`现在视频播放到了: ${input.value} 秒`);
     } else {
-      console.log("广告时间");
+      // console.log("广告时间");
     }
   });
 }
 
+function getTranslation() {
+  let url = `https://www.ted.com/graphql`;
+  let id = window.location.href.split("/")[4].split("?")[0];
+  let body = {
+    operationName: "Transcript",
+    variables: {
+      id: id,
+      language: "zh-cn",
+    },
+    extensions: {
+      persistedQuery: {
+        version: 1,
+        sha256Hash:
+          "5f6ae435c55824ea2754c9fdba3941597255adf547f92ed8f43c3fac29c7003e",
+      },
+    },
+  };
+  const headers = new Headers();
+  headers.append("Content-Type", "application/json");
+  return new Promise((resolve) => {
+    fetch(url, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(body),
+    }).then((res) => {
+      res.json().then((r) => {
+        resolve(r);
+      });
+    });
+  });
+}
+
+async function traverseParagraphsContainerElement() {
+  let translationResult = await getTranslation();
+  const translation = translationResult.data.translation;
+  if (translation === null) {
+    alert("没有中文翻译");
+    return;
+  }
+  // paragraphs 是一个数组，每个元素是一个段落
+  const paragraphs = translation.paragraphs;
+  const divElement = document.querySelector(
+    '[data-testid="paragraphs-container"]'
+  );
+  divElement.childNodes.forEach((node, index) => {
+    // node就是一个个段落，node的第一个孩子节点是显示时间的，第二个节点是包含真正内容
+    // 我需要处理的就是这个contentParagraph，把翻译内容更新到这个节点
+    // contentParagraph就是除去显示时间的那个节点
+    let divClassWFull = node.childNodes[1];
+    let divClassWFullClone = divClassWFull.cloneNode(true);
+    divClassWFullClone.id = "stylish-reader-paragraph";
+    let spanClassTextTextPrimary = divClassWFullClone.childNodes[0];
+    spanClassTextTextPrimary.childNodes.forEach((childNode, indicator) => {
+      // 这里的childNode就是每一个小小的cues
+      childNode.childNodes[0].textContent =
+        paragraphs[index].cues[indicator].text;
+    });
+    node.appendChild(divClassWFullClone);
+  });
+}
 function createStylishReaderButtonOnTed() {
   let tedPlayer = document.getElementById("talk-title");
   let button = document.createElement("button");
@@ -213,11 +292,12 @@ function createStylishReaderButtonOnTed() {
   button.style.fontSize = "16px"; // 字体大小
   button.style.cursor = "pointer"; // 鼠标悬停时的指针样式
   button.style.transition = "background-color 0.3s, border-color 0.3s"; // 过渡效果
-
   // 添加点击事件监听器
+  getReadTranscriptButtonAndClick();
+
   button.addEventListener("mousedown", function () {
-    console.log("clicked...");
-    createSponsorMask();
+    // addVideoEventListener();
+    traverseParagraphsContainerElement();
     this.style.backgroundColor = "#E0E0E0"; // 点击时的背景颜色
     this.style.borderColor = "#C0C0C0"; // 点击时的边框颜色
   });
