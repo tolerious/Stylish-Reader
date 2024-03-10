@@ -118,7 +118,7 @@ async function extensionIconClicked() {
       // let j = await t.json();
       // Notify content script
       if (t.ok && j.code === 200) {
-        // notifyContentScript({ type: "saveArticleSuccess" });
+        notifyContentScript({ type: "saveArticleSuccess" });
       }
     } else {
       browser.tabs.create({ url: "pages/login.html" });
