@@ -29,6 +29,9 @@ function createStylishIconElement() {
     imgElement.style.boxSizing = "border-box";
     imgElement.style.backgroundColor = "#05010d";
     imgElement.style.borderRadius = "5px";
+    imgElement.addEventListener("click", () => {
+      console.log("...");
+    });
 
     return imgElement;
   } else {
@@ -36,18 +39,18 @@ function createStylishIconElement() {
   }
 }
 
-function addStylishBarButton() {
+function addStylishBarIconToToolBar() {
   if (checkStylishIconLength() === 0) {
     let tedPlayerDiv = document.querySelector("#ted-player");
     if (tedPlayerDiv !== null) {
       clearInterval(videoElementIsValidInterval);
-      let tedPlayerDivThirdChild = tedPlayerDiv.childNodes[2];
+      let tedPlayerDivThirdChild = tedPlayerDiv?.childNodes[2];
       let tedPlayerDivThirdChildSectionChild =
-        tedPlayerDivThirdChild.childNodes[0];
+        tedPlayerDivThirdChild?.childNodes[0];
 
       const node = createStylishIconElement();
       if (node) {
-        tedPlayerDivThirdChildSectionChild.appendChild(node);
+        tedPlayerDivThirdChildSectionChild?.appendChild(node);
       }
     }
   }
@@ -66,7 +69,7 @@ setInterval(() => {
 export function ted() {
   if (supportedDomains.includes(getCurrentDomain())) {
     videoElementIsValidInterval = setInterval(() => {
-      addStylishBarButton();
+      addStylishBarIconToToolBar();
     }, 300);
   }
 }

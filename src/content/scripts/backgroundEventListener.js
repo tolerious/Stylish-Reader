@@ -1,6 +1,6 @@
 // Event Listener for the content script
 
-export function eventListener() {
+export function listenEventFromBackground() {
   browser.runtime.onMessage.addListener((message) => {
     switch (message.type) {
       case "show":
