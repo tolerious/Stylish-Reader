@@ -13,7 +13,8 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content_script.js"],
+      "js": ["content_script.js", "assets/js/plyr.js"],
+      "css": ["assets/css/plyr.css"],
       "run_at": "document_end"
     }
   ],
