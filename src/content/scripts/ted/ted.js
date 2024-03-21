@@ -18,6 +18,11 @@ function getCurrentDomain() {
 
 function createStylishIconElement() {
   if (checkStylishIconLength() === 0) {
+    let divElement = document.createElement("div");
+    divElement.classList = [
+      "media-subtitles-wrapper       flex       items-center       justify-center",
+    ];
+    divElement.style.paddingLeft = "8px";
     let imgElement = document.createElement("img");
     imgElement.className = "stylish-reader-icon";
     imgElement.src = browser.runtime.getURL("assets/stylish-reader-48.png");
@@ -32,8 +37,8 @@ function createStylishIconElement() {
     imgElement.addEventListener("click", () => {
       console.log("...");
     });
-
-    return imgElement;
+    divElement.append(imgElement);
+    return divElement;
   } else {
     return null;
   }
@@ -41,16 +46,13 @@ function createStylishIconElement() {
 
 function addStylishBarIconToToolBar() {
   if (checkStylishIconLength() === 0) {
-    let tedPlayerDiv = document.querySelector("#ted-player");
-    if (tedPlayerDiv !== null) {
+    let tedMediaControlBar = document.getElementById("media-control-bar");
+    if (tedMediaControlBar !== null) {
       clearInterval(videoElementIsValidInterval);
-      let tedPlayerDivThirdChild = tedPlayerDiv?.childNodes[2];
-      let tedPlayerDivThirdChildSectionChild =
-        tedPlayerDivThirdChild?.childNodes[0];
 
       const node = createStylishIconElement();
       if (node) {
-        tedPlayerDivThirdChildSectionChild?.appendChild(node);
+        tedMediaControlBar?.appendChild(node);
       }
     }
   }
