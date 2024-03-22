@@ -3,6 +3,11 @@
 // 服务器地址
 let server_url = "http://localhost:3000";
 
+// TED 网站，当前页面URL
+let tedCurrentUrl = "";
+
+let contentScriptLoaded = false;
+
 // 获取当前标签页的ID
 function getCurrentTabId() {
   return new Promise((resolve) => {
@@ -17,6 +22,16 @@ function getCurrentTabUrl() {
   return new Promise((resolve) => {
     browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       resolve(tabs[0].url);
+    });
+  });
+}
+
+function waitUntilContentScriptLoaded() {
+  return new Promise((resolve) => {
+    browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+      if (changeInfo.status === "complete" && tab.active) {
+        resolve(true);
+      }
     });
   });
 }
@@ -135,6 +150,12 @@ browser.runtime.onMessage.addListener(async (message) => {
     let tabId = await getCurrentTabId();
     browser.tabs.remove(tabId);
   }
+  if (message.type === "contentLoaded") {
+    contentScriptLoaded = true;
+    if (tedCurrentUrl && contentScriptLoaded) {
+      notifyContentScript({ type: "intercept", url: tedCurrentUrl });
+    }
+  }
 });
 
 // 监听tab的url是否发生变化，发生变化了就通知content script
@@ -142,6 +163,34 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   // 检查URL是否改变
   if (changeInfo.url) {
     // 在这里执行你想要的操作
-    notifyContentScript({ type: "urlChanged", url: changeInfo.url });
+    // notifyContentScript({ type: "urlChanged", url: changeInfo.url });
   }
 });
+
+function detailsHandler(details) {
+  if (!details.url.includes("subtitles") && details.tabId > 0) {
+    console.log("*************************");
+    console.log("请求 URL: " + details.url);
+    console.log(details);
+    console.log("*************************");
+    tedCurrentUrl = details.url;
+    console.log(contentScriptLoaded);
+    if (contentScriptLoaded && tedCurrentUrl) {
+      notifyContentScript({ type: "intercept", url: tedCurrentUrl });
+    }
+  }
+}
+
+browser.webRequest.onBeforeRequest.addListener(
+  // 回调函数，处理请求
+  detailsHandler,
+  {
+    urls: [
+      // "https://www.ted.com/graphql",
+      "https://hls.ted.com/project_masters/*",
+    ],
+  }
+  // { urls: ["https://*.jd.com/*"] }
+  // 过滤器，指定监听的请求类型和 URL 规则
+  //   { urls: ["<all_urls>"] }
+);

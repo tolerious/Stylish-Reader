@@ -8,7 +8,10 @@ import {
   customEventInContentScript,
   sendMessageFromContentScriptToInjectedScript,
 } from "./scripts/ted/customEvent.js";
+import { sendMessage } from "./scripts/utils/sendMessageToBackground.js";
 
+// 告诉background，我已经load了
+sendMessage("contentLoaded", "content script loaded");
 // 注册自定义事件
 customEventInContentScript();
 injectCSS();
