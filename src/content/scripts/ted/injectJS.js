@@ -4,11 +4,11 @@ function injectInternalScript(code) {
   script.textContent = code;
   document.body.appendChild(script);
   //  FIXME: Remove test code
-  injecOtherScript();
+  injectOtherScript();
 }
 
 //  FIXME: Remove test code
-function injecOtherScript() {
+function injectOtherScript() {
   const code = `
   // 监听来自内容脚本的消息
 document.addEventListener('fromContentScript', (event) => {
