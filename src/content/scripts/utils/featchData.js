@@ -7,7 +7,6 @@ export function fetchData(url) {
     headers: {
       "Content-Type": "text/vtt; charset=utf-8", // 根据你的需求设置请求头
     },
-    //   body: JSON.stringify({ key: "value" }), // 设置请求的 payload
   };
   fetch(url, requestOptions)
     .then((response) => {
