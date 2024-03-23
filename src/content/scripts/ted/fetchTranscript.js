@@ -6,7 +6,7 @@ const supportedLanguages = new Map([
   ["zh-tw", "繁體中文"],
 ]);
 export function fetchTranscript(url) {
-  console.log(url);
+  // console.log(url);
   const requestOptions = {
     method: "GET",
     headers: {

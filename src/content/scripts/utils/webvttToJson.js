@@ -24,6 +24,7 @@ export function parseWebVTT(vttString) {
         startTime: startTime,
         endTime: endTime,
         text: text,
+        id: i,
       });
     }
   }
