@@ -1,14 +1,33 @@
+import { createVideoPagePopup } from "./videoPage";
+
 // 在页面中注入JavaScript
 function injectInternalScript(code) {
   const script = document.createElement("script");
   script.textContent = code;
   document.body.appendChild(script);
   //  FIXME: Remove test code
-  injecOtherScript();
+  injectOtherScript();
 }
 
+function injectInternalModuleScript(code) {
+  const script = document.createElement("script");
+  script.type = "module";
+  script.textContent = code;
+  document.body.appendChild(script);
+}
+
+export function injectVideoVueScript() {
+  console.log("inject vue script...");
+  createVideoPagePopup();
+  fetch(browser.runtime.getURL("assets/js/stylish-reader-video-page.js"))
+    .then((response) => response.text())
+    .then((js) => injectInternalModuleScript(js))
+    .catch((error) =>
+      console.error("Error injecting video vue script:", error)
+    );
+}
 //  FIXME: Remove test code
-function injecOtherScript() {
+function injectOtherScript() {
   const code = `
   // 监听来自内容脚本的消息
 document.addEventListener('fromContentScript', (event) => {
@@ -62,8 +81,10 @@ function sendMessageToContentScript(message) {
 
 export function injectScript() {
   console.log("inject script...");
-  fetch(chrome.runtime.getURL("assets/js/plyr.js"))
+  fetch(browser.runtime.getURL("assets/js/plyr.js"))
     .then((response) => response.text())
-    .then((js) => injectInternalScript(js))
+    .then((js) => {
+      injectInternalScript(js);
+    })
     .catch((error) => console.error("Error injecting script:", error));
 }

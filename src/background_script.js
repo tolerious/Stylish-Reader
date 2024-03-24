@@ -168,7 +168,11 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 });
 
 function detailsHandler(details) {
-  if (!details.url.includes("subtitles") && details.tabId > 0) {
+  if (
+    !details.url.includes("subtitles") &&
+    details.tabId > 0 &&
+    !details.url.includes("m3u8")
+  ) {
     console.log("*************************");
     console.log("请求 URL: " + details.url);
     console.log(details);

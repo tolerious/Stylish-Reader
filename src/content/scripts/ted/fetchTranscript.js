@@ -6,8 +6,7 @@ const supportedLanguages = new Map([
   ["zh-tw", "繁體中文"],
 ]);
 export function fetchTranscript(url) {
-  // if (url.includes("metadata")) {
-  console.log(url);
+  // console.log(url);
   const requestOptions = {
     method: "GET",
     headers: {
@@ -29,11 +28,13 @@ export function fetchTranscript(url) {
       const subtitles = data.subtitles.filter(
         (item) => item.code == "en" || item.code == "zh-cn"
       );
-      // console.log(subtitles);
+      console.log(subtitles);
+      subtitles.forEach((subtitle) => {
+        fetchData(subtitle.webvtt);
+      });
     })
     .catch((error) => {
       // 在这里处理请求失败的情况
       console.error("There was a problem with the fetch operation:", error);
     });
-  // }
 }
