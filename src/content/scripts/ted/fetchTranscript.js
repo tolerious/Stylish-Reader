@@ -1,10 +1,7 @@
-import { fetchTextData } from "../utils/featchData";
+import { fetchTextData } from "../utils/fetchData";
 
-const supportedLanguages = new Map([
-  ["en", "English"],
-  ["zh-cn", "简体中文"],
-  ["zh-tw", "繁體中文"],
-]);
+export let supportedLanguages = [];
+
 export function fetchTranscript(url) {
   // console.log(url);
   const requestOptions = {
@@ -28,6 +25,14 @@ export function fetchTranscript(url) {
       const subtitles = data.subtitles.filter(
         (item) => item.code == "en" || item.code == "zh-cn"
       );
+      // 通知Vue页面支持哪些语言
+      supportedLanguages = data.subtitles
+        .filter((item) => item.code == "en" || item.code == "zh-cn")
+        .reduce((acc, item) => {
+          acc.push({ code: item.code });
+          return acc;
+        }, []);
+      console.log(supportedLanguages);
       console.log(subtitles);
       subtitles.forEach((subtitle) => {
         fetchTextData(subtitle.webvtt);
