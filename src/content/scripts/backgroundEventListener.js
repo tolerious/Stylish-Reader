@@ -3,6 +3,8 @@
 import { fetchTranscript } from "./ted/fetchTranscript";
 import { ted } from "./ted/ted";
 
+export let backgroundScriptNotifiedUrl = "";
+
 export function listenEventFromBackground() {
   browser.runtime.onMessage.addListener((message) => {
     switch (message.type) {
@@ -15,7 +17,9 @@ export function listenEventFromBackground() {
         ted();
         break;
       case "intercept":
-        fetchTranscript(message.url);
+        // fetchTranscript(message.url);
+        console.log(`Intercepted: ${message.url}`);
+        backgroundScriptNotifiedUrl = message.url;
         break;
       default:
         break;
