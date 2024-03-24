@@ -25,7 +25,6 @@ export function fetchTranscript(url) {
       const subtitles = data.subtitles.filter(
         (item) => item.code == "en" || item.code == "zh-cn"
       );
-      // 通知Vue页面支持哪些语言
       supportedLanguages = data.subtitles
         .filter((item) => item.code == "en" || item.code == "zh-cn")
         .reduce((acc, item) => {
@@ -35,7 +34,7 @@ export function fetchTranscript(url) {
       console.log(supportedLanguages);
       console.log(subtitles);
       subtitles.forEach((subtitle) => {
-        fetchTextData(subtitle.webvtt);
+        fetchTextData(subtitle.webvtt, subtitle.code);
       });
     })
     .catch((error) => {

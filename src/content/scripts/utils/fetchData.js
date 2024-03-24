@@ -1,6 +1,7 @@
+import { sendMessageFromContentScriptToInjectedScript } from "../ted/customEvent";
 import { parseWebVTT } from "./webvttToJson";
 
-export function fetchTextData(url) {
+export function fetchTextData(url, code) {
   // console.log(url);
   const requestOptions = {
     method: "GET",
@@ -18,7 +19,7 @@ export function fetchTextData(url) {
       return response.text();
     })
     .then((data) => {
-      // console.log(parseWebVTT(data));
+      console.log(parseWebVTT(data));
     })
     .catch((error) => {
       // 在这里处理请求失败的情况
