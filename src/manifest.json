@@ -3,7 +3,7 @@
   "name": "Stylish Reader",
   "description": "Help you learn English better and easier.",
   "developer": { "name": "Toly Feng", "url": "https://stylishreader.com" },
-  "version": "0.0.1",
+  "version": "0.0.7",
   "icons": {
     "48": "icons/stylish-reader-48.png"
   },
@@ -12,11 +12,25 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*.mozilla.org/*"],
-      "js": ["content_script.js"]
+      "matches": ["<all_urls>"],
+      "js": ["content_script.js", "assets/js/plyr.js"],
+      "css": ["assets/css/plyr.css"],
+      "run_at": "document_end"
     }
   ],
-  "permissions": ["activeTab", "tabs"],
+  "web_accessible_resources": [
+    "assets/stylish-reader-48.png",
+    "assets/right-arrow.png",
+    "assets/cancel-button.png"
+  ],
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "storage",
+    "webRequest",
+    "webRequestBlocking",
+    "<all_urls>"
+  ],
   "browser_action": {
     "default_icon": {
       "48": "icons/stylish-reader-48.png",

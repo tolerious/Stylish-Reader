@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="jquery-3.7.1.min.js"></script>
+    <title>Stylish Reader Login</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="login-form">
+        <h1>Stylish Reader</h1>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          placeholder="Username"
+          required
+        />
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Password"
+          required
+        />
+        <button type="submit">Login</button>
+        <button type="register">Register</button>
+        <p id="error-message" class="error-message">
+          Username and password do not match
+        </p>
+        <p id="register-success" class="error-message">
+          Register Success, enjoy!
+        </p>
+        <!-- <p class="forgot-password">Forgot your password?</p> -->
+        <p class="register-link">
+          Don't have an account? <a id="register-a" href="#">Register here</a>
+        </p>
+        <p><a href="https://stylishreader.com">Contact Author</a></p>
+      </div>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>

@@ -1,0 +1,17 @@
+@startuml business flow
+title Business Flow Diagram
+start
+:install extension;
+:click extension;
+if(registered?) then (yes)
+    :type username and password;
+    :click login;
+else (no)
+    :show popup page;
+    :click register;
+    :redirect to office website;
+    :register account;
+endif
+:start to use;
+stop
+@enduml
