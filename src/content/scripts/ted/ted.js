@@ -1,5 +1,11 @@
 // TED 网站上的操作
 
+import { pauseTedOfficialWebsiteVideo } from "../utils/controlTedOfficialWebsite";
+import { injectVideoVueScript } from "./injectJS";
+import { showVideoPagePopup } from "./videoPage";
+
+let hasCreatedVuePage = false;
+
 const supportedDomains = ["www.ted.com"];
 
 let videoElementIsValidInterval = null;
@@ -35,7 +41,14 @@ function createStylishIconElement() {
     imgElement.style.backgroundColor = "#05010d";
     imgElement.style.borderRadius = "5px";
     imgElement.addEventListener("click", () => {
-      console.log("...");
+      if (!hasCreatedVuePage) {
+        injectVideoVueScript();
+        hasCreatedVuePage = true;
+      }
+      if (hasCreatedVuePage) {
+        showVideoPagePopup();
+      }
+      pauseTedOfficialWebsiteVideo();
     });
     divElement.append(imgElement);
     return divElement;

@@ -2,7 +2,7 @@
 
 import { listenEventFromBackground } from "./scripts/backgroundEventListener.js";
 import { customEventInContentScript } from "./scripts/ted/customEvent.js";
-import { injectCSS } from "./scripts/ted/injectCSS.js";
+import { injectCss } from "./scripts/ted/injectCSS.js";
 import { injectScript } from "./scripts/ted/injectJS.js";
 import { ted } from "./scripts/ted/ted.js";
 import { sendMessage } from "./scripts/utils/sendMessageToBackground.js";
@@ -11,7 +11,8 @@ import { sendMessage } from "./scripts/utils/sendMessageToBackground.js";
 sendMessage("contentLoaded", "content script loaded");
 // 注册自定义事件
 customEventInContentScript();
-injectCSS();
+// 注入自定义css和js
+injectCss();
 injectScript();
 
 // 监听来自background的消息

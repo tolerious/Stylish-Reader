@@ -1,6 +1,14 @@
+import { hideVideoPagePopup } from "./videoPage";
+
 export function customEventInContentScript() {
   document.addEventListener("fromInjectScript", (event) => {
-    console.log("Received message from injected script:", event.detail);
+    switch (event.detail.type) {
+      case "close-popup":
+        hideVideoPagePopup();
+        break;
+      default:
+        break;
+    }
   });
 }
 
