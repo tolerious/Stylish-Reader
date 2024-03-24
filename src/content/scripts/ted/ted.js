@@ -1,6 +1,10 @@
 // TED 网站上的操作
 
 import { pauseTedOfficialWebsiteVideo } from "../utils/controlTedOfficialWebsite";
+import { fetchSharedLink } from "../utils/fetchData";
+import { getTitleFromTedUrl } from "../utils/parseUrl";
+import { sendMessageFromContentScriptToInjectedScript } from "./customEvent";
+import { supportedLanguages } from "./fetchTranscript";
 import { injectVideoVueScript } from "./injectJS";
 import { showVideoPagePopup } from "./videoPage";
 
@@ -20,6 +24,21 @@ function getCurrentDomain() {
   }
   domain = domain.split(":")[0];
   return domain;
+}
+
+async function sendDataToVuePage() {
+  const title = getTitleFromTedUrl();
+  const data = await fetchSharedLink(title);
+  const highUrl = data.data.videos.nodes[0].nativeDownloads.high;
+  console.log(data.data.videos.nodes[0].nativeDownloads.high);
+  sendMessageFromContentScriptToInjectedScript({
+    type: "update-video-source",
+    videoUrl: highUrl,
+  });
+  sendMessageFromContentScriptToInjectedScript({
+    type: "languages",
+    supportedLanguages,
+  });
 }
 
 function createStylishIconElement() {
@@ -48,7 +67,13 @@ function createStylishIconElement() {
       if (hasCreatedVuePage) {
         showVideoPagePopup();
       }
+      // 暂停原网站上的视频
       pauseTedOfficialWebsiteVideo();
+      // 给Vue页面发送原始视频的链接
+      setTimeout(() => {
+        console.log("send data...");
+        sendDataToVuePage();
+      }, 2000);
     });
     divElement.append(imgElement);
     return divElement;

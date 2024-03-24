@@ -6,7 +6,7 @@ function injectInternalScript(code) {
   script.textContent = code;
   document.body.appendChild(script);
   //  FIXME: Remove test code
-  injectOtherScript();
+  // injectOtherScript();
 }
 
 function injectInternalModuleScript(code) {
@@ -30,9 +30,9 @@ export function injectVideoVueScript() {
 function injectOtherScript() {
   const code = `
   // 监听来自内容脚本的消息
-document.addEventListener('fromContentScript', (event) => {
-  console.log('Received message from content script:', event.detail);
-});
+// document.addEventListener('fromContentScript', (event) => {
+//   console.log('Received message from content script:', event.detail);
+// });
 
 // 发送消息到内容脚本
 function sendMessageToContentScript(message) {

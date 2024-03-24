@@ -2,7 +2,8 @@ import { hideVideoPagePopup } from "./videoPage";
 
 export function customEventInContentScript() {
   document.addEventListener("fromInjectScript", (event) => {
-    switch (event.detail.type) {
+    const detail = JSON.parse(event.detail);
+    switch (detail.type) {
       case "close-popup":
         hideVideoPagePopup();
         break;
@@ -13,6 +14,8 @@ export function customEventInContentScript() {
 }
 
 export function sendMessageFromContentScriptToInjectedScript(message) {
-  const event = new CustomEvent("fromContentScript", { detail: message });
+  const event = new CustomEvent("fromContentScript", {
+    detail: JSON.stringify(message),
+  });
   document.dispatchEvent(event);
 }
