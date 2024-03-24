@@ -1,6 +1,6 @@
 import { parseWebVTT } from "./webvttToJson";
 
-export function fetchData(url) {
+export function fetchTextData(url) {
   // console.log(url);
   const requestOptions = {
     method: "GET",

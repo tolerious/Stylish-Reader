@@ -1,4 +1,4 @@
-import { fetchData } from "../utils/featchData";
+import { fetchTextData } from "../utils/featchData";
 
 const supportedLanguages = new Map([
   ["en", "English"],
@@ -30,7 +30,7 @@ export function fetchTranscript(url) {
       );
       console.log(subtitles);
       subtitles.forEach((subtitle) => {
-        fetchData(subtitle.webvtt);
+        fetchTextData(subtitle.webvtt);
       });
     })
     .catch((error) => {
