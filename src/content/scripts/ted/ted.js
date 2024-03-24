@@ -1,10 +1,11 @@
 // TED 网站上的操作
 
+import { backgroundScriptNotifiedUrl } from "../backgroundEventListener";
 import { pauseTedOfficialWebsiteVideo } from "../utils/controlTedOfficialWebsite";
-import { fetchSharedLink } from "../utils/fetchData";
+import { fetchSharedLink, fetchTextData } from "../utils/fetchData";
 import { getTitleFromTedUrl } from "../utils/parseUrl";
 import { sendMessageFromContentScriptToInjectedScript } from "./customEvent";
-import { supportedLanguages } from "./fetchTranscript";
+import { fetchTranscript, supportedLanguages } from "./fetchTranscript";
 import { injectVideoVueScript } from "./injectJS";
 import { showVideoPagePopup } from "./videoPage";
 
@@ -29,11 +30,24 @@ function getCurrentDomain() {
 async function sendDataToVuePage() {
   const title = getTitleFromTedUrl();
   const data = await fetchSharedLink(title);
+  /**
+   * TODO:这里存在一种情况就是，网站的视频不支持下载，所以 nativeDownloads 为空，需要特殊处理下
+   * 测试url为: https://www.ted.com/talks/venus_keus_three_ways_the_universe_could_end
+   *  */
   const highUrl = data.data.videos.nodes[0].nativeDownloads.high;
-  console.log(data.data.videos.nodes[0].nativeDownloads.high);
   sendMessageFromContentScriptToInjectedScript({
     type: "update-video-source",
     videoUrl: highUrl,
+  });
+
+  const subtitles = await fetchTranscript(backgroundScriptNotifiedUrl);
+
+  subtitles.forEach(async (subtitle) => {
+    let o = await fetchTextData(subtitle.webvtt, subtitle.code);
+    sendMessageFromContentScriptToInjectedScript({
+      type: "webvtt",
+      data: o,
+    });
   });
   sendMessageFromContentScriptToInjectedScript({
     type: "languages",
@@ -70,10 +84,10 @@ function createStylishIconElement() {
       // 暂停原网站上的视频
       pauseTedOfficialWebsiteVideo();
       // 给Vue页面发送原始视频的链接
-      setTimeout(() => {
-        console.log("send data...");
-        sendDataToVuePage();
-      }, 2000);
+      // setTimeout(() => {
+      console.log("send data...");
+      sendDataToVuePage();
+      // }, 2000);
     });
     divElement.append(imgElement);
     return divElement;
