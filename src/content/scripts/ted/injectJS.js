@@ -17,7 +17,7 @@ function injectInternalModuleScript(code) {
 }
 
 export function injectVideoVueScript() {
-  console.log("inject vue script...");
+  // console.log("inject vue script...");
   createVideoPagePopup();
   fetch(browser.runtime.getURL("assets/js/stylish-reader-video-page.js"))
     .then((response) => response.text())
@@ -80,7 +80,7 @@ function sendMessageToContentScript(message) {
 // 从文件中读取JavaScript并注入到页面中
 
 export function injectScript() {
-  console.log("inject script...");
+  // console.log("inject script...");
   fetch(browser.runtime.getURL("assets/js/plyr.js"))
     .then((response) => response.text())
     .then((js) => {

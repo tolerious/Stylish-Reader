@@ -18,7 +18,7 @@ export function listenEventFromBackground() {
         break;
       case "intercept":
         // fetchTranscript(message.url);
-        console.log(`Intercepted: ${message.url}`);
+        // console.log(`Intercepted: ${message.url}`);
         backgroundScriptNotifiedUrl = message.url;
         break;
       default:

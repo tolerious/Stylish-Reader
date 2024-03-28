@@ -34,7 +34,7 @@ async function sendDataToVuePage() {
    * TODO:这里存在一种情况就是，网站的视频不支持下载，所以 nativeDownloads 为空，需要特殊处理下
    * 测试url为: https://www.ted.com/talks/venus_keus_three_ways_the_universe_could_end
    *  */
-  console.log(data);
+  // console.log(data);
   let highUrl = data.data.videos.nodes[0].nativeDownloads.high;
   if (!highUrl) {
     highUrl = data.data.videos.nodes[0].nativeDownloads.medium;
@@ -110,7 +110,7 @@ function createStylishIconElement() {
     pauseTedOfficialWebsiteVideo();
     // 给Vue页面发送原始视频的链接
     // setTimeout(() => {
-    console.log("send data...");
+    // console.log("send data...");
     sendDataToVuePage();
     // }, 2000);
   });
