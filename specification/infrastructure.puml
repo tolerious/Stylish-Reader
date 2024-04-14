@@ -23,7 +23,7 @@ package plugins as plugins {
     portout "build content script" as bcs
     port "build background script" as bbs
     component "vite.config.js" as pluginsvite
-    package common as pluginscommon {
+    package EntryPoint as pluginscommon {
         component "constants.js" as pluginscommonconstants
         note right
             存放background.js和content.js共用的常量
