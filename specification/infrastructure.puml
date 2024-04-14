@@ -1,0 +1,81 @@
+@startuml Infrastructure
+title Infrastructure
+
+
+package "Firefox Extension" as fe {
+    component "manifest.json" as manifest
+    component "content_script.js" as fecontentscriptjs
+    component "background.js" as febackgroundjs
+}
+
+package "utils" as commonUtils {
+    component "auth" as auth
+    package "request" as commonutilsrequest {
+        component "fetch" as commonutilsrequestfetch
+    }
+    component "storage" as commonutilsstorage
+    component "customDomEvent" as cde
+}
+
+
+
+package plugins as plugins {
+    portout "build content script" as bcs
+    port "build background script" as bbs
+    component "vite.config.js" as pluginsvite
+    package common as pluginscommon {
+        component "constants.js" as pluginscommonconstants
+        note right
+            存放background.js和content.js共用的常量
+        end note
+        component "background.js" as pluginscommonbackgroundjs
+        note right
+            background.js的入口文件
+        end note
+        component "content.js" as pluginscommoncontentjs
+        note right
+            content.js的入口文件
+        end note
+    }
+    package Ted as ted {
+        package content as tedcontent {
+            component "content.js" as tedcontentjs
+        }
+
+        package background as tedbackground {
+            component "background.js" as tedbackgroundjs
+        }
+
+        package injection as tedinjection {
+            component "inject.js" as tedinjectionjs
+        }
+
+        package utils as tedutils {
+            component "utils.js" as tedutilsjs
+        }
+
+    }
+
+    pluginscommoncontentjs ..> pluginscommonconstants#GoldenRod : use
+    pluginscommonbackgroundjs ..> pluginscommonconstants#GoldenRod : use
+
+    pluginsvite ..> pluginscommoncontentjs : use
+    pluginsvite ..> pluginscommonbackgroundjs : use
+
+    pluginscommoncontentjs --> tedcontentjs#red : import
+
+    pluginscommonbackgroundjs --> tedbackgroundjs#blue : import
+
+    pluginsvite --> bcs#YellowGreen
+    pluginsvite --> bbs#YellowGreen
+    bcs-->fecontentscriptjs : generate
+    bbs-->febackgroundjs : generate
+
+    tedbackgroundjs--> tedutilsjs : import
+    tedcontentjs-->tedutilsjs : import
+    tedcontentjs-->tedinjectionjs : import
+
+    tedutilsjs ..> commonutilsrequest : use
+
+}
+@enduml
