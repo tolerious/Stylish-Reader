@@ -1,4 +1,38 @@
-import { createVideoPagePopup } from "./videoPage";
+import {
+  checkIfVideoPopupExist,
+  createVideoPagePopup,
+  showVideoPagePopup,
+} from "./utils";
+
+export function injectVideoVueScript() {
+  // console.log("inject vue script...");
+  if (checkIfVideoPopupExist()) {
+    showVideoPagePopup();
+    console.log('exist...')
+    return;
+  }
+  console.log('not exist...')
+  createVideoPagePopup();
+  // 此js就是Vue项目build好的js文件
+  fetch(browser.runtime.getURL("assets/js/stylish-reader-video-page.js"))
+    .then((response) => response.text())
+    .then((js) => injectInternalModuleScript(js))
+    .catch((error) =>
+      console.error("Error injecting video vue script:", error)
+    );
+}
+
+// 从文件中读取JavaScript并注入到页面中
+
+export function injectScript() {
+  // console.log("inject script...");
+  fetch(browser.runtime.getURL("assets/js/plyr.js"))
+    .then((response) => response.text())
+    .then((js) => {
+      injectInternalScript(js);
+    })
+    .catch((error) => console.error("Error injecting script:", error));
+}
 
 // 在页面中注入JavaScript
 function injectInternalScript(code) {
@@ -16,16 +50,6 @@ function injectInternalModuleScript(code) {
   document.body.appendChild(script);
 }
 
-export function injectVideoVueScript() {
-  // console.log("inject vue script...");
-  createVideoPagePopup();
-  fetch(browser.runtime.getURL("assets/js/stylish-reader-video-page.js"))
-    .then((response) => response.text())
-    .then((js) => injectInternalModuleScript(js))
-    .catch((error) =>
-      console.error("Error injecting video vue script:", error)
-    );
-}
 //  FIXME: Remove test code
 function injectOtherScript() {
   const code = `
@@ -75,16 +99,4 @@ function sendMessageToContentScript(message) {
   const script = document.createElement("script");
   script.textContent = code;
   document.body.appendChild(script);
-}
-
-// 从文件中读取JavaScript并注入到页面中
-
-export function injectScript() {
-  // console.log("inject script...");
-  fetch(browser.runtime.getURL("assets/js/plyr.js"))
-    .then((response) => response.text())
-    .then((js) => {
-      injectInternalScript(js);
-    })
-    .catch((error) => console.error("Error injecting script:", error));
 }

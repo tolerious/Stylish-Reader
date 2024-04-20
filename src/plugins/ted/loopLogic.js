@@ -5,6 +5,7 @@
 
 import { createStylishIconElement } from "../utils/utils";
 import { tedMediaControlBarStylishReaderIconId } from "./constants";
+import { injectVideoVueScript } from "./injectJS";
 import {
   findMediaControlBar,
   isStylishReaderMediaControlBarIconExist,
@@ -20,6 +21,12 @@ export function createTedStylishReaderVideoToolbarIcon() {
       const iconElement = createStylishIconElement(
         tedMediaControlBarStylishReaderIconId
       );
+      //   添加点击事件处理函数
+      iconElement.addEventListener("click", function () {
+        console.log("clicked...");
+        injectVideoVueScript();
+      });
+      //   添加到工具栏上
       mediaControlBar.appendChild(iconElement);
     }
   }, 300);
