@@ -9,6 +9,7 @@ import { injectVideoVueScript } from "./injectJS";
 import {
   findMediaControlBar,
   isStylishReaderMediaControlBarIconExist,
+  pauseTedOfficialWebsiteVideo,
 } from "./utils";
 
 export function createTedStylishReaderVideoToolbarIcon() {
@@ -24,6 +25,7 @@ export function createTedStylishReaderVideoToolbarIcon() {
       //   添加点击事件处理函数
       iconElement.addEventListener("click", function () {
         console.log("clicked...");
+        pauseTedOfficialWebsiteVideo();
         injectVideoVueScript();
       });
       //   添加到工具栏上

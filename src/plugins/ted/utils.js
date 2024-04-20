@@ -43,3 +43,10 @@ export function showVideoPagePopup() {
 export function hideVideoPagePopup() {
   document.getElementById(popupVideoVuePageMountPointId).style.display = "none";
 }
+
+export function pauseTedOfficialWebsiteVideo() {
+  const video = document.querySelector("video");
+  if (video) {
+    video.pause();
+  }
+}
