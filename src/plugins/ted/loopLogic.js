@@ -3,7 +3,10 @@
  * 如果不存在就在工具栏上创建一个，但是必须保证的是当前页面只有一个这样的元素。
  */
 
-import { createStylishIconElement } from "../utils/utils";
+import {
+  createStylishIconElement,
+  getPreparedDataForVuePage,
+} from "../utils/utils";
 import { tedMediaControlBarStylishReaderIconId } from "./constants";
 import { injectVideoVueScript } from "./injectJS";
 import {
@@ -23,8 +26,13 @@ export function createTedStylishReaderVideoToolbarIcon() {
         tedMediaControlBarStylishReaderIconId
       );
       //   添加点击事件处理函数
-      iconElement.addEventListener("click", function () {
+      iconElement.addEventListener("click", async function () {
         console.log("clicked...");
+        const preparedData = await getPreparedDataForVuePage();
+        if (!preparedData.sharedLink) {
+          alert("Video link is not available, please try again later.");
+          return;
+        }
         pauseTedOfficialWebsiteVideo();
         injectVideoVueScript();
       });

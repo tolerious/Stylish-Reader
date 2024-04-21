@@ -8,10 +8,10 @@ export function injectVideoVueScript() {
   // console.log("inject vue script...");
   if (checkIfVideoPopupExist()) {
     showVideoPagePopup();
-    console.log('exist...')
+    console.log('vue page exist...')
     return;
   }
-  console.log('not exist...')
+  console.log('vue not exist...')
   createVideoPagePopup();
   // 此js就是Vue项目build好的js文件
   fetch(browser.runtime.getURL("assets/js/stylish-reader-video-page.js"))

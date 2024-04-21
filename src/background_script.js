@@ -178,6 +178,7 @@ function detailsHandler(details) {
     console.log(details);
     console.log("*************************");
     tedCurrentUrl = details.url;
+    browser.storage.local.set({ "ted-transcript-url": tedCurrentUrl });
     console.log(contentScriptLoaded);
     if (contentScriptLoaded && tedCurrentUrl) {
       notifyContentScript({ type: "intercept", url: tedCurrentUrl });
