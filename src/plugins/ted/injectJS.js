@@ -5,27 +5,30 @@ import {
 } from "./utils";
 
 export function injectVideoVueScript() {
-  // console.log("inject vue script...");
-  if (checkIfVideoPopupExist()) {
-    showVideoPagePopup();
-    console.log('vue page exist...')
-    return;
-  }
-  console.log('vue not exist...')
-  createVideoPagePopup();
-  // 此js就是Vue项目build好的js文件
-  fetch(browser.runtime.getURL("assets/js/stylish-reader-video-page.js"))
-    .then((response) => response.text())
-    .then((js) => injectInternalModuleScript(js))
-    .catch((error) =>
-      console.error("Error injecting video vue script:", error)
-    );
+  return new Promise((resolve) => {
+    if (checkIfVideoPopupExist()) {
+      showVideoPagePopup();
+      resolve(true);
+      return;
+    }
+    createVideoPagePopup();
+    // 此js就是Vue项目build好的js文件
+    fetch(browser.runtime.getURL("assets/js/stylish-reader-video-page.js"))
+      .then((response) => response.text())
+      .then((js) => {
+        injectInternalModuleScript(js);
+        resolve(true);
+      })
+      .catch((error) => {
+        console.error("Error injecting video vue script:", error);
+        resolve(false);
+      });
+  });
 }
 
 // 从文件中读取JavaScript并注入到页面中
 
 export function injectScript() {
-  // console.log("inject script...");
   fetch(browser.runtime.getURL("assets/js/plyr.js"))
     .then((response) => response.text())
     .then((js) => {

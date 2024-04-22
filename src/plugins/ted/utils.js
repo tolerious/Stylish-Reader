@@ -9,7 +9,7 @@ export function findMediaControlBar() {
   return new Promise((resolve) => {
     const elements = document.querySelectorAll("#media-control-bar");
     elements.forEach((element) => {
-      if (!element.classList.contains("lg-tui:hidden")) {
+      if (!element.hasAttribute("slot")) {
         resolve(element);
       }
     });

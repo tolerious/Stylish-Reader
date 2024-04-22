@@ -8,6 +8,7 @@ import {
   getPreparedDataForVuePage,
 } from "../utils/utils";
 import { tedMediaControlBarStylishReaderIconId } from "./constants";
+import { sendMessageFromContentScriptToVuePage } from "./eventListener";
 import { injectVideoVueScript } from "./injectJS";
 import {
   findMediaControlBar,
@@ -28,13 +29,23 @@ export function createTedStylishReaderVideoToolbarIcon() {
       //   添加点击事件处理函数
       iconElement.addEventListener("click", async function () {
         console.log("clicked...");
+
         const preparedData = await getPreparedDataForVuePage();
         if (!preparedData.sharedLink) {
           alert("Video link is not available, please try again later.");
           return;
         }
+
         pauseTedOfficialWebsiteVideo();
-        injectVideoVueScript();
+        const r = await injectVideoVueScript();
+        if (r) {
+          setTimeout(() => {
+            sendMessageFromContentScriptToVuePage({
+              type: "prepare",
+              data: preparedData,
+            });
+          }, 1000);
+        }
       });
       //   添加到工具栏上
       mediaControlBar.appendChild(iconElement);
