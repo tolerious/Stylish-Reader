@@ -3,7 +3,6 @@ import { fetchTextData } from "../utils/fetchData";
 export let supportedLanguages = [];
 
 export function fetchTranscript(url) {
-  // console.log(url);
   const requestOptions = {
     method: "GET",
     headers: {
