@@ -79,12 +79,6 @@ export function fetchTranscript(url) {
         const subtitles = data.subtitles.filter(
           (item) => item.code == "en" || item.code == "zh-cn"
         );
-        supportedLanguages = data.subtitles
-          .filter((item) => item.code == "en" || item.code == "zh-cn")
-          .reduce((acc, item) => {
-            acc.push({ code: item.code });
-            return acc;
-          }, []);
         resolve(subtitles);
       })
       .catch((error) => {
