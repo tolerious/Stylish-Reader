@@ -1,5 +1,6 @@
 // Ted 插件的工具函数
 
+import { logger } from "../utils/utils";
 import {
   popupVideoVuePageMountPointId,
   tedMediaControlBarStylishReaderIconId,
@@ -17,7 +18,7 @@ export function findMediaControlBar() {
 }
 
 export function isStylishReaderMediaControlBarIconExist() {
-  return document.getElementById(tedMediaControlBarStylishReaderIconId);
+  return !!document.getElementById(tedMediaControlBarStylishReaderIconId);
 }
 
 export function checkIfVideoPopupExist() {

@@ -19,6 +19,7 @@ import {
 export function createTedStylishReaderVideoToolbarIcon() {
   // 由于用户可能使用了一些第三方插件影响了页面结构，所以这里无限循环来确保
   // 创建元素成功
+
   setInterval(async () => {
     // 找到真正的 media control bar
     const mediaControlBar = await findMediaControlBar();

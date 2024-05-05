@@ -5,3 +5,6 @@ export const tedMediaControlBarStylishReaderIconId =
   "ted-video-tool-bar-stylish-reader-icon";
 
 export const popupVideoVuePageMountPointId = "stylish-reader-video-page-root";
+
+export const developmentEnvironment = "development";
+// export const developmentEnvironment = "production";

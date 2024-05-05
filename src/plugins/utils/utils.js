@@ -1,5 +1,6 @@
 // 此处存放工具函数供所有plugin使用
 
+import { developmentEnvironment } from "../ted/constants";
 import { fetchTranscript, sendMessageToBackground } from "../ted/utils";
 
 // 创建一个Stylish Reader图标元素,不包括事件监听器,事件监听器在各个plugin中自行添加
@@ -104,7 +105,12 @@ export function fetchSharedLink(title, language = "en") {
 }
 
 export function logger(message) {
-  console.log(`%c${message}`)
+  if (developmentEnvironment === "development") {
+    console.log(
+      `%c${message}`,
+      "color:white;background-color:black;font-size:16px"
+    );
+  }
 }
 
 function getTranscriptUrlFromStorage() {
