@@ -6,14 +6,15 @@
 import {
   createStylishIconElement,
   getPreparedDataForVuePage,
+  logger,
 } from "../utils/utils";
 import { tedMediaControlBarStylishReaderIconId } from "./constants";
 import { sendMessageFromContentScriptToVuePage } from "./eventListener";
-import { injectVideoVueScript } from "./injectJS";
 import {
   findMediaControlBar,
   isStylishReaderMediaControlBarIconExist,
   pauseTedOfficialWebsiteVideo,
+  showVideoPagePopup,
 } from "./utils";
 
 export function createTedStylishReaderVideoToolbarIcon() {
@@ -27,13 +28,14 @@ export function createTedStylishReaderVideoToolbarIcon() {
       const iconElement = createStylishIconElement(
         tedMediaControlBarStylishReaderIconId
       );
+      //  #region 添加点击事件处理函数
       //   添加点击事件处理函数
       iconElement.addEventListener("click", async function () {
-        console.log(
-          "%cShow Stylish Reader Video Page.",
-          "background-color: #05010d; color: #f8f8f2; padding: 4px; border-radius: 4px;"
-        );
-
+        logger("Show Stylish Reader Video Page.");
+        sendMessageFromContentScriptToVuePage({
+          type: "cleanup",
+          data: "",
+        });
         const preparedData = await getPreparedDataForVuePage();
         if (!preparedData.sharedLink) {
           alert("Video link is not available, please try another video.");
@@ -41,16 +43,15 @@ export function createTedStylishReaderVideoToolbarIcon() {
         }
 
         pauseTedOfficialWebsiteVideo();
-        const r = await injectVideoVueScript();
-        if (r) {
-          setTimeout(() => {
-            sendMessageFromContentScriptToVuePage({
-              type: "prepare",
-              data: preparedData,
-            });
-          }, 1000);
-        }
+        showVideoPagePopup();
+        setTimeout(() => {
+          sendMessageFromContentScriptToVuePage({
+            type: "prepare",
+            data: preparedData,
+          });
+        }, 1000);
       });
+      //  #endregion
       //   添加到工具栏上
       mediaControlBar.appendChild(iconElement);
     }

@@ -33,6 +33,7 @@ export function createVideoPagePopup() {
   videoPagePopup.style.zIndex = "9999";
   videoPagePopup.style.width = "100%";
   videoPagePopup.style.height = "100%";
+  videoPagePopup.style.display = "none";
   document.body.appendChild(videoPagePopup);
 }
 

@@ -1,13 +1,10 @@
-import {
-  checkIfVideoPopupExist,
-  createVideoPagePopup,
-  showVideoPagePopup,
-} from "./utils";
+import { logger } from "../utils/utils";
+import { checkIfVideoPopupExist, createVideoPagePopup } from "./utils";
 
 export function injectVideoVueScript() {
+  logger("Injecting video vue script.");
   return new Promise((resolve) => {
     if (checkIfVideoPopupExist()) {
-      showVideoPagePopup();
       resolve(true);
       return;
     }

@@ -29,7 +29,7 @@ export function createStylishIconElement(
 export async function getPreparedDataForVuePage() {
   const title = getTitleFromTedUrl();
   const sharedLinkObject = await fetchSharedLink(title);
-  sendMessageToBackground("contentLoaded", "content script loaded");
+  sendMessageToBackground("tedContentScriptLoaded", "content script loaded");
   const transcriptUrl = await getTranscriptUrlFromStorage();
 
   const subtitles = await fetchTranscript(transcriptUrl);
@@ -108,7 +108,7 @@ export function logger(message) {
   if (developmentEnvironment === "development") {
     console.log(
       `%c${message}`,
-      "color:white;background-color:black;font-size:16px"
+      "padding: 2px 3px;color:white;background-color:black;font-size:16px"
     );
   }
 }

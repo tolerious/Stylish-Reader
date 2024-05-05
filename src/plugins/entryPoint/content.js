@@ -1,4 +1,6 @@
 import { initializeTed } from "../ted";
 
 // 插件 Ted
-initializeTed();
+if (window.location.hostname.includes("ted.com")) {
+  initializeTed();
+}
