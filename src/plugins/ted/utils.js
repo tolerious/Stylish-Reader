@@ -56,7 +56,6 @@ export function sendMessageToBackground(type, message) {
 }
 
 export function fetchTranscript(url) {
-  console.log(url);
   const requestOptions = {
     method: "GET",
     headers: {

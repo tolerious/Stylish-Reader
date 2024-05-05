@@ -28,11 +28,14 @@ export function createTedStylishReaderVideoToolbarIcon() {
       );
       //   添加点击事件处理函数
       iconElement.addEventListener("click", async function () {
-        console.log("clicked...");
+        console.log(
+          "%cShow Stylish Reader Video Page.",
+          "background-color: #05010d; color: #f8f8f2; padding: 4px; border-radius: 4px;"
+        );
 
         const preparedData = await getPreparedDataForVuePage();
         if (!preparedData.sharedLink) {
-          alert("Video link is not available, please try again later.");
+          alert("Video link is not available, please try another video.");
           return;
         }
 
