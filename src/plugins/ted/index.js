@@ -10,7 +10,7 @@ import { createTedStylishReaderVideoToolbarIcon } from "./loopLogic";
 import { sendMessageToBackground } from "./utils";
 
 export function initializeTed() {
-  sendMessageToBackground("contentLoaded", "content script loaded");
+  sendMessageToBackground("tedContentScriptLoaded", "content script loaded");
 
   // 创建事件监听器(自定义事件，background 脚本的监听事件等)
   registerReceiveMessageFromVuePage();

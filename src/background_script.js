@@ -150,7 +150,7 @@ browser.runtime.onMessage.addListener(async (message) => {
     let tabId = await getCurrentTabId();
     browser.tabs.remove(tabId);
   }
-  if (message.type === "contentLoaded") {
+  if (message.type === "tedContentScriptLoaded") {
     contentScriptLoaded = true;
     if (tedCurrentUrl && contentScriptLoaded) {
       notifyContentScript({ type: "intercept", url: tedCurrentUrl });
