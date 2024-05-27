@@ -133,3 +133,6 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# extension dist
+web-ext-artifacts/
