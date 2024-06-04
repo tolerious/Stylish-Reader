@@ -1,21 +1,21 @@
 export function parseTextNode(node, indexList) {
-  console.log("==============================================");
-  console.log("==============================================");
-  console.log(node); // 对每个元素进行操作，例如打印元素
-  //   console.log(`Text Content: ${node.textContent.trim()}`);
-  //   console.log(`Node Name: ${node.nodeName}`);
-  //   console.log(node.parentNode.innerHTML);
-  node.parentElement.style.color = "red";
-  console.log(indexList);
-  console.log("==============================================");
-  console.log("==============================================");
   let t = convertNodeContentToStringList(node);
   indexList.forEach((i) => {
-    t[i] = `<span style="color:red">${t[i]}</span>`;
+    t[i] = createCustomElement(t[i]).outerHTML;
   });
   let p = t.join(" ");
-  console.log(p);
-  node.parentNode.innerHTML = p;
+
+  return { node, p };
+}
+
+function createCustomElement(textContent) {
+  const spanElement = document.createElement("span");
+  spanElement.classList = ["clickable"];
+  spanElement.style.color = "pink";
+  spanElement.style.cursor = "pointer";
+  spanElement.style.fontWeight = "bold";
+  spanElement.innerHTML = textContent;
+  return spanElement;
 }
 
 export function convertNodeContentToStringList(node) {

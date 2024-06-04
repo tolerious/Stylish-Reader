@@ -106,10 +106,15 @@ export function fetchSharedLink(title, language = "en") {
 
 export function logger(message) {
   if (developmentEnvironment === "development") {
+    // console.log(
+    //   `%c${message}`,
+    //   "padding: 2px 3px;color:white;background-color:black;font-size:16px"
+    // );
     console.log(
       `%c${message}`,
-      "padding: 2px 3px;color:white;background-color:black;font-size:16px"
+      "background: #1E90FF; color: white; font-size: 18px; font-weight: bold; padding: 10px; border-radius: 5px; text-shadow: 1px 1px 2px black;"
     );
+    // console.log(`%c${message} 🚀`, "font-size:20px; background:linear-gradient(45deg, orange, blue); color:transparent; -webkit-background-clip: text; background-clip: text;");
   }
 }
 

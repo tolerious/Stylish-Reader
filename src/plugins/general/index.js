@@ -1,3 +1,4 @@
+import { logger } from "../utils/utils";
 import {
   convertNodeContentToStringList,
   findIndexOfTargetWordInOriginalStringList,
@@ -5,15 +6,17 @@ import {
 } from "./utils";
 
 export function initializeGeneralWebSite() {
-  console.log("initializeGeneralWebSite");
+  logger("initializeGeneralWebSite");
   let walker = document.createTreeWalker(
     document.body,
     NodeFilter.SHOW_TEXT,
     null,
     false
   );
-  const targetWordList = ["nation"];
+  const targetWordList = ["nation", "boost", "for", "china"];
   let node = walker.currentNode;
+  let index = 0;
+  let map = new Map();
   while (node) {
     let indexList = findIndexOfTargetWordInOriginalStringList(
       convertNodeContentToStringList(node),
@@ -24,9 +27,18 @@ export function initializeGeneralWebSite() {
       node.textContent.trim() !== "" &&
       indexList.length > 0
     ) {
-      parseTextNode(node, indexList);
+      let r = parseTextNode(node, indexList);
+      map.set(index, r);
+      index++;
     }
-    console.log("...");
     node = walker.nextNode();
   }
+  for (const [_, value] of map) {
+    value.node.parentNode.innerHTML = value.p;
+  }
+  document.querySelectorAll(".clickable").forEach((e) => {
+    e.addEventListener("click", (e) => {
+      console.log(e.target.textContent);
+    });
+  });
 }

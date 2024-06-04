@@ -1,3 +1,5 @@
+import { logger } from "../utils/utils";
+
 export function initializeBBC() {
-  console.log("initializeBBC called");
+  logger("initializeBBC called");
 }
