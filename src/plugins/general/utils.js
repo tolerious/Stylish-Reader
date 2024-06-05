@@ -159,3 +159,26 @@ function createTranslationFloatingPanel(x, y) {
   divElement.style.left = x + "px";
   document.body.appendChild(divElement);
 }
+
+export function getTranslationFromYouDao() {
+  // 使用 fetch 方法发送 GET 请求
+  fetch("https://dict.youdao.com/result?word=collected&lang=en")
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok " + response.statusText);
+      }
+      return response.text();
+    })
+    .then((html) => {
+      // 输出获取到的 HTML 内容
+      console.log(html);
+      const parse = new DOMParser();
+      const doc = parse.parseFromString(html, "text/html");
+      const dictBook = doc.querySelector(".dict-book");
+      console.log(dictBook.textContent);
+      // 你可以在这里处理 HTML，比如插入到 DOM 中
+    })
+    .catch((error) => {
+      console.error("There was a problem with the fetch operation:", error);
+    });
+}
