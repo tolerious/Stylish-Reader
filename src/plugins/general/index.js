@@ -1,12 +1,16 @@
 import { logger } from "../utils/utils";
 import {
+  addSelectionChangeEvent,
   convertNodeContentToStringList,
+  customizeMouseDownEvent,
   findIndexOfTargetWordInOriginalStringList,
   parseTextNode,
 } from "./utils";
 
 export function initializeGeneralWebSite() {
   logger("initializeGeneralWebSite");
+  addSelectionChangeEvent();
+  customizeMouseDownEvent();
   let walker = document.createTreeWalker(
     document.body,
     NodeFilter.SHOW_TEXT,
@@ -38,7 +42,7 @@ export function initializeGeneralWebSite() {
   }
   document.querySelectorAll(".clickable").forEach((e) => {
     e.addEventListener("click", (e) => {
-      console.log(e.target.textContent);
+      logger(e.target.textContent);
     });
   });
 }
