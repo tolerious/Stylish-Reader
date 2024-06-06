@@ -142,14 +142,14 @@ function hideTranslationFloatingPanel() {
   }
 }
 
-// TODO: 可以把创建这个panel的代码放到单独的仓库中进行管理
-function createTranslationFloatingPanel(x, y) {
+function createTranslationFloatingPanel(x = 0, y = 0) {
   const divElement = document.createElement("div");
   divElement.id = translationFloatingPanelId;
-  divElement.style.display = "block";
+  divElement.style.display = "none";
   divElement.style.padding = "10px";
   divElement.style.boxSizing = "border-box";
   divElement.style.borderRadius = "3px";
+  // 这里的宽高，不应该固定，应该根据内容动态计算出来。
   divElement.style.height = translationPanelSize.height + "px";
   divElement.style.width = translationPanelSize.width + "px";
   divElement.style.backgroundColor = "white";
@@ -157,7 +157,63 @@ function createTranslationFloatingPanel(x, y) {
   divElement.style.position = "fixed";
   divElement.style.top = y + "px";
   divElement.style.left = x + "px";
+  divElement.style.zIndex = "9999";
   document.body.appendChild(divElement);
+}
+
+function checkIfTranslationFloatingPanelExist() {
+  return document.getElementById(translationFloatingPanelId);
+}
+
+function injectInternalCSS(css) {
+  const style = document.createElement("style");
+  style.setAttribute("type", "text/css");
+  style.appendChild(document.createTextNode(css));
+  document.head.appendChild(style);
+}
+
+export function injectTranslationFloatingPanelCss() {
+  fetch(
+    browser.runtime.getURL(
+      "assets/css/stylish-reader-translation-panel-index.css"
+    )
+  )
+    .then((response) => response.text())
+    .then((css) => injectInternalCSS(css))
+    .catch((error) => console.error("Error injecting CSS:", error));
+}
+
+function injectInternalModuleScript(code) {
+  const script = document.createElement("script");
+  script.type = "module";
+  script.textContent = code;
+  document.body.appendChild(script);
+}
+
+export function injectTranslationFloatingPanelVuePage() {
+  return new Promise((resolve) => {
+    if (checkIfTranslationFloatingPanelExist()) {
+      resolve(true);
+      return;
+    }
+    createTranslationFloatingPanel();
+    // 此js就是Vue项目build好的js文件
+    fetch(
+      browser.runtime.getURL("assets/js/stylish-reader-translation-panel.js")
+    )
+      .then((response) => response.text())
+      .then((js) => {
+        injectInternalModuleScript(js);
+        resolve(true);
+      })
+      .catch((error) => {
+        console.error(
+          "Error injecting translation floating panel vue script:",
+          error
+        );
+        resolve(false);
+      });
+  });
 }
 
 export function getTranslationFromYouDao(textToBeTranslated) {

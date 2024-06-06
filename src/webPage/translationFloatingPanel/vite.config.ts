@@ -7,11 +7,16 @@ import VueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [
-    vue(),
-    vueJsx(),
-    VueDevTools(),
-  ],
+  build: {
+    rollupOptions: {
+      output: {
+        entryFileNames: 'stylish-reader-translation-panel.js', // 入口文件名
+        chunkFileNames: 'stylish-reader-translation-panel-[name].js', // 代码拆分的文件名
+        assetFileNames: 'stylish-reader-translation-panel-[name].[ext]' // 静态资源文件名
+      }
+    }
+  },
+  plugins: [vue(), vueJsx(), VueDevTools()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

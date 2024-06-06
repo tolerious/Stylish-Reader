@@ -5,13 +5,17 @@ import {
   customizeMouseDownEvent,
   findIndexOfTargetWordInOriginalStringList,
   getTranslationFromYouDao,
+  injectTranslationFloatingPanelCss,
+  injectTranslationFloatingPanelVuePage,
   parseTextNode,
 } from "./utils";
 
-export function initializeGeneralWebSite() {
+export async function initializeGeneralWebSite() {
   logger("initializeGeneralWebSite");
   addSelectionChangeEvent();
   customizeMouseDownEvent();
+  injectTranslationFloatingPanelCss();
+  await injectTranslationFloatingPanelVuePage();
   let walker = document.createTreeWalker(
     document.body,
     NodeFilter.SHOW_TEXT,
