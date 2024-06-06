@@ -44,7 +44,7 @@ export function initializeGeneralWebSite() {
   document.querySelectorAll(".clickable").forEach((e) => {
     e.addEventListener("click", (e) => {
       logger(e.target.textContent);
-      getTranslationFromYouDao();
+      getTranslationFromYouDao(e.target.textContent);
     });
   });
 }

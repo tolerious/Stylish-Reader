@@ -160,9 +160,9 @@ function createTranslationFloatingPanel(x, y) {
   document.body.appendChild(divElement);
 }
 
-export function getTranslationFromYouDao() {
+export function getTranslationFromYouDao(textToBeTranslated) {
   // 使用 fetch 方法发送 GET 请求
-  fetch("https://dict.youdao.com/result?word=collected&lang=en")
+  fetch(`https://dict.youdao.com/result?word=${textToBeTranslated}&lang=en`)
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok " + response.statusText);
@@ -171,11 +171,15 @@ export function getTranslationFromYouDao() {
     })
     .then((html) => {
       // 输出获取到的 HTML 内容
-      console.log(html);
       const parse = new DOMParser();
       const doc = parse.parseFromString(html, "text/html");
-      const dictBook = doc.querySelector(".dict-book");
-      console.log(dictBook.textContent);
+      const dictBook = doc.querySelectorAll(".basic .word-exp");
+      dictBook.forEach((book) => {
+        const pos = book.querySelector(".pos");
+        const translation = book.querySelector(".trans");
+        logger(pos.textContent);
+        logger(translation.textContent);
+      });
       // 你可以在这里处理 HTML，比如插入到 DOM 中
     })
     .catch((error) => {
