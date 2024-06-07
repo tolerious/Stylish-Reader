@@ -11,6 +11,8 @@ src/dist/
 src/content_script.js
 stylish-reader-video-page-index.css
 stylish-reader-video-page.js
+stylish-reader-translation-panel-index.css
+stylish-reader-translation-panel.js
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
