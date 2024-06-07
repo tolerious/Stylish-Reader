@@ -47,6 +47,22 @@ export function findIndexOfTargetWordInOriginalStringList(
 
 export function customizeMouseDownEvent() {
   document.addEventListener("mousedown", function (event) {
+    const mouseX = event.clientX;
+    const mouseY = event.clientY;
+    const floatingPanelContainer = document.getElementById(
+      translationFloatingPanelId
+    );
+    const floatingPanelContainerRect =
+      floatingPanelContainer.getBoundingClientRect();
+    if (
+      mouseX >= floatingPanelContainerRect.left &&
+      mouseX <= floatingPanelContainerRect.right &&
+      mouseY >= floatingPanelContainerRect.top &&
+      mouseY <= floatingPanelContainerRect.bottom
+    ) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
     if (
       [stylishReaderFloatingIconId, translationFloatingPanelId].includes(
         event.target.id
@@ -146,7 +162,6 @@ function createTranslationFloatingPanel(x = 0, y = 0) {
   const divElement = document.createElement("div");
   divElement.id = translationFloatingPanelId;
   divElement.style.display = "none";
-  divElement.style.padding = "10px";
   divElement.style.boxSizing = "border-box";
   divElement.style.borderRadius = "3px";
   // 这里的宽高，不应该固定，应该根据内容动态计算出来。

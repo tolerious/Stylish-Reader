@@ -1,17 +1,18 @@
 <template>
-  <div class="container" @click.stop.prevent="stopPop"><p>12331 asdf</p></div>
+  <div class="floating-panel-container">
+    basdfasdf
+    <div>
+      1231231123
+      <div>123</div>
+    </div>
+  </div>
 </template>
 
-<script setup lang="ts">
-function stopPop(e: any) {
-  console.log(e)
-}
-</script>
+<script setup lang="ts"></script>
 
 <style scoped>
-.container {
-  height: 50px;
-  width: 100px;
-  background-color: blue;
+.floating-panel-container {
+  height: 100%;
+  width: 100%;
 }
 </style>
