@@ -13,7 +13,11 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content_script.js", "assets/js/plyr.js"],
+      "js": [
+        "content_script.js",
+        "assets/js/plyr.js",
+        "assets/js/stylish-reader-translation-panel.js"
+      ],
       "css": ["assets/css/plyr.css"],
       "run_at": "document_end"
     }

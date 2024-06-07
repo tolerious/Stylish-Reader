@@ -15,7 +15,7 @@ export async function initializeGeneralWebSite() {
   addSelectionChangeEvent();
   customizeMouseDownEvent();
   injectTranslationFloatingPanelCss();
-  await injectTranslationFloatingPanelVuePage();
+  injectTranslationFloatingPanelVuePage();
   let walker = document.createTreeWalker(
     document.body,
     NodeFilter.SHOW_TEXT,

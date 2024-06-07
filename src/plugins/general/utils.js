@@ -183,37 +183,11 @@ export function injectTranslationFloatingPanelCss() {
     .catch((error) => console.error("Error injecting CSS:", error));
 }
 
-function injectInternalModuleScript(code) {
-  const script = document.createElement("script");
-  script.type = "module";
-  script.textContent = code;
-  document.body.appendChild(script);
-}
-
 export function injectTranslationFloatingPanelVuePage() {
-  return new Promise((resolve) => {
-    if (checkIfTranslationFloatingPanelExist()) {
-      resolve(true);
-      return;
-    }
-    createTranslationFloatingPanel();
-    // 此js就是Vue项目build好的js文件
-    fetch(
-      browser.runtime.getURL("assets/js/stylish-reader-translation-panel.js")
-    )
-      .then((response) => response.text())
-      .then((js) => {
-        injectInternalModuleScript(js);
-        resolve(true);
-      })
-      .catch((error) => {
-        console.error(
-          "Error injecting translation floating panel vue script:",
-          error
-        );
-        resolve(false);
-      });
-  });
+  if (checkIfTranslationFloatingPanelExist()) {
+    return;
+  }
+  createTranslationFloatingPanel();
 }
 
 export function getTranslationFromYouDao(textToBeTranslated) {
