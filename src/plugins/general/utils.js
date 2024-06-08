@@ -186,20 +186,16 @@ function hideFloatingIcon() {
   }
 }
 
-export function showTranslationFloatingPanel() {
+export function showTranslationFloatingPanel(source = "selection") {
   const translationPanel = document.getElementById(translationFloatingPanelId);
   const selection = window.getSelection();
   const range = selection.getRangeAt(0);
   const rect = range.getBoundingClientRect();
   let x = calculateSelectionPosition(rect, translationPanelSize).x;
   let y = calculateSelectionPosition(rect, translationPanelSize).y;
-  if (translationPanel) {
-    translationPanel.style.display = "block";
-    translationPanel.style.top = y + "px";
-    translationPanel.style.left = x + "px";
-  } else {
-    createTranslationFloatingPanel(x, y);
-  }
+  translationPanel.style.display = "block";
+  translationPanel.style.top = y + "px";
+  translationPanel.style.left = x + "px";
 }
 
 function hideTranslationFloatingPanel() {
