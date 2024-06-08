@@ -154,6 +154,20 @@ function calculateSelectionPosition(rect, baseElementSize) {
   };
 }
 
+function createFloatingIcon(x, y) {
+  const divElement = document.createElement("div");
+  divElement.id = stylishReaderFloatingIconId;
+  divElement.style.display = "block";
+  divElement.style.position = "fixed";
+  divElement.style.top = y + "px";
+  divElement.style.left = x + "px";
+  divElement.style.height = floatingIconSize.width + "px";
+  divElement.style.width = floatingIconSize.height + "px";
+  divElement.style.backgroundColor = stylishReaderMainColor;
+  divElement.style.cursor = "pointer";
+  document.body.appendChild(divElement);
+}
+
 function showFloatingIcon(x, y) {
   const floatingIcon = document.getElementById(stylishReaderFloatingIconId);
   if (floatingIcon) {
@@ -170,23 +184,6 @@ function hideFloatingIcon() {
   if (floatingIcon) {
     floatingIcon.style.display = "none";
   }
-}
-
-function createFloatingIcon(x, y) {
-  const divElement = document.createElement("div");
-  divElement.id = stylishReaderFloatingIconId;
-  divElement.style.display = "block";
-  divElement.style.position = "fixed";
-  divElement.style.top = y + "px";
-  divElement.style.left = x + "px";
-  divElement.style.height = floatingIconSize.width + "px";
-  divElement.style.width = floatingIconSize.height + "px";
-  divElement.style.backgroundColor = stylishReaderMainColor;
-  divElement.style.cursor = "pointer";
-  divElement.addEventListener("click", function (event) {
-    event.stopPropagation();
-  });
-  document.body.appendChild(divElement);
 }
 
 export function showTranslationFloatingPanel() {
