@@ -114,13 +114,17 @@ function customizeMouseDownEvent() {
     ) {
       event.stopPropagation();
       event.preventDefault();
+      return;
     }
     // 点击的是floatingIcon
     if ([stylishReaderFloatingIconId].includes(event.target.id)) {
       showTranslationFloatingPanel();
       event.stopPropagation();
       event.preventDefault();
+      return;
     }
+    hideFloatingIcon();
+    hideTranslationFloatingPanel();
   });
 }
 
@@ -138,9 +142,6 @@ function addSelectionChangeEvent() {
       // FIXME: 这里没有考虑到selection的位置可能会超出屏幕的情况
       showFloatingIcon(x, y);
       logger(selection.toString().trim());
-    } else {
-      hideFloatingIcon();
-      hideTranslationFloatingPanel();
     }
   });
 }
