@@ -168,7 +168,7 @@ function createTranslationFloatingPanel(x = 0, y = 0) {
   divElement.style.height = translationPanelSize.height + "px";
   divElement.style.width = translationPanelSize.width + "px";
   divElement.style.backgroundColor = "white";
-  divElement.style.border = "1px solid " + stylishReaderMainColor;
+  divElement.style.boxShadow = "0 0 15px 5px grey";
   divElement.style.position = "fixed";
   divElement.style.top = y + "px";
   divElement.style.left = x + "px";
