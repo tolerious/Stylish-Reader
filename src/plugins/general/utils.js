@@ -123,6 +123,7 @@ function customizeMouseDownEvent() {
       event.preventDefault();
       return;
     }
+    // 如果点击在别处，隐藏floatingPanel和floatingIcon
     hideFloatingIcon();
     hideTranslationFloatingPanel();
   });
