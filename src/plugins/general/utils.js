@@ -49,7 +49,8 @@ export function goThroughDomAndGenerateCustomElement(
     });
   });
 }
-export function parseTextNode(node, indexList) {
+
+function parseTextNode(node, indexList) {
   let t = convertNodeContentToStringList(node);
   indexList.forEach((i) => {
     t[i] = createCustomElement(t[i]).outerHTML;
@@ -69,11 +70,11 @@ function createCustomElement(textContent) {
   return spanElement;
 }
 
-export function convertNodeContentToStringList(node) {
+function convertNodeContentToStringList(node) {
   return node.textContent.trim().split(" ");
 }
 
-export function findIndexOfTargetWordInOriginalStringList(
+function findIndexOfTargetWordInOriginalStringList(
   originalStringList,
   targetStringList
 ) {
@@ -104,6 +105,7 @@ function customizeMouseDownEvent() {
     );
     const floatingPanelContainerRect =
       floatingPanelContainer.getBoundingClientRect();
+    // 在floatingPanel范围内
     if (
       mouseX >= floatingPanelContainerRect.left &&
       mouseX <= floatingPanelContainerRect.right &&
@@ -113,11 +115,8 @@ function customizeMouseDownEvent() {
       event.stopPropagation();
       event.preventDefault();
     }
-    if (
-      [stylishReaderFloatingIconId, translationFloatingPanelId].includes(
-        event.target.id
-      )
-    ) {
+    // 点击的是floatingIcon
+    if ([stylishReaderFloatingIconId].includes(event.target.id)) {
       showTranslationFloatingPanel();
       event.stopPropagation();
       event.preventDefault();
