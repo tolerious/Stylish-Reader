@@ -18,7 +18,10 @@
         "assets/js/plyr.js",
         "assets/js/stylish-reader-translation-panel.js"
       ],
-      "css": ["assets/css/plyr.css"],
+      "css": [
+        "assets/css/plyr.css",
+        "assets/css/stylish-reader-translation-panel-index.css"
+      ],
       "run_at": "document_end"
     }
   ],

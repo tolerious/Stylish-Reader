@@ -7,6 +7,48 @@ import {
   translationPanelSize,
 } from "./constants";
 
+/**
+ * 遍历页面上所有dom节点， 根据单词列表，构建自定义元素
+ * @param {Array} targetWordList 目标词典单词列表
+ */
+export function goThroughDomAndGenerateCustomElement(
+  targetWordList = ["nation", "boost", "for", "china"]
+) {
+  let walker = document.createTreeWalker(
+    document.body,
+    NodeFilter.SHOW_TEXT,
+    null,
+    false
+  );
+  let node = walker.currentNode;
+  let map = new Map();
+  let index = 0;
+  while (node) {
+    let indexList = findIndexOfTargetWordInOriginalStringList(
+      convertNodeContentToStringList(node),
+      targetWordList
+    );
+    if (
+      !["SCRIPT", "HTML"].includes(node.parentNode.nodeName) &&
+      node.textContent.trim() !== "" &&
+      indexList.length > 0
+    ) {
+      let r = parseTextNode(node, indexList);
+      map.set(index, r);
+      index++;
+    }
+    node = walker.nextNode();
+  }
+  for (const [_, value] of map) {
+    value.node.parentNode.innerHTML = value.p;
+  }
+  document.querySelectorAll(".clickable").forEach((e) => {
+    e.addEventListener("click", (e) => {
+      logger(e.target.textContent);
+      getTranslationFromYouDao(e.target.textContent);
+    });
+  });
+}
 export function parseTextNode(node, indexList) {
   let t = convertNodeContentToStringList(node);
   indexList.forEach((i) => {
@@ -45,7 +87,15 @@ export function findIndexOfTargetWordInOriginalStringList(
   return indexList;
 }
 
-export function customizeMouseDownEvent() {
+export function customizeGeneralEvent() {
+  addSelectionChangeEvent();
+  customizeMouseDownEvent();
+}
+
+/**
+ * 监听mousedown事件，当用户点击悬浮图标时，显示翻译面板
+ */
+function customizeMouseDownEvent() {
   document.addEventListener("mousedown", function (event) {
     const mouseX = event.clientX;
     const mouseY = event.clientY;
@@ -75,7 +125,10 @@ export function customizeMouseDownEvent() {
   });
 }
 
-export function addSelectionChangeEvent() {
+/**
+ * 监听selectionchange事件，当用户选中文本时，显示悬浮图标
+ */
+function addSelectionChangeEvent() {
   document.addEventListener("selectionchange", function () {
     const selection = window.getSelection();
     const range = selection.getRangeAt(0);
@@ -135,7 +188,7 @@ function createFloatingIcon(x, y) {
   document.body.appendChild(divElement);
 }
 
-function showTranslationFloatingPanel() {
+export function showTranslationFloatingPanel() {
   const translationPanel = document.getElementById(translationFloatingPanelId);
   const selection = window.getSelection();
   const range = selection.getRangeAt(0);
