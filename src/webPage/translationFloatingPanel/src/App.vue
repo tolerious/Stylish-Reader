@@ -1,15 +1,17 @@
 <template>
-  <div class="container mx-auto columns-2 px-1">
-    <div>content</div>
-    <div>*</div>
-  </div>
-  <div class="container mx-auto flex cursor-pointer flex-row space-x-2 px-1">
-    <div>/ˈkɒntent /</div>
-    <div class="">🔊</div>
-  </div>
-  <div class="flex flex-row px-1" v-for="item in dic" :key="item.pos">
-    <div>{{ item.pos }}</div>
-    <div>{{ item.zh }}</div>
+  <div class="container mx-auto px-1 py-1">
+    <div class="columns-2">
+      <div class="text-xl font-medium">content</div>
+      <div>*</div>
+    </div>
+    <div class="my-2 flex cursor-pointer flex-row space-x-2">
+      <div>/ˈkɒntent /</div>
+      <div class="" @click="handleClick">🔊</div>
+    </div>
+    <div class="flex flex-row" v-for="item in dic" :key="item.pos">
+      <div>{{ item.pos }}</div>
+      <div>{{ item.zh }}</div>
+    </div>
   </div>
 </template>
 
@@ -24,6 +26,10 @@ const dic = [
     zh: '指向'
   }
 ]
+
+function handleClick() {
+  console.log('clicked...')
+}
 </script>
 
 <style scoped>

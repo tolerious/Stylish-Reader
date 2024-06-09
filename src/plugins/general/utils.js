@@ -1,6 +1,7 @@
 import { stylishReaderMainColor } from "../utils/constants";
 import { logger } from "../utils/utils";
 import {
+  clickableWordClassName,
   floatingIconSize,
   stylishReaderFloatingIconId,
   translationFloatingPanelId,
@@ -11,9 +12,8 @@ import {
  * 遍历页面上所有dom节点， 根据单词列表，构建自定义元素
  * @param {Array} targetWordList 目标词典单词列表
  */
-export function goThroughDomAndGenerateCustomElement(
-  targetWordList = ["nation", "boost", "for", "china"]
-) {
+
+export function goThroughDomAndGenerateCustomElement(targetWordList) {
   let walker = document.createTreeWalker(
     document.body,
     NodeFilter.SHOW_TEXT,
@@ -23,69 +23,78 @@ export function goThroughDomAndGenerateCustomElement(
   let node = walker.currentNode;
   let map = new Map();
   let index = 0;
+  // 找到所有符合要求的#text节点，并保存在Map中
   while (node) {
-    let indexList = findIndexOfTargetWordInOriginalStringList(
-      convertNodeContentToStringList(node),
-      targetWordList
-    );
     if (
       !["SCRIPT", "HTML"].includes(node.parentNode.nodeName) &&
-      node.textContent.trim() !== "" &&
-      indexList.length > 0
+      node.textContent.trim() !== ""
     ) {
-      let r = parseTextNode(node, indexList);
-      map.set(index, r);
+      map.set(index, node);
       index++;
     }
     node = walker.nextNode();
   }
+  // 判断#text是否包含目标单词
   for (const [_, value] of map) {
-    value.node.parentNode.innerHTML = value.p;
+    convertCurrentTextNodeContent(value, targetWordList);
   }
-  document.querySelectorAll(".clickable").forEach((e) => {
+
+  document.querySelectorAll(`.${clickableWordClassName}`).forEach((e) => {
     e.addEventListener("click", (e) => {
       logger(e.target.textContent);
+      hideFloatingIcon();
       getTranslationFromYouDao(e.target.textContent);
     });
   });
 }
 
-function parseTextNode(node, indexList) {
-  let t = convertNodeContentToStringList(node);
-  indexList.forEach((i) => {
-    t[i] = createCustomElement(t[i]).outerHTML;
-  });
-  let p = t.join(" ");
-
-  return { node, p };
-}
-
-function createCustomElement(textContent) {
-  const spanElement = document.createElement("span");
-  spanElement.classList = ["clickable"];
-  spanElement.style.color = "pink";
-  spanElement.style.cursor = "pointer";
-  spanElement.style.fontWeight = "bold";
-  spanElement.innerHTML = textContent;
-  return spanElement;
-}
-
-function convertNodeContentToStringList(node) {
-  return node.textContent.trim().split(" ");
-}
-
-function findIndexOfTargetWordInOriginalStringList(
-  originalStringList,
-  targetStringList
-) {
-  const targetStringSet = new Set(targetStringList);
+function convertCurrentTextNodeContent(textNode, targetWordList) {
+  // 判断并找出当前文本节点中包含的目标单词
+  const textContent = textNode.textContent;
+  const targetWordSet = new Set(targetWordList);
+  const splitedTextContentStringList = textContent.split(" ");
   const indexList = [];
-  originalStringList.filter((s, index) => {
-    if (targetStringSet.has(s.toLowerCase())) {
+  splitedTextContentStringList.filter((s, index) => {
+    /**
+     *  FIXME: 这里没有处理的一点是如果是被特殊服务包裹起来的字符，
+     * 例如"hello, world",这里world"会被当成一个单词，所以使用set中的has
+     * 函数就无法判断出来，这里需要单独处理下这种情况
+     *
+     * */
+    if (targetWordSet.has(s.toLowerCase())) {
       indexList.push(index);
     }
   });
-  return indexList;
+
+  const currentTextNodeParentNode = textNode.parentNode;
+  const newNodeList = [];
+  // 遍历indexList，重新构造#text节点
+  if (indexList.length > 0) {
+    splitedTextContentStringList.forEach((s, index) => {
+      // 这段文本不包含目标单词
+      const stt = s + " ";
+      if (indexList.indexOf(index) > -1) {
+        const spanElement = document.createElement("span");
+        spanElement.textContent = stt;
+        spanElement.style.color = "pink";
+        spanElement.classList = [clickableWordClassName];
+        spanElement.style.cursor = "pointer";
+        newNodeList.push(spanElement);
+      } else {
+        const textNode = document.createTextNode(stt);
+        newNodeList.push(textNode);
+      }
+    });
+    /**
+     * FIXME: 这里再最外层添加了一个span元素，是有一些问题的，因为增加了一个原本dom中不存在的元素
+     * 有可能会改变原有dom的样式，这里最好是插入一个自定义的dom元素，这样不会改变原有dom的结构。
+     */
+    const temporaryDivElement = document.createElement("span");
+    newNodeList.forEach((node) => {
+      temporaryDivElement.append(node);
+    });
+    currentTextNodeParentNode.replaceChild(temporaryDivElement, textNode);
+  }
 }
 
 export function customizeGeneralEvent() {
@@ -105,6 +114,7 @@ function customizeMouseDownEvent() {
     );
     const floatingPanelContainerRect =
       floatingPanelContainer.getBoundingClientRect();
+
     // 在floatingPanel范围内
     if (
       mouseX >= floatingPanelContainerRect.left &&
@@ -116,6 +126,7 @@ function customizeMouseDownEvent() {
       event.preventDefault();
       return;
     }
+
     // 点击的是floatingIcon
     if ([stylishReaderFloatingIconId].includes(event.target.id)) {
       showTranslationFloatingPanel();
@@ -123,7 +134,18 @@ function customizeMouseDownEvent() {
       event.preventDefault();
       return;
     }
+
+    // 点击的是单词列表中的单词，即已经高亮的单词，需要显示翻译面板
+    if (event.target.classList.toString().includes(clickableWordClassName)) {
+      showTranslationFloatingPanel(
+        "word",
+        calculateFloatingPanelPosition(event.target)
+      );
+      return;
+    }
+
     // 如果点击在别处，隐藏floatingPanel和floatingIcon
+
     hideFloatingIcon();
     hideTranslationFloatingPanel();
   });
@@ -142,7 +164,7 @@ function addSelectionChangeEvent() {
       let y = calculateSelectionPosition(rect, floatingIconSize).y;
       // FIXME: 这里没有考虑到selection的位置可能会超出屏幕的情况
       showFloatingIcon(x, y);
-      logger(selection.toString().trim());
+      // logger(selection.toString().trim());
     }
   });
 }
@@ -186,16 +208,49 @@ function hideFloatingIcon() {
   }
 }
 
-export function showTranslationFloatingPanel(source = "selection") {
+function calculateFloatingPanelPosition(targetElement) {
+  const x = targetElement.getBoundingClientRect().left;
+  const y = targetElement.getBoundingClientRect().top;
+  showTranslationFloatingPanelTemporary();
+  const floatingPanel = document.getElementById(translationFloatingPanelId);
+  const floatingPanelHeight = floatingPanel.offsetHeight;
+  const floatingPanelWidth = floatingPanel.offsetWidth;
+  return {
+    x: x - floatingPanelWidth / 2,
+    y: y - floatingPanelHeight,
+  };
+}
+
+// 临时显示下panel，但是是透明的，所以用户不会感觉到知识为了获取到它的宽高
+function showTranslationFloatingPanelTemporary() {
+  const floatingPanel = document.getElementById(translationFloatingPanelId);
+  floatingPanel.style.display = "block";
+  floatingPanel.style.opacity = 0;
+  floatingPanel.style.top = 0;
+  floatingPanel.style.left = 0;
+}
+
+// source=selection,说明点击的是floating icon
+export function showTranslationFloatingPanel(
+  source = "selection",
+  position = { x: 0, y: 0 }
+) {
   const translationPanel = document.getElementById(translationFloatingPanelId);
-  const selection = window.getSelection();
-  const range = selection.getRangeAt(0);
-  const rect = range.getBoundingClientRect();
-  let x = calculateSelectionPosition(rect, translationPanelSize).x;
-  let y = calculateSelectionPosition(rect, translationPanelSize).y;
   translationPanel.style.display = "block";
-  translationPanel.style.top = y + "px";
-  translationPanel.style.left = x + "px";
+  if (source === "selection") {
+    const selection = window.getSelection();
+    const range = selection.getRangeAt(0);
+    showTranslationFloatingPanelTemporary();
+    let x = calculateFloatingPanelPosition(range).x;
+    let y = calculateFloatingPanelPosition(range).y;
+    translationPanel.style.top = y + "px";
+    translationPanel.style.left = x + "px";
+    translationPanel.style.opacity = 1;
+  } else {
+    translationPanel.style.top = position.y + "px";
+    translationPanel.style.left = position.x + "px";
+    translationPanel.style.opacity = 1;
+  }
 }
 
 function hideTranslationFloatingPanel() {
@@ -212,7 +267,7 @@ function createTranslationFloatingPanel(x = 0, y = 0) {
   divElement.style.boxSizing = "border-box";
   divElement.style.borderRadius = "3px";
   // 这里的宽高，不应该固定，应该根据内容动态计算出来。
-  divElement.style.height = translationPanelSize.height + "px";
+  // divElement.style.height = translationPanelSize.height + "px";
   divElement.style.width = translationPanelSize.width + "px";
   divElement.style.backgroundColor = "white";
   divElement.style.boxShadow = "0 0 15px 5px grey";
