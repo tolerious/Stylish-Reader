@@ -177,17 +177,22 @@ function calculateSelectionPosition(rect, baseElementSize) {
 }
 
 function createFloatingIcon(x, y) {
-  const divElement = document.createElement("div");
-  divElement.id = stylishReaderFloatingIconId;
-  divElement.style.display = "block";
-  divElement.style.position = "fixed";
-  divElement.style.top = y + "px";
-  divElement.style.left = x + "px";
-  divElement.style.height = floatingIconSize.width + "px";
-  divElement.style.width = floatingIconSize.height + "px";
-  divElement.style.backgroundColor = stylishReaderMainColor;
-  divElement.style.cursor = "pointer";
-  document.body.appendChild(divElement);
+  const div = document.createElement("div");
+  div.id = stylishReaderFloatingIconId;
+  div.style.display = "block";
+  div.style.position = "fixed";
+  div.style.top = y + "px";
+  div.style.left = x + "px";
+  div.style.height = floatingIconSize.height + "px";
+  div.style.width = floatingIconSize.width + "px";
+  div.style.borderRadius = "5px";
+  div.style.cursor = "pointer";
+  div.style.border = "2px solid #f80061";
+  div.style.backgroundColor = "white";
+  div.style.backgroundImage =
+    "url('https://stylishreader.oss-cn-beijing.aliyuncs.com/stylish-reader-48.png')";
+  div.style.backgroundSize = "cover";
+  document.body.appendChild(div);
 }
 
 function showFloatingIcon(x, y) {
