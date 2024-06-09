@@ -41,7 +41,6 @@ const audioPlayer: Ref<HTMLAudioElement | null> = ref(null)
 function handleClick() {
   audioUrl.value = `https://dict.youdao.com/dictvoice?type=1&audio=${currentWord.value}`
   audioPlayer.value?.play()
-  audioPlayer.value?.play()
 }
 
 function listenEventFromGeneralScript() {
