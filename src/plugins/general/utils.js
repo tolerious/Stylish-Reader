@@ -43,6 +43,10 @@ export function goThroughDomAndGenerateCustomElement(targetWordList) {
     e.addEventListener("click", (e) => {
       logger(e.target.textContent);
       hideFloatingIcon();
+      sendMessageFromGeneralScriptToFloatingPanel({
+        type: "search-word",
+        word: e.target.textContent,
+      });
       getTranslationFromYouDao(e.target.textContent);
     });
   });
@@ -76,7 +80,7 @@ function convertCurrentTextNodeContent(textNode, targetWordList) {
       if (indexList.indexOf(index) > -1) {
         const spanElement = document.createElement("span");
         spanElement.textContent = stt;
-        spanElement.style.color = "pink";
+        spanElement.style.color = stylishReaderMainColor;
         spanElement.classList = [clickableWordClassName];
         spanElement.style.cursor = "pointer";
         newNodeList.push(spanElement);
@@ -164,7 +168,11 @@ function addSelectionChangeEvent() {
       let y = calculateSelectionPosition(rect, floatingIconSize).y;
       // FIXME: 这里没有考虑到selection的位置可能会超出屏幕的情况
       showFloatingIcon(x, y);
-      // logger(selection.toString().trim());
+      sendMessageFromGeneralScriptToFloatingPanel({
+        type: "search-word",
+        word: selection.toString().trim(),
+      });
+      logger(selection.toString().trim());
     }
   });
 }
@@ -187,7 +195,7 @@ function createFloatingIcon(x, y) {
   div.style.width = floatingIconSize.width + "px";
   div.style.borderRadius = "5px";
   div.style.cursor = "pointer";
-  div.style.border = "2px solid #f80061";
+  div.style.border = "2px solid " + stylishReaderMainColor;
   div.style.backgroundColor = "white";
   div.style.backgroundImage =
     "url('https://stylishreader.oss-cn-beijing.aliyuncs.com/stylish-reader-48.png')";
@@ -337,4 +345,24 @@ export function getTranslationFromYouDao(textToBeTranslated) {
     .catch((error) => {
       console.error("There was a problem with the fetch operation:", error);
     });
+}
+
+export function customizeEvent() {
+  document.addEventListener("floatingPanelEvent", (event) => {
+    const detail = JSON.parse(event.detail);
+    switch (detail.type) {
+      case "close-popup":
+        hideVideoPagePopup();
+        break;
+      default:
+        break;
+    }
+  });
+}
+
+function sendMessageFromGeneralScriptToFloatingPanel(message) {
+  const event = new CustomEvent("generalScriptEvent", {
+    detail: JSON.stringify(message),
+  });
+  document.dispatchEvent(event);
 }

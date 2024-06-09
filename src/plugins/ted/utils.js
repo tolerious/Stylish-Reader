@@ -1,6 +1,5 @@
 // Ted 插件的工具函数
 
-import { logger } from "../utils/utils";
 import {
   popupVideoVuePageMountPointId,
   tedMediaControlBarStylishReaderIconId,
