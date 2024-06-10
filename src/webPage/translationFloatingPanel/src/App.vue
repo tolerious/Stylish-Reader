@@ -2,7 +2,7 @@
   <div class="container mx-auto px-1 py-1">
     <div class="flex columns-2 flex-row">
       <div class="basis-11/12 flex-col text-xl">{{ currentWord }}</div>
-      <div class="flex w-9 basis-9 cursor-pointer select-none flex-row justify-around">🤍</div>
+      <div class="flex w-9 basis-9 cursor-pointer select-none flex-row justify-around">🤍❤️</div>
     </div>
     <div class="my-2 flex cursor-pointer flex-row space-x-2">
       <div>
