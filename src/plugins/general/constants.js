@@ -21,6 +21,6 @@ export const floatingIconSize = {
 };
 
 export const translationPanelSize = {
-  width: 300,
+  width: 500,
   height: 200,
 };

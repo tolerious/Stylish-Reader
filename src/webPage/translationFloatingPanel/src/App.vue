@@ -1,14 +1,16 @@
 <template>
   <div class="container mx-auto px-1 py-1">
-    <div class="columns-2">
-      <div class="text-xl font-medium">{{ currentWord }}</div>
-      <div>*</div>
+    <div class="flex columns-2 flex-row">
+      <div class="basis-11/12 flex-col text-xl">{{ currentWord }}</div>
+      <div class="flex w-9 basis-9 cursor-pointer select-none flex-row justify-around">🤍</div>
     </div>
     <div class="my-2 flex cursor-pointer flex-row space-x-2">
-      <div>{{ phonetic }}</div>
-      <div class="" @click="handleClick">🔊</div>
+      <div>
+        <span>{{ phonetic }}</span>
+      </div>
+      <div v-if="isPlayAudioIconVisible" @click="handleClick">🔊</div>
     </div>
-    <div class="flex flex-row" v-for="item in dic" :key="item.pos">
+    <div class="flex flex-row flex-nowrap" v-for="item in dic" :key="item.pos">
       <div>{{ item.pos }}</div>
       <div>{{ item.zh }}</div>
     </div>
@@ -30,11 +32,13 @@ interface Translation {
 
 const dic: Ref<Translation[]> = ref([]);
 
-const currentWord = ref('');
+const currentWord = ref('console log object good enough nice student who are you');
 
 const phonetic = ref('');
 
 const audioUrl = ref('');
+
+const isPlayAudioIconVisible = ref(true);
 
 const audioPlayer: Ref<HTMLAudioElement | null> = ref(null);
 
@@ -49,13 +53,18 @@ function listenEventFromGeneralScript() {
     const data = JSON.parse(ee.detail);
     switch (data.type) {
       case 'search-word':
-        phonetic.value = '';
-        dic.value = [];
         currentWord.value = data.word;
+        if (data.word.trim().split(' ').length > 1) {
+          isPlayAudioIconVisible.value = false;
+        } else {
+          isPlayAudioIconVisible.value = true;
+        }
         getTranslationFromYouDao(data.word);
         break;
       case 'play':
-        handleClick();
+        if (isPlayAudioIconVisible.value) {
+          handleClick();
+        }
         break;
       default:
         break;
@@ -72,6 +81,8 @@ function getTranslationFromYouDao(textToBeTranslated: string) {
       return response.text();
     })
     .then((html) => {
+      phonetic.value = '';
+      dic.value = [];
       const parse = new DOMParser();
       const doc = parse.parseFromString(html, 'text/html');
       const dictBook = doc.querySelectorAll('.basic .word-exp');
@@ -85,6 +96,18 @@ function getTranslationFromYouDao(textToBeTranslated: string) {
           zh: translation?.textContent ?? ''
         });
       });
+      // 选中的不是单词，是句子或者是其他
+      if (dictBook.length === 0) {
+        const backupDicBook = doc.querySelectorAll('.dict-book .trans-content');
+        backupDicBook.forEach((book) => {
+          const pos = '';
+          const translation = book.textContent;
+          dic.value.push({
+            pos,
+            zh: translation?.trim() ?? ''
+          });
+        });
+      }
       sendMessageToGeneralScript({ type: 'get-translation-done' });
     })
     .catch((error) => {
