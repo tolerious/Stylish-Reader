@@ -200,6 +200,7 @@ function createFloatingIcon(x, y) {
   div.style.width = floatingIconSize.width + "px";
   div.style.borderRadius = "5px";
   div.style.cursor = "pointer";
+  div.style.zIndex = 9998;
   div.style.border = "2px solid " + stylishReaderMainColor;
   div.style.backgroundColor = "white";
   div.style.backgroundImage =
@@ -233,10 +234,9 @@ function calculateFloatingPanelPosition(targetElement) {
   const floatingPanel = document.getElementById(translationFloatingPanelId);
   const floatingPanelHeight = floatingPanel.offsetHeight;
   const floatingPanelWidth = floatingPanel.offsetWidth;
-
   return {
-    x: x - floatingPanelWidth / 2,
-    y: y - floatingPanelHeight,
+    x: x - floatingPanelWidth / 2 < 0 ? 0 : x - floatingPanelWidth / 2,
+    y: y - floatingPanelHeight < 0 ? 0 : y - floatingPanelHeight,
   };
 }
 
