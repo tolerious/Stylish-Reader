@@ -1,5 +1,4 @@
 import { stylishReaderMainColor } from "../utils/constants";
-import { logger } from "../utils/utils";
 import {
   clickableWordClassName,
   floatingIconSize,
@@ -41,7 +40,6 @@ export function goThroughDomAndGenerateCustomElement(targetWordList) {
 
   document.querySelectorAll(`.${clickableWordClassName}`).forEach((e) => {
     e.addEventListener("click", (e) => {
-      logger(e.target.textContent);
       hideFloatingIcon();
       sendMessageFromGeneralScriptToFloatingPanel({
         type: "search-word",
@@ -133,6 +131,9 @@ function customizeMouseDownEvent() {
     // 点击的是floatingIcon
     if ([stylishReaderFloatingIconId].includes(event.target.id)) {
       showTranslationFloatingPanel();
+      sendMessageFromGeneralScriptToFloatingPanel({
+        type: "play",
+      });
       event.stopPropagation();
       event.preventDefault();
       return;
@@ -146,6 +147,9 @@ function customizeMouseDownEvent() {
           "word",
           calculateFloatingPanelPosition(event.target)
         );
+        sendMessageFromGeneralScriptToFloatingPanel({
+          type: "play",
+        });
       }, 500);
       return;
     }
@@ -174,7 +178,6 @@ function addSelectionChangeEvent() {
         type: "search-word",
         word: selection.toString().trim(),
       });
-      logger(selection.toString().trim());
     }
   });
 }

@@ -47,12 +47,15 @@ function listenEventFromGeneralScript() {
   document.addEventListener('generalScriptEvent', (e: Event) => {
     const ee = e as CustomEvent;
     const data = JSON.parse(ee.detail);
-    phonetic.value = '';
-    dic.value = [];
     switch (data.type) {
       case 'search-word':
+        phonetic.value = '';
+        dic.value = [];
         currentWord.value = data.word;
         getTranslationFromYouDao(data.word);
+        break;
+      case 'play':
+        handleClick();
         break;
       default:
         break;
@@ -69,7 +72,6 @@ function getTranslationFromYouDao(textToBeTranslated: string) {
       return response.text();
     })
     .then((html) => {
-      // 输出获取到的 HTML 内容
       const parse = new DOMParser();
       const doc = parse.parseFromString(html, 'text/html');
       const dictBook = doc.querySelectorAll('.basic .word-exp');
@@ -84,7 +86,6 @@ function getTranslationFromYouDao(textToBeTranslated: string) {
         });
       });
       sendMessageToGeneralScript({ type: 'get-translation-done' });
-      handleClick();
     })
     .catch((error) => {
       console.error('There was a problem with the fetch operation:', error);
