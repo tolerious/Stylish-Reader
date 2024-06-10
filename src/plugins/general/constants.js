@@ -12,6 +12,7 @@ export const targetWordList = [
   "and",
   "to",
   "the",
+  "developer",
 ];
 
 export const floatingIconSize = {

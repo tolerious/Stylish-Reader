@@ -47,7 +47,6 @@ export function goThroughDomAndGenerateCustomElement(targetWordList) {
         type: "search-word",
         word: e.target.textContent,
       });
-      getTranslationFromYouDao(e.target.textContent);
     });
   });
 }
@@ -141,10 +140,13 @@ function customizeMouseDownEvent() {
 
     // 点击的是单词列表中的单词，即已经高亮的单词，需要显示翻译面板
     if (event.target.classList.toString().includes(clickableWordClassName)) {
-      showTranslationFloatingPanel(
-        "word",
-        calculateFloatingPanelPosition(event.target)
-      );
+      hideTranslationFloatingPanel();
+      setTimeout(() => {
+        showTranslationFloatingPanel(
+          "word",
+          calculateFloatingPanelPosition(event.target)
+        );
+      }, 500);
       return;
     }
 
@@ -228,6 +230,7 @@ function calculateFloatingPanelPosition(targetElement) {
   const floatingPanel = document.getElementById(translationFloatingPanelId);
   const floatingPanelHeight = floatingPanel.offsetHeight;
   const floatingPanelWidth = floatingPanel.offsetWidth;
+
   return {
     x: x - floatingPanelWidth / 2,
     y: y - floatingPanelHeight,
@@ -279,8 +282,6 @@ function createTranslationFloatingPanel(x = 0, y = 0) {
   divElement.style.display = "none";
   divElement.style.boxSizing = "border-box";
   divElement.style.borderRadius = "3px";
-  // 这里的宽高，不应该固定，应该根据内容动态计算出来。
-  // divElement.style.height = translationPanelSize.height + "px";
   divElement.style.width = translationPanelSize.width + "px";
   divElement.style.backgroundColor = "white";
   divElement.style.boxShadow = "0 0 15px 5px grey";
@@ -320,39 +321,11 @@ export function injectTranslationFloatingPanelVuePage() {
   createTranslationFloatingPanel();
 }
 
-export function getTranslationFromYouDao(textToBeTranslated) {
-  // 使用 fetch 方法发送 GET 请求
-  fetch(`https://dict.youdao.com/result?word=${textToBeTranslated}&lang=en`)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok " + response.statusText);
-      }
-      return response.text();
-    })
-    .then((html) => {
-      // 输出获取到的 HTML 内容
-      const parse = new DOMParser();
-      const doc = parse.parseFromString(html, "text/html");
-      const dictBook = doc.querySelectorAll(".basic .word-exp");
-      dictBook.forEach((book) => {
-        const pos = book.querySelector(".pos");
-        const translation = book.querySelector(".trans");
-        logger(pos.textContent);
-        logger(translation.textContent);
-      });
-      // 你可以在这里处理 HTML，比如插入到 DOM 中
-    })
-    .catch((error) => {
-      console.error("There was a problem with the fetch operation:", error);
-    });
-}
-
 export function customizeEvent() {
   document.addEventListener("floatingPanelEvent", (event) => {
     const detail = JSON.parse(event.detail);
     switch (detail.type) {
-      case "close-popup":
-        hideVideoPagePopup();
+      case "get-translation-done":
         break;
       default:
         break;

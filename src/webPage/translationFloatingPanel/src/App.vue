@@ -83,7 +83,7 @@ function getTranslationFromYouDao(textToBeTranslated: string) {
           zh: translation?.textContent ?? ''
         })
       })
-      // 你可以在这里处理 HTML，比如插入到 DOM 中
+      sendMessageToGeneralScript({ type: 'get-translation-done' })
     })
     .catch((error) => {
       console.error('There was a problem with the fetch operation:', error)
@@ -93,12 +93,13 @@ function getTranslationFromYouDao(textToBeTranslated: string) {
 onMounted(() => {
   listenEventFromGeneralScript()
 })
-// function sendMessageToGeneralScript(message: any) {
-//   const event = new CustomEvent('floatingPanelEvent', {
-//     detail: JSON.stringify(message)
-//   })
-//   document.dispatchEvent(event)
-// }
+
+function sendMessageToGeneralScript(message: any) {
+  const event = new CustomEvent('floatingPanelEvent', {
+    detail: JSON.stringify(message)
+  })
+  document.dispatchEvent(event)
+}
 </script>
 
 <style scoped>
