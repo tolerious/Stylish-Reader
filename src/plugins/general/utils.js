@@ -234,9 +234,17 @@ function calculateFloatingPanelPosition(targetElement) {
   const floatingPanel = document.getElementById(translationFloatingPanelId);
   const floatingPanelHeight = floatingPanel.offsetHeight;
   const floatingPanelWidth = floatingPanel.offsetWidth;
+  let positionX = x - floatingPanelWidth / 2;
+  let positionY = y - floatingPanelHeight;
+  if (
+    x - floatingPanelWidth / 2 + floatingPanelWidth >
+    document.body.clientWidth
+  ) {
+    positionX = document.body.clientWidth - floatingPanelWidth;
+  }
   return {
-    x: x - floatingPanelWidth / 2 < 0 ? 0 : x - floatingPanelWidth / 2,
-    y: y - floatingPanelHeight < 0 ? 0 : y - floatingPanelHeight,
+    x: positionX < 0 ? 0 : positionX,
+    y: positionY < 0 ? 0 : positionY,
   };
 }
 

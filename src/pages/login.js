@@ -56,4 +56,13 @@ $(document).ready(function () {
     $("button[type='submit']").hide();
     $("button[type='register']").show();
   });
+  $("#contact-author").click(function () {
+    $("#close-contact-info").show();
+    $("#contact-info-img").show();
+  });
+  $("#close-contact-info").click(function () {
+    console.log("hide");
+    $("#close-contact-info").hide();
+    $("#contact-info-img").hide();
+  });
 });
