@@ -8,7 +8,7 @@
     "build": "run-s build:*",
     "build:content": "vite build --config vite.content.config.js",
     "build:background": "vite build --config vite.background.config.js",
-    "build:copy": "cp ./content/content_script.js ../../",
+    "build:copy": "cp ./content/content_script.js ../../ && cp ./background/background_script.js ../../",
     "preview": "vite preview"
   },
   "devDependencies": {

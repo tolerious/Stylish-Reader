@@ -9,6 +9,7 @@ lerna-debug.log*
 stylish*.zip
 src/dist/
 src/content_script.js
+src/background_script.js
 stylish-reader-video-page-index.css
 stylish-reader-video-page.js
 stylish-reader-translation-panel-index.css

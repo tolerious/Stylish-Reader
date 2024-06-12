@@ -3,5 +3,8 @@
 // 后端服务器地址
 export const backendServerUrl = "http://localhost:3000";
 
-// 
-export const supportDomains=['']
+// 支持的url域名
+export const supportDomains = [""];
+
+// 登录token的key，用作权限验证
+export const loginTokenKey = "stylish-reader-token";
