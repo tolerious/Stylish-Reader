@@ -2,7 +2,13 @@
   <div class="container mx-auto px-1 py-1">
     <div class="flex columns-2 flex-row">
       <div class="basis-11/12 flex-col text-xl">{{ currentWord }}</div>
-      <div class="flex w-9 basis-9 cursor-pointer select-none flex-row justify-around">🤍❤️</div>
+      <div
+        class="flex w-9 basis-9 cursor-pointer select-none flex-row justify-around"
+        @click="markWord"
+      >
+        <span v-if="isLiked">❤️</span>
+        <span v-else>🤍</span>
+      </div>
     </div>
     <div class="my-2 flex cursor-pointer flex-row space-x-2">
       <div>
@@ -19,7 +25,9 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, type Ref } from 'vue';
+import { onMounted, ref, watch, type Ref } from 'vue';
+import { DELETE_WORD, GET_WORD_ID, SAVE_WORD, SEARCH_WORD } from './constants';
+import { customDelete, customPost } from './utils/customRequest';
 
 interface CustomEvent extends Event {
   detail: string;
@@ -32,7 +40,7 @@ interface Translation {
 
 const dic: Ref<Translation[]> = ref([]);
 
-const currentWord = ref('console log object good enough nice student who are you');
+const currentWord = ref('');
 
 const phonetic = ref('');
 
@@ -41,6 +49,27 @@ const audioUrl = ref('');
 const isPlayAudioIconVisible = ref(true);
 
 const audioPlayer: Ref<HTMLAudioElement | null> = ref(null);
+
+const isLiked = ref(false);
+
+async function markWord() {
+  if (isLiked.value) {
+    const t = await customPost(GET_WORD_ID, { en: currentWord.value.trim() });
+    customPost(DELETE_WORD, { id: t.data.data._id });
+    isLiked.value = false;
+  } else {
+    const r = await customPost(SAVE_WORD, { en: currentWord.value.trim() });
+    isLiked.value = true;
+  }
+}
+
+watch(currentWord, async (newVal) => {
+  if (newVal.trim().split(' ').length > 1) {
+    return;
+  }
+  const t = await customPost(SEARCH_WORD, { en: newVal });
+  isLiked.value = t.data.data.isLiked;
+});
 
 function handleClick() {
   audioUrl.value = `https://dict.youdao.com/dictvoice?type=1&audio=${currentWord.value}`;
@@ -116,6 +145,14 @@ function getTranslationFromYouDao(textToBeTranslated: string) {
 }
 
 onMounted(() => {
+  if (import.meta.env.MODE === 'development') {
+    localStorage.setItem(
+      'token',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJuYW1lIjoidG9seSIsInBhc3N3b3JkIjoidG9seSJ9LCJleHAiOjE3MTg4MTg3NzQsImlhdCI6MTcxODYwMjc3NH0.nmckUWIhSusT2AKPDjoA5e_LMNV6ha5Tlu9BD6tXGis'
+    );
+    console.log(import.meta.env);
+  }
+
   listenEventFromGeneralScript();
 });
 
