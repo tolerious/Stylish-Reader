@@ -1,7 +1,7 @@
 // This file includes constants used in background and content script.
 
 // 后端服务器地址
-export const backendServerUrl = "http://localhost:3000";
+export const backendServerUrl = import.meta.env.VITE_APP_BACKEND_SERVER_URL;
 
 // 支持的url域名
 export const supportDomains = [""];

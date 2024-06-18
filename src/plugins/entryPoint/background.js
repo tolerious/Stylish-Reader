@@ -15,6 +15,14 @@ let contentScriptLoaded = false;
 
 console.log("background.js loaded");
 
+async function checkConnection() {
+  let t = await pingPong();
+  let j = await t.json();
+  if (t.ok && j.code !== 200) {
+    browser.tabs.create({ url: "pages/login.html" });
+  }
+}
+
 // 向 content script 发送消息
 async function notifyContentScript(messageObject) {
   const tabId = await getCurrentTabId();
@@ -100,6 +108,9 @@ browser.runtime.onMessage.addListener(async (message) => {
       if (tedCurrentUrl && contentScriptLoaded) {
         notifyContentScript({ type: "intercept", url: tedCurrentUrl });
       }
+      break;
+    case "check-authorize":
+      checkConnection();
       break;
     default:
       break;

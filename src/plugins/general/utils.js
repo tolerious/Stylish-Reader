@@ -356,7 +356,6 @@ function sendMessageFromGeneralScriptToFloatingPanel(message) {
 export async function getWordList() {
   const token = await getLoginToken();
   const userSetting = await getUserSettings(token);
-  console.log(userSetting.defaultGroupID);
   const r = await fetch(`${backendServerUrl}/word/bygroup`, {
     method: "POST",
     headers: {
@@ -365,10 +364,8 @@ export async function getWordList() {
     },
     body: JSON.stringify({ groupID: userSetting.defaultGroupID }),
   });
-  console.log(r);
   const j = await r.json();
-  console.log(j.data);
-  return j.data.map((word) => word.en);
+  return j.data ? j.data.map((word) => word.en) : [];
 }
 
 async function getUserSettings(token) {
@@ -380,4 +377,12 @@ async function getUserSettings(token) {
   });
   const j = await r.json();
   return j.data;
+}
+
+export function checkAuthorize() {
+  sendMessageToBackgroundScript("check-authorize", "");
+}
+
+function sendMessageToBackgroundScript(type, message) {
+  browser.runtime.sendMessage({ type, message });
 }

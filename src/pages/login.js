@@ -1,4 +1,5 @@
 let server_url = "http://localhost:3000";
+// let server_url = "https://api.stylishreader.com";
 $(document).ready(function () {
   function setErrorMessage(message) {
     $("#error-message").text(message);
