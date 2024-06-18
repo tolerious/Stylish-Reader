@@ -10,6 +10,5 @@ export async function initializeGeneralWebSite() {
   logger("initializeGeneralWebSite");
   customizeGeneralEvent();
   injectTranslationFloatingPanelVuePage();
-  console.log(await getWordList());
   goThroughDomAndGenerateCustomElement(await getWordList());
 }

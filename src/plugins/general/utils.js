@@ -1,3 +1,4 @@
+import { backendServerUrl } from "../entryPoint/constants";
 import { getLoginToken } from "../entryPoint/utils/background.utils";
 import { stylishReaderMainColor } from "../utils/constants";
 import {
@@ -353,5 +354,30 @@ function sendMessageFromGeneralScriptToFloatingPanel(message) {
 }
 
 export async function getWordList() {
-  return ["hello", "world", "good", "morning", "and", "or"];
+  const token = await getLoginToken();
+  const userSetting = await getUserSettings(token);
+  console.log(userSetting.defaultGroupID);
+  const r = await fetch(`${backendServerUrl}/word/bygroup`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ groupID: userSetting.defaultGroupID }),
+  });
+  console.log(r);
+  const j = await r.json();
+  console.log(j.data);
+  return j.data.map((word) => word.en);
+}
+
+async function getUserSettings(token) {
+  const r = await fetch(backendServerUrl + "/usersetting", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const j = await r.json();
+  return j.data;
 }
