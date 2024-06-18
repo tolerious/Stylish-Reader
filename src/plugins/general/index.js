@@ -1,7 +1,7 @@
 import { logger } from "../utils/utils";
-import { targetWordList } from "./constants";
 import {
   customizeGeneralEvent,
+  getWordList,
   goThroughDomAndGenerateCustomElement,
   injectTranslationFloatingPanelVuePage,
 } from "./utils";
@@ -10,5 +10,6 @@ export async function initializeGeneralWebSite() {
   logger("initializeGeneralWebSite");
   customizeGeneralEvent();
   injectTranslationFloatingPanelVuePage();
-  goThroughDomAndGenerateCustomElement(targetWordList);
+  console.log(await getWordList());
+  goThroughDomAndGenerateCustomElement(await getWordList());
 }

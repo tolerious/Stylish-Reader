@@ -4,7 +4,9 @@ $(document).ready(function () {
     $("#error-message").text(message);
     $("#error-message").show();
   }
+
   $("button[type='submit']").click(function () {
+    console.log("submit");
     setErrorMessage("");
     let username = $("#username").val();
     let password = $("#password").val();
@@ -12,6 +14,7 @@ $(document).ready(function () {
       setErrorMessage("Username and password cannot be empty.");
       return;
     }
+
     $.ajax({
       url: `${server_url}/logic/login`,
       method: "POST",
@@ -30,16 +33,24 @@ $(document).ready(function () {
       },
     });
   });
+
   $("button[type='register']").click(function () {
+    setErrorMessage("");
+    console.log("register");
+    let username = $("#username").val();
+    let password = $("#password").val();
     $.ajax({
-      url: `${server_url}/logic/login`,
+      url: `${server_url}/user/create`,
       method: "POST",
       // timeout: 1500,
-      data: { username, password },
+      data: { username, password, ignore: true, source: "stylish" },
       success: function (res) {
         if (res.code === 200) {
-          setErrorMessage("Login success.");
+          setErrorMessage("Register success. Please login in");
           browser.runtime.sendMessage({ type: "popup", data: res });
+          $("button[type='submit']").show();
+          $("button[type='register']").hide();
+          $("#register-success").show();
         } else {
           setErrorMessage(res.msg);
         }
@@ -48,18 +59,18 @@ $(document).ready(function () {
         setErrorMessage(err.statusText);
       },
     });
-    $("button[type='submit']").show();
-    $("button[type='register']").hide();
-    $("#register-success").show();
   });
+
   $("#register-a").click(function () {
     $("button[type='submit']").hide();
     $("button[type='register']").show();
   });
+
   $("#contact-author").click(function () {
     $("#close-contact-info").show();
     $("#contact-info-img").show();
   });
+
   $("#close-contact-info").click(function () {
     console.log("hide");
     $("#close-contact-info").hide();

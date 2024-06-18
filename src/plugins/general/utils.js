@@ -1,3 +1,4 @@
+import { getLoginToken } from "../entryPoint/utils/background.utils";
 import { stylishReaderMainColor } from "../utils/constants";
 import {
   clickableWordClassName,
@@ -349,4 +350,8 @@ function sendMessageFromGeneralScriptToFloatingPanel(message) {
     detail: JSON.stringify(message),
   });
   document.dispatchEvent(event);
+}
+
+export async function getWordList() {
+  return ["hello", "world", "good", "morning", "and", "or"];
 }

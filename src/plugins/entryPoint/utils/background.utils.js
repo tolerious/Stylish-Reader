@@ -1,11 +1,28 @@
 import { backendServerUrl, loginTokenKey } from "../constants";
 
-// 获取登录token
-export function getLoginToken() {
+/**
+ * Save token to local storage
+ * @param {*} token - token to save
+ * @returns {Promise} - true if success, false if failed
+ */
+export function setLoginToken(token) {
   return new Promise((resolve) => {
-    browser.storage.local.get(loginTokenKey).then((res) => {
-      resolve(res[loginTokenKey]);
-    });
+    browser.storage.local
+      .set({ [loginTokenKey]: token })
+      .then(() => {
+        resolve(true);
+      })
+      .catch((e) => {
+        resolve(false);
+      });
+  });
+}
+
+// 获取登录token
+export async function getLoginToken() {
+  const value = await browser.storage.local.get(loginTokenKey);
+  return new Promise((resolve) => {
+    resolve(value[loginTokenKey]);
   });
 }
 
@@ -24,24 +41,6 @@ export function getCurrentTabUrl() {
     browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       resolve(tabs[0].url);
     });
-  });
-}
-
-/**
- * Save token to local storage
- * @param {*} token - token to save
- * @returns {Promise} - true if success, false if failed
- */
-export function setLoginToken(token) {
-  return new Promise((resolve) => {
-    browser.storage.local
-      .set({ loginTokenKey: token })
-      .then(() => {
-        resolve(true);
-      })
-      .catch((e) => {
-        resolve(false);
-      });
   });
 }
 

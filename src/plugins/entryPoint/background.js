@@ -46,10 +46,9 @@ function handleError(error) {
 
 // 扩展图标被点击
 async function extensionIconClicked(tab, clickEvent) {
-  console.log(tab);
-  console.log(clickEvent);
-  let t = await getLoginToken();
-  if (t === undefined || t === null || t === "") {
+  let token = await getLoginToken();
+
+  if (token === undefined || token === null || token === "") {
     // Need login logic here...
     browser.tabs.create({ url: "pages/login.html" });
   } else {
@@ -57,13 +56,12 @@ async function extensionIconClicked(tab, clickEvent) {
     let t = await pingPong();
     let j = await t.json();
     if (t.ok && j.code === 200) {
-      console.log("Login state is valid.");
       //   let t = await saveArticle();
       // let j = await t.json();
       // Notify content script
-      if (t.ok && j.code === 200) {
-        notifyContentScript({ type: "saveArticleSuccess" });
-      }
+      // if (t.ok && j.code === 200) {
+      //   notifyContentScript({ type: "saveArticleSuccess" });
+      // }
     } else {
       browser.tabs.create({ url: "pages/login.html" });
     }
