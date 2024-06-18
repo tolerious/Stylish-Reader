@@ -1,4 +1,4 @@
-import { loginTokenKey } from "../constants";
+import { backendServerUrl, loginTokenKey } from "../constants";
 
 // 获取登录token
 export function getLoginToken() {
@@ -69,5 +69,3 @@ export async function saveArticle() {
     body: JSON.stringify({ link: await getCurrentTabUrl() }),
   });
 }
-
-

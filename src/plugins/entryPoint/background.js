@@ -92,16 +92,19 @@ browser.browserAction.onClicked.addListener(extensionIconClicked);
 
 // Listen for messages from pages(Mozilla://file pages, not web pages) and content scripts
 browser.runtime.onMessage.addListener(async (message) => {
-  if (message.type === "login-success") {
-    setLoginToken(message.data.data.token);
-    let tabId = await getCurrentTabId();
-    browser.tabs.remove(tabId);
-  }
-  if (message.type === "tedContentScriptLoaded") {
-    contentScriptLoaded = true;
-    if (tedCurrentUrl && contentScriptLoaded) {
-      notifyContentScript({ type: "intercept", url: tedCurrentUrl });
-    }
+  switch (message.type) {
+    case "login-success":
+      setLoginToken(message.data.data.token);
+      browser.tabs.remove(await getCurrentTabId());
+      break;
+    case "tedContentScriptLoaded":
+      contentScriptLoaded = true;
+      if (tedCurrentUrl && contentScriptLoaded) {
+        notifyContentScript({ type: "intercept", url: tedCurrentUrl });
+      }
+      break;
+    default:
+      break;
   }
 });
 
