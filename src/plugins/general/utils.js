@@ -51,6 +51,21 @@ export function goThroughDomAndGenerateCustomElement(targetWordList) {
   });
 }
 
+function removeUnMarkedWord(word) {
+  const markedNodeList = document.querySelectorAll(
+    `.${clickableWordClassName}`
+  );
+  markedNodeList.forEach((node) => {
+    // 说明取消的是这个节点
+    if (node.textContent.trim() === word.trim()) {
+      const targetParentNode = node.parentNode;
+      // 重新把被自定义span标签包裹的文本系欸但替换回来
+      const textNode = document.createTextNode(` ${word} `);
+      targetParentNode.replaceChild(textNode, node);
+    }
+  });
+}
+
 function convertCurrentTextNodeContent(textNode, targetWordList) {
   // 判断并找出当前文本节点中包含的目标单词
   const textContent = textNode.textContent;
@@ -103,6 +118,7 @@ function convertCurrentTextNodeContent(textNode, targetWordList) {
 export function customizeGeneralEvent() {
   addSelectionChangeEvent();
   customizeMouseDownEvent();
+  listenFromFloatingPanelEvent();
 }
 
 /**
@@ -342,11 +358,14 @@ export function injectTranslationFloatingPanelVuePage() {
   createTranslationFloatingPanel();
 }
 
-export function customizeEvent() {
+export function listenFromFloatingPanelEvent() {
   document.addEventListener("floatingPanelEvent", (event) => {
     const detail = JSON.parse(event.detail);
     switch (detail.type) {
       case "get-translation-done":
+        break;
+      case "remove-word":
+        removeUnMarkedWord(detail.message);
         break;
       default:
         break;

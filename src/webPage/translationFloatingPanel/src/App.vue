@@ -27,7 +27,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watch, type Ref } from 'vue';
 import { DELETE_WORD, GET_WORD_ID, SAVE_WORD, SEARCH_WORD } from './constants';
-import { customDelete, customPost } from './utils/customRequest';
+import { customPost } from './utils/customRequest';
 
 interface CustomEvent extends Event {
   detail: string;
@@ -57,6 +57,7 @@ async function markWord() {
     const t = await customPost(GET_WORD_ID, { en: currentWord.value.trim() });
     customPost(DELETE_WORD, { id: t.data.data._id });
     isLiked.value = false;
+    sendMessageToGeneralScript({ type: 'remove-word', message: currentWord.value.trim() });
   } else {
     const r = await customPost(SAVE_WORD, { en: currentWord.value.trim() });
     isLiked.value = true;
@@ -67,7 +68,7 @@ watch(currentWord, async (newVal) => {
   if (newVal.trim().split(' ').length > 1) {
     return;
   }
-  const t = await customPost(SEARCH_WORD, { en: newVal });
+  const t = await customPost(SEARCH_WORD, { en: newVal.trim() });
   isLiked.value = t.data.data.isLiked;
 });
 
@@ -96,7 +97,7 @@ function listenEventFromGeneralScript() {
         }
         break;
       case 'token':
-        console.log(data.message);
+        localStorage.setItem('token', data.message);
         break;
       default:
         break;
@@ -140,7 +141,6 @@ function getTranslationFromYouDao(textToBeTranslated: string) {
           });
         });
       }
-      sendMessageToGeneralScript({ type: 'get-translation-done' });
     })
     .catch((error) => {
       console.error('There was a problem with the fetch operation:', error);
@@ -148,14 +148,6 @@ function getTranslationFromYouDao(textToBeTranslated: string) {
 }
 
 onMounted(() => {
-  if (import.meta.env.MODE === 'development') {
-    localStorage.setItem(
-      'token',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJuYW1lIjoidG9seSIsInBhc3N3b3JkIjoidG9seSJ9LCJleHAiOjE3MTg4MTg3NzQsImlhdCI6MTcxODYwMjc3NH0.nmckUWIhSusT2AKPDjoA5e_LMNV6ha5Tlu9BD6tXGis'
-    );
-    console.log(import.meta.env);
-  }
-
   listenEventFromGeneralScript();
 });
 

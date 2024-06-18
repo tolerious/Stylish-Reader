@@ -8,6 +8,7 @@ lerna-debug.log*
 .pnpm-debug.log*
 stylish*.zip
 src/dist/
+*.stackdump
 src/content_script.js
 src/background_script.js
 stylish-reader-video-page-index.css
