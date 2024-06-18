@@ -95,6 +95,9 @@ function listenEventFromGeneralScript() {
           handleClick();
         }
         break;
+      case 'token':
+        console.log(data.message);
+        break;
       default:
         break;
     }

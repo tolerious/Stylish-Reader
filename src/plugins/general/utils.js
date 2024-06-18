@@ -109,7 +109,7 @@ export function customizeGeneralEvent() {
  * 监听mousedown事件，当用户点击悬浮图标时，显示翻译面板
  */
 function customizeMouseDownEvent() {
-  document.addEventListener("mousedown", function (event) {
+  document.addEventListener("mousedown", async function (event) {
     const mouseX = event.clientX;
     const mouseY = event.clientY;
     const floatingPanelContainer = document.getElementById(
@@ -136,6 +136,10 @@ function customizeMouseDownEvent() {
       sendMessageFromGeneralScriptToFloatingPanel({
         type: "play",
       });
+      sendMessageFromGeneralScriptToFloatingPanel({
+        type: "token",
+        message: await getLoginToken(),
+      });
       event.stopPropagation();
       event.preventDefault();
       return;
@@ -144,11 +148,15 @@ function customizeMouseDownEvent() {
     // 点击的是单词列表中的单词，即已经高亮的单词，需要显示翻译面板
     if (event.target.classList.toString().includes(clickableWordClassName)) {
       hideTranslationFloatingPanel();
-      setTimeout(() => {
+      setTimeout(async () => {
         showTranslationFloatingPanel(
           "word",
           calculateFloatingPanelPosition(event.target)
         );
+        sendMessageFromGeneralScriptToFloatingPanel({
+          type: "token",
+          message: await getLoginToken(),
+        });
         sendMessageFromGeneralScriptToFloatingPanel({
           type: "play",
         });
