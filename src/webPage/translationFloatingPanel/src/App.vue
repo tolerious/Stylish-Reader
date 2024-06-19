@@ -55,12 +55,17 @@ const isLiked = ref(false);
 async function markWord() {
   if (isLiked.value) {
     const t = await customPost(GET_WORD_ID, { en: currentWord.value.trim().toLocaleLowerCase() });
-    customPost(DELETE_WORD, { id: t.data.data._id });
-    isLiked.value = false;
-    sendMessageToGeneralScript({ type: 'remove-word', message: currentWord.value.trim() });
+    const r = await customPost(DELETE_WORD, { id: t.data.data._id });
+    if (r.data.code === 200) {
+      isLiked.value = false;
+      sendMessageToGeneralScript({ type: 'remove-word', message: currentWord.value.trim() });
+    }
   } else {
-    await customPost(SAVE_WORD, { en: currentWord.value.trim() });
-    isLiked.value = true;
+    const t = await customPost(SAVE_WORD, { en: currentWord.value.trim() });
+    if (t.data.code === 200) {
+      isLiked.value = true;
+      sendMessageToGeneralScript({ type: 'save-word' });
+    }
   }
 }
 
@@ -86,6 +91,7 @@ function listenEventFromGeneralScript() {
         currentWord.value = data.word;
         if (data.word.trim().split(' ').length > 1) {
           isPlayAudioIconVisible.value = false;
+          isLiked.value = false;
         } else {
           isPlayAudioIconVisible.value = true;
         }

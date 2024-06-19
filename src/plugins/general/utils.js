@@ -111,7 +111,9 @@ function convertCurrentTextNodeContent(textNode, targetWordList) {
     newNodeList.forEach((node) => {
       temporaryDivElement.append(node);
     });
-    currentTextNodeParentNode.replaceChild(temporaryDivElement, textNode);
+    if (!currentTextNodeParentNode.classList.contains(clickableWordClassName)) {
+      currentTextNodeParentNode.replaceChild(temporaryDivElement, textNode);
+    }
   }
 }
 
@@ -359,13 +361,16 @@ export function injectTranslationFloatingPanelVuePage() {
 }
 
 export function listenFromFloatingPanelEvent() {
-  document.addEventListener("floatingPanelEvent", (event) => {
+  document.addEventListener("floatingPanelEvent", async (event) => {
     const detail = JSON.parse(event.detail);
     switch (detail.type) {
       case "get-translation-done":
         break;
       case "remove-word":
         removeUnMarkedWord(detail.message);
+        break;
+      case "save-word":
+        goThroughDomAndGenerateCustomElement(await getWordList());
         break;
       default:
         break;
