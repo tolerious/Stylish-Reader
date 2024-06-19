@@ -59,7 +59,7 @@ async function markWord() {
     isLiked.value = false;
     sendMessageToGeneralScript({ type: 'remove-word', message: currentWord.value.trim() });
   } else {
-    const r = await customPost(SAVE_WORD, { en: currentWord.value.trim() });
+    await customPost(SAVE_WORD, { en: currentWord.value.trim() });
     isLiked.value = true;
   }
 }
