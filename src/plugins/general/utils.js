@@ -57,7 +57,7 @@ function removeUnMarkedWord(word) {
   );
   markedNodeList.forEach((node) => {
     // 说明取消的是这个节点
-    if (node.textContent.trim() === word.trim()) {
+    if (node.textContent.trim().toLocaleLowerCase() === word.trim()) {
       const targetParentNode = node.parentNode;
       // 重新把被自定义span标签包裹的文本系欸但替换回来
       const textNode = document.createTextNode(` ${word} `);

@@ -54,7 +54,7 @@ const isLiked = ref(false);
 
 async function markWord() {
   if (isLiked.value) {
-    const t = await customPost(GET_WORD_ID, { en: currentWord.value.trim() });
+    const t = await customPost(GET_WORD_ID, { en: currentWord.value.trim().toLocaleLowerCase() });
     customPost(DELETE_WORD, { id: t.data.data._id });
     isLiked.value = false;
     sendMessageToGeneralScript({ type: 'remove-word', message: currentWord.value.trim() });
@@ -68,7 +68,7 @@ watch(currentWord, async (newVal) => {
   if (newVal.trim().split(' ').length > 1) {
     return;
   }
-  const t = await customPost(SEARCH_WORD, { en: newVal.trim() });
+  const t = await customPost(SEARCH_WORD, { en: newVal.trim().toLowerCase() });
   isLiked.value = t.data.data.isLiked;
 });
 
