@@ -94,6 +94,13 @@ function detailsHandler(details) {
     }
   }
 }
+
+function tempDetailsHandler(details) {
+  if (details.url.includes("timedtext")) {
+    console.log(details);
+    notifyContentScript({ type: "youtube", url: details.url });
+  }
+}
 browser.browserAction.onClicked.addListener(extensionIconClicked);
 
 // Listen for messages from pages(Mozilla://file pages, not web pages) and content scripts
@@ -128,12 +135,14 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
 browser.webRequest.onBeforeRequest.addListener(
   // 回调函数，处理请求
-  detailsHandler,
+  tempDetailsHandler,
   {
-    urls: [
-      // "https://www.ted.com/graphql",
-      "https://hls.ted.com/project_masters/*",
-    ],
+    // urls: [
+    //   // "https://www.ted.com/graphql",
+    //   "https://hls.ted.com/project_masters/*",
+    //   "https://www.youtube.com/api/timedtext/*",
+    // ],
+    urls: ["<all_urls>"],
   }
   // { urls: ["https://*.jd.com/*"] }
   // 过滤器，指定监听的请求类型和 URL 规则
