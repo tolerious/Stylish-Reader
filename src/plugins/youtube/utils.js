@@ -42,16 +42,16 @@ function createYoutubeStylishIconElement() {
 
 function parseSubtitles(url) {
   logger(url);
-  fetch(url)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.json();
-    })
-    .then((data) => {
-      console.log(data);
-    });
+  // fetch(url)
+  //   .then((response) => {
+  //     if (!response.ok) {
+  //       throw new Error("Network response was not ok");
+  //     }
+  //     return response.json();
+  //   })
+  //   .then((data) => {
+  //     console.log(data);
+  //   });
 }
 
 const requestUrlList = [];
