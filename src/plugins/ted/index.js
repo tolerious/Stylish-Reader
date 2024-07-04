@@ -1,9 +1,7 @@
 // Entry point for this plugin.
 
-import {
-  registerEventFromBackground,
-  registerReceiveMessageFromVuePage,
-} from "./eventListener";
+import { registerEventFromBackground } from "../utils/utils";
+import { registerReceiveMessageFromVuePage } from "./eventListener";
 import { injectCSS } from "./injectCSS";
 import { injectScript, injectVideoVueScript } from "./injectJS";
 import { createTedStylishReaderVideoToolbarIcon } from "./loopLogic";

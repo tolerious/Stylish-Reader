@@ -134,17 +134,38 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 });
 
 browser.webRequest.onBeforeRequest.addListener(
-  // 回调函数，处理请求
-  tempDetailsHandler,
-  {
-    // urls: [
-    //   // "https://www.ted.com/graphql",
-    //   "https://hls.ted.com/project_masters/*",
-    //   "https://www.youtube.com/api/timedtext/*",
-    // ],
-    urls: ["<all_urls>"],
-  }
-  // { urls: ["https://*.jd.com/*"] }
-  // 过滤器，指定监听的请求类型和 URL 规则
-  //   { urls: ["<all_urls>"] }
+  function (details) {
+    processResponse(details);
+  },
+  { urls: ["https://www.youtube.com/api/timedtext*"] },
+  ["blocking"]
 );
+
+// 处理响应数据
+function processResponse(details) {
+  // 这里可以使用 XHR 或 Fetch 重新获取响应数据
+  let filter = browser.webRequest.filterResponseData(details.requestId);
+
+  let decoder = new TextDecoder("utf-8");
+  let encoder = new TextEncoder();
+  let data = [];
+
+  filter.ondata = (event) => {
+    let str = decoder.decode(event.data, { stream: true });
+    data.push(str);
+    filter.write(encoder.encode(event.data));
+  };
+
+  filter.onstop = (event) => {
+    let responseBody = data.join("");
+    try {
+      let json = JSON.parse(responseBody);
+      console.log("Response JSON data: ", json);
+      notifyContentScript({ type: "youtube", url: details.url, data: json });
+      // 在这里处理 JSON 数据
+    } catch (e) {
+      alert("视频处理失败，请刷新页面重试");
+    }
+    filter.disconnect();
+  };
+}

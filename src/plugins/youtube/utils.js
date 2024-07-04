@@ -1,6 +1,9 @@
 import { logger } from "../utils/utils";
 import { youtubeStylishReaderIconId } from "./constants";
 
+let currentYoutubeTranslationUrl = "";
+let currentYoutubeTranslationData = "";
+
 export function createYoutubeStylishReaderIcon() {
   //   const tt = document.querySelector(".ytp-chrome-bottom");
   //   tt.style.opacity = 1;
@@ -9,8 +12,16 @@ export function createYoutubeStylishReaderIcon() {
   }
   const toolBar = document.querySelector(".ytp-right-controls");
   if (toolBar) {
-    toolBar.appendChild(createYoutubeStylishIconElement());
+    const element = createYoutubeStylishIconElement();
+    element.addEventListener("click", onClickStylishReaderIcon);
+    toolBar.appendChild(element);
   }
+}
+
+function onClickStylishReaderIcon(e) {
+  logger(currentYoutubeTranslationUrl);
+  console.log(currentYoutubeTranslationData);
+  // TODO: 在这里把获取到的数据调用后端API，保存在数据库中
 }
 
 function findYoutubeStylishReaderToolBarIcon() {
@@ -40,32 +51,16 @@ function createYoutubeStylishIconElement() {
   return divElement;
 }
 
-function parseSubtitles(url) {
-  logger(url);
-  // fetch(url)
-  //   .then((response) => {
-  //     if (!response.ok) {
-  //       throw new Error("Network response was not ok");
-  //     }
-  //     return response.json();
-  //   })
-  //   .then((data) => {
-  //     console.log(data);
-  //   });
+function parseSubtitles(url, data) {
+  currentYoutubeTranslationUrl = url;
+  currentYoutubeTranslationData = data;
 }
 
-const requestUrlList = [];
 export function registerEventListenerForBackendScript() {
   browser.runtime.onMessage.addListener((message) => {
     switch (message.type) {
       case "youtube":
-        const url = message.url;
-        if (requestUrlList.includes(url)) {
-          return;
-        }
-        requestUrlList.push(url);
-        parseSubtitles(message.url);
-        requestUrlList.push(message.url + "&tlang=zh-Hans");
+        parseSubtitles(message.url, message.data);
         break;
       default:
         break;
