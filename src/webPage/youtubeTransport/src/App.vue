@@ -17,6 +17,7 @@ function registerEventListenerFromContentScript() {
   })
 }
 
+// TODO: 使用环境变量来判断服务器地址
 async function saveArticle(o: any) {
   return await axios.post(
     `http://localhost:3000/article`,
