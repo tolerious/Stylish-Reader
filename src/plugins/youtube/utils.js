@@ -47,6 +47,7 @@ async function onClickStylishReaderIcon(e) {
       videoId: getVideoId(),
       token,
       link: window.location.href,
+      title: document.title,
     },
   });
 }
