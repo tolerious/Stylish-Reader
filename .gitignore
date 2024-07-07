@@ -11,10 +11,11 @@ src/dist/
 *.stackdump
 src/content_script.js
 src/background_script.js
-stylish-reader-video-page-index.css
-stylish-reader-video-page.js
-stylish-reader-translation-panel-index.css
-stylish-reader-translation-panel.js
+src/assets/js/stylish-reader-video-page.js
+src/assets/css/stylish-reader-video-page-index.css
+src/assets/css/stylish-reader-translation-panel-index.css
+src/assets/js/stylish-reader-translation-panel.js
+src/assets/js/youtube-transport.js
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json

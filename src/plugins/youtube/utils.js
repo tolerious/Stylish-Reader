@@ -1,8 +1,14 @@
+import { getLoginToken } from "../entryPoint/utils/background.utils";
 import { logger } from "../utils/utils";
-import { youtubeStylishReaderIconId } from "./constants";
+import {
+  youtubeStylishReaderIconId,
+  youtubeVuePageMountPoint,
+} from "./constants";
 
 let currentYoutubeTranslationUrl = "";
+let currentYoutubeZhTranslationUrl = "";
 let currentYoutubeTranslationData = "";
+let currentYoutubeZhTranslationData = "";
 
 export function createYoutubeStylishReaderIcon() {
   //   const tt = document.querySelector(".ytp-chrome-bottom");
@@ -18,10 +24,36 @@ export function createYoutubeStylishReaderIcon() {
   }
 }
 
-function onClickStylishReaderIcon(e) {
+async function onClickStylishReaderIcon(e) {
   logger(currentYoutubeTranslationUrl);
-  console.log(currentYoutubeTranslationData);
-  // TODO: 在这里把获取到的数据调用后端API，保存在数据库中
+  logger(currentYoutubeZhTranslationUrl);
+
+  if (
+    currentYoutubeTranslationUrl === "" ||
+    currentYoutubeZhTranslationUrl === ""
+  ) {
+    logger("No translation found");
+    return;
+  }
+
+  const token = await getLoginToken();
+  sendMessageToYoutubeVideoPage({
+    type: "subtitle",
+    data: {
+      enUrl: currentYoutubeTranslationUrl,
+      enData: currentYoutubeTranslationData,
+      zhUrl: currentYoutubeZhTranslationUrl,
+      zhData: currentYoutubeZhTranslationData,
+      videoId: getVideoId(),
+      token,
+      link: window.location.href,
+    },
+  });
+}
+
+function getVideoId() {
+  const url = new URL(window.location.href);
+  return url.searchParams.get("v");
 }
 
 function findYoutubeStylishReaderToolBarIcon() {
@@ -52,8 +84,19 @@ function createYoutubeStylishIconElement() {
 }
 
 function parseSubtitles(url, data) {
-  currentYoutubeTranslationUrl = url;
-  currentYoutubeTranslationData = data;
+  const u = new URL(url);
+  logger(u.searchParams.get("lang"));
+  if (u.searchParams.get("lang") === "en") {
+    currentYoutubeTranslationUrl = url;
+    currentYoutubeTranslationData = data;
+  }
+  if (
+    u.searchParams.get("lang") === "zh" ||
+    u.searchParams.get("tlang") === "zh-Hans"
+  ) {
+    currentYoutubeZhTranslationUrl = url;
+    currentYoutubeZhTranslationData = data;
+  }
 }
 
 export function registerEventListenerForBackendScript() {
@@ -66,4 +109,34 @@ export function registerEventListenerForBackendScript() {
         break;
     }
   });
+}
+
+function sendMessageToYoutubeVideoPage(message) {
+  const event = new CustomEvent("fromYoutubeVideoContentScript", {
+    detail: JSON.stringify(message),
+  });
+  document.dispatchEvent(event);
+}
+
+export function registerReceiveMessageFromVideoPage() {
+  document.addEventListener("fromYoutubeVideo", (event) => {});
+}
+
+export function injectYoutubeVideoVuePage() {
+  if (isYoutubeVideoPageExist()) {
+    return;
+  }
+  createYoutubeVuePageMountPoint();
+}
+
+function isYoutubeVideoPageExist() {
+  return document.getElementById(youtubeVuePageMountPoint);
+}
+
+function createYoutubeVuePageMountPoint() {
+  logger("createYoutubeVuePageMountPoint");
+  const divElement = document.createElement("div");
+  divElement.id = youtubeVuePageMountPoint;
+  divElement.style.display = "block";
+  document.body.appendChild(divElement);
 }

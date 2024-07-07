@@ -16,7 +16,8 @@
       "js": [
         "content_script.js",
         "assets/js/plyr.js",
-        "assets/js/stylish-reader-translation-panel.js"
+        "assets/js/stylish-reader-translation-panel.js",
+        "assets/js/youtube-transport.js"
       ],
       "css": [
         "assets/css/plyr.css",
