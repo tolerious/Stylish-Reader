@@ -4,8 +4,7 @@ const instance = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL,
   timeout: 3000,
   headers: {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${localStorage.getItem('token')}`
+    'Content-Type': 'application/json'
   }
 });
 
