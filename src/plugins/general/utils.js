@@ -79,7 +79,6 @@ function convertCurrentTextNodeContent(textNode, targetWordList) {
      * 函数就无法判断出来，这里需要单独处理下这种情况
      *
      * */
-    console.log(s.toLocaleLowerCase());
     if (
       targetWordSet.has(
         s
