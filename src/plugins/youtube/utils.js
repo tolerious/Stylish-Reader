@@ -27,29 +27,30 @@ export function createYoutubeStylishReaderIcon() {
 async function onClickStylishReaderIcon(e) {
   logger(currentYoutubeTranslationUrl);
   logger(currentYoutubeZhTranslationUrl);
-
   if (
-    currentYoutubeTranslationUrl === "" ||
-    currentYoutubeZhTranslationUrl === ""
+    currentYoutubeTranslationUrl.trim() === "" ||
+    currentYoutubeZhTranslationUrl.trim() === ""
   ) {
     logger("No translation found");
-    return;
+    alert("请切换中英双语字母后再保存");
+  } else {
+    console.log("en", currentYoutubeTranslationUrl);
+    console.log("zh", currentYoutubeZhTranslationUrl);
+    const token = await getLoginToken();
+    sendMessageToYoutubeVideoPage({
+      type: "subtitle",
+      data: {
+        enUrl: currentYoutubeTranslationUrl,
+        enData: currentYoutubeTranslationData,
+        zhUrl: currentYoutubeZhTranslationUrl,
+        zhData: currentYoutubeZhTranslationData,
+        videoId: getVideoId(),
+        token,
+        link: window.location.href,
+        title: document.title,
+      },
+    });
   }
-
-  const token = await getLoginToken();
-  sendMessageToYoutubeVideoPage({
-    type: "subtitle",
-    data: {
-      enUrl: currentYoutubeTranslationUrl,
-      enData: currentYoutubeTranslationData,
-      zhUrl: currentYoutubeZhTranslationUrl,
-      zhData: currentYoutubeZhTranslationData,
-      videoId: getVideoId(),
-      token,
-      link: window.location.href,
-      title: document.title,
-    },
-  });
 }
 
 function getVideoId() {
@@ -87,7 +88,11 @@ function createYoutubeStylishIconElement() {
 function parseSubtitles(url, data) {
   const u = new URL(url);
   logger(u.searchParams.get("lang"));
-  if (u.searchParams.get("lang") === "en") {
+  if (
+    u.searchParams.get("lang") === "en" &&
+    (u.searchParams.get("tlang") !== "zh-Hans" ||
+      u.searchParams.get("tlang") === undefined)
+  ) {
     currentYoutubeTranslationUrl = url;
     currentYoutubeTranslationData = data;
   }
@@ -117,6 +122,8 @@ function sendMessageToYoutubeVideoPage(message) {
     detail: JSON.stringify(message),
   });
   document.dispatchEvent(event);
+  currentYoutubeZhTranslationUrl = "";
+  currentYoutubeTranslationUrl = "";
 }
 
 export function registerReceiveMessageFromVideoPage() {

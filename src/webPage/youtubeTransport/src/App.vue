@@ -9,11 +9,14 @@ function registerEventListenerFromContentScript() {
     const d = detail.data
     if (await checkIfVideoExist(d.videoId, d.token)) {
       console.log('video exist')
+      alert('视频已经添加过')
       return
     }
     console.log(d)
     const a = await saveArticle(d)
-    console.log(a)
+    if (a.data.code === 200) {
+      alert('视频添加成功')
+    }
   })
 }
 
