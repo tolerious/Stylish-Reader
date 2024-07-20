@@ -11,6 +11,7 @@ let currentYoutubeTranslationData = "";
 let currentYoutubeZhTranslationData = "";
 
 export function createYoutubeStylishReaderIcon() {
+  // For debug
   //   const tt = document.querySelector(".ytp-chrome-bottom");
   //   tt.style.opacity = 1;
   if (findYoutubeStylishReaderToolBarIcon()) {
