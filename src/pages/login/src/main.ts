@@ -113,6 +113,7 @@ $(function () {
     $("#login-btn").hide();
     $("#register-span").hide();
     $("#not-a-member").hide();
+    $("#error-message").hide();
   });
 
   $("#login-span").on("click", function () {
@@ -123,6 +124,7 @@ $(function () {
     $("#login-btn").show();
     $("#register-span").show();
     $("#not-a-member").show();
+    $("#error-message").hide();
   });
 
   $("#register-btn").on("click", function (event) {
@@ -142,13 +144,16 @@ $(function () {
       success: function (res) {
         if (res.code === 200) {
           browser.runtime.sendMessage({ type: "login-success", data: res });
+          $("#error-message").show();
           $("#error-message").text("Login success");
         } else {
+          $("#error-message").show();
           $("#error-message").text(res.msg);
           clearErrorMessageAfterTimeout();
         }
       },
       error: function (err) {
+        $("#error-message").show();
         $("#error-message").text(err.statusText);
         clearErrorMessageAfterTimeout();
       },
