@@ -145,11 +145,19 @@ $(function () {
           $("#error-message").text("Login success");
         } else {
           $("#error-message").text(res.msg);
+          clearErrorMessageAfterTimeout();
         }
       },
       error: function (err) {
         $("#error-message").text(err.statusText);
+        clearErrorMessageAfterTimeout();
       },
     });
   });
 });
+
+function clearErrorMessageAfterTimeout() {
+  setTimeout(() => {
+    $("#error-message").text("");
+  }, 2380);
+}
