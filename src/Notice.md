@@ -2,7 +2,9 @@
 
 ## 发布前需要更改的地方
 
-login.js 文件中的url要替换成生产环境
+- login.js 文件中的url要替换成生产环境
+
+- 进入到`pages/login`目录下执行build
 
 ## 考虑将login改成Vue打包的页面，这样可以更好的切换开发环境和生产环境
 
