@@ -1,5 +1,7 @@
-import "./output.css";
 import $ from "jquery";
+import "./output.css";
+
+const serverUrl = import.meta.env.VITE_SERVER;
 
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
       <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
@@ -17,7 +19,7 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
       </div>
 
       <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form class="space-y-6" action="#" method="POST">
+        <form class="space-y-6">
           <div>
             <label
               for="username"
@@ -81,7 +83,11 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
           </div>
         </form>
 
-        <p class="mt-10 text-center text-sm text-gray-500 cursor-pointer">
+        <p class="mt-4 text-center text-pink-700" id="error-message">
+          <span></span>
+        </p>
+        
+        <p class="mt-7 text-center text-sm text-gray-500 cursor-pointer">
           <span id="not-a-member">Not a member?</span>
           <span style="display:none" id="want-to-login">I want to</span>
           <a 
@@ -119,9 +125,31 @@ $(function () {
     $("#not-a-member").show();
   });
 
-  $("#register-btn").on("click", function () {
-    console.log("..!");
+  $("#register-btn").on("click", function (event) {
+    event.preventDefault();
   });
 
-  $("#login-btn").on("click", function () {});
+  $("#login-btn").on("click", function (event) {
+    event.preventDefault();
+    const username = $("#username").val();
+    const password = $("#password").val();
+
+    $.ajax({
+      url: `${serverUrl}/logic/login`,
+      method: "POST",
+      // timeout: 1500,
+      data: { username, password },
+      success: function (res) {
+        if (res.code === 200) {
+          browser.runtime.sendMessage({ type: "login-success", data: res });
+          $("#error-message").text("Login success");
+        } else {
+          $("#error-message").text(res.msg);
+        }
+      },
+      error: function (err) {
+        $("#error-message").text(err.statusText);
+      },
+    });
+  });
 });
