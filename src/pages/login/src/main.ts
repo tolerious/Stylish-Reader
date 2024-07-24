@@ -129,6 +129,32 @@ $(function () {
 
   $("#register-btn").on("click", function (event) {
     event.preventDefault();
+
+    const username = $("#username").val();
+    const password = $("#password").val();
+
+    $.ajax({
+      url: `${serverUrl}/user/create`,
+      method: "POST",
+      // timeout: 1500,
+      data: { username, password, ignore: true, source: "stylish" },
+      success: function (res) {
+        if (res.code === 200) {
+          $("#error-message").show();
+          $("#error-message").text("Register success");
+          clearErrorMessageAfterTimeout();
+        } else {
+          $("#error-message").show();
+          $("#error-message").text(res.msg);
+          clearErrorMessageAfterTimeout();
+        }
+      },
+      error: function (err) {
+        $("#error-message").show();
+        $("#error-message").text(err.statusText);
+        clearErrorMessageAfterTimeout();
+      },
+    });
   });
 
   $("#login-btn").on("click", function (event) {
