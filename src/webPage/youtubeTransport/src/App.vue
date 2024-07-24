@@ -2,6 +2,9 @@
 import axios from 'axios'
 import { onMounted } from 'vue'
 import { RouterView } from 'vue-router'
+
+const serverUrl = import.meta.env.VITE_SERVER
+
 function registerEventListenerFromContentScript() {
   document.addEventListener('fromYoutubeVideoContentScript', async (event: any) => {
     const detail = JSON.parse(event.detail)
@@ -23,7 +26,7 @@ function registerEventListenerFromContentScript() {
 // TODO: 使用环境变量来判断服务器地址
 async function saveArticle(o: any) {
   return await axios.post(
-    `http://localhost:3000/article`,
+    `${serverUrl}/article`,
     {
       ...o,
       enTranscriptData: JSON.stringify(o.enData),
@@ -37,7 +40,7 @@ async function saveArticle(o: any) {
 
 async function checkIfVideoExist(videoId: string, token: string) {
   // TODO: 使用环境变量来判断服务器地址
-  const url = `http://localhost:3000/article/youtube`
+  const url = `${serverUrl}/article/youtube`
   const r = await axios.post(
     url,
     { videoId },

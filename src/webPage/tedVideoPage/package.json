@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && cp dist/stylish-reader-video-page.js  ../../assets/js/ && cp dist/stylish-reader-video-page-index.css ../../assets/css",
+    "release": "vite build && cp dist/stylish-reader-video-page.js  ../../assets/js/ && cp dist/stylish-reader-video-page-index.css ../../assets/css",
     "preview": "vite preview"
   },
   "dependencies": {

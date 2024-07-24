@@ -16,7 +16,7 @@
       display: grid;
       grid-template-columns: 1fr 25% 25%;
       grid-template-rows: auto 280px 50px;
-      grid-template-areas: 'left-top right-bar right-right-bar' 'left-middle right-bar right-right-bar' 'left-bottom right-bar right-right-bar';
+      grid-template-areas: &quot;left-top right-bar right-right-bar&quot; &quot;left-middle right-bar right-right-bar&quot; &quot;left-bottom right-bar right-right-bar&quot;;
     "
   >
     <div
@@ -308,6 +308,7 @@ function eventListenerFromContent() {
       case "cleanup":
         break;
       case "prepare":
+        // @ts-ignore
         const sharedLink = detail.data.sharedLink;
         if (!video.value || video.value !== sharedLink) {
           video.value = sharedLink;
