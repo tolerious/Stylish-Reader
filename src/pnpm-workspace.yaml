@@ -1,0 +1,4 @@
+packages:
+  - "webPage/*"
+  - "pages/*"
+  - "plugins/entryPoint"
