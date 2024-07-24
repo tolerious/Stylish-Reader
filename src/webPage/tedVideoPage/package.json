@@ -1,0 +1,19 @@
+{
+  "name": "stylish-reader-video-page",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && cp dist/stylish-reader-video-page.js  ../../assets/js/ && cp dist/stylish-reader-video-page-index.css ../../assets/css",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "plyr": "^3.7.8",
+    "vue": "^3.4.21"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "vite": "^5.2.0"
+  }
+}
