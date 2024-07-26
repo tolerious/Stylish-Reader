@@ -149,3 +149,11 @@ function createYoutubeVuePageMountPoint() {
   divElement.style.display = "block";
   document.body.appendChild(divElement);
 }
+
+export function toggleSubtitleBtn() {
+  const subtitleBtn = document.querySelector("[aria-keyshortcuts='c']");
+  const value = subtitleBtn.getAttribute("aria-pressed");
+  if (value === "false") {
+    subtitleBtn.click();
+  }
+}

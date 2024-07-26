@@ -3,6 +3,7 @@ import {
   createYoutubeStylishReaderIcon,
   injectYoutubeVideoVuePage,
   registerEventListenerForBackendScript,
+  toggleSubtitleBtn,
 } from "./utils";
 
 export function initializeYoutube() {
@@ -12,5 +13,6 @@ export function initializeYoutube() {
 
   setInterval(() => {
     createYoutubeStylishReaderIcon();
+    toggleSubtitleBtn();
   }, 1000);
 }
