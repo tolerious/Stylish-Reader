@@ -150,6 +150,21 @@ function createYoutubeVuePageMountPoint() {
   document.body.appendChild(divElement);
 }
 
+function showTipsText(type) {
+  if (type === "en") {
+    const divElement = document.createElement("div");
+    divElement.textContent = "en";
+    const container = document.getElementById("owner");
+    container.appendChild(divElement);
+  }
+  if (type === "zh") {
+    const divElement = document.createElement("div");
+    divElement.textContent = "zh";
+    const container = document.getElementById("owner");
+    container.appendChild(divElement);
+  }
+}
+
 export function toggleSubtitleBtn() {
   const subtitleBtn = document.querySelector("[aria-keyshortcuts='c']");
   const value = subtitleBtn.getAttribute("aria-pressed");
