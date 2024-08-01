@@ -1,8 +1,15 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import EmptyComponent from '@/components/EmptyComponent.vue';
+import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: []
-})
+  routes: [
+    {
+      path: '/',
+      name: 'home',
+      component: EmptyComponent
+    }
+  ]
+});
 
-export default router
+export default router;

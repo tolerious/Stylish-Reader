@@ -73,7 +73,16 @@ watch(currentWord, async (newVal) => {
   if (newVal.trim().split(' ').length > 1) {
     return;
   }
-  const t = await customPost(SEARCH_WORD, { en: newVal.trim().toLowerCase() });
+  const t = await customPost(SEARCH_WORD, {
+    en: newVal
+      .trim()
+      .toLowerCase()
+      .replace(',', '')
+      .replace('.', '')
+      .replace('"', '')
+      .replace('(', '')
+      .replace(')', '')
+  });
   isLiked.value = t.data.data.isLiked;
 });
 
