@@ -14,6 +14,8 @@ let currentYoutubeTranslationUrl = "";
 let currentYoutubeZhTranslationUrl = "";
 let currentYoutubeTranslationData = "";
 let currentYoutubeZhTranslationData = "";
+let isEnglishTranscriptExist = false;
+let isChineseTranscriptExist = false;
 
 export function createYoutubeStylishReaderIcon() {
   // For debug
@@ -111,6 +113,7 @@ function isCurrentSubtitleEnglish(url) {
   return (
     (u.searchParams.get("lang") === "en" ||
       u.searchParams.get("lang") === "en-CA" ||
+      u.searchParams.get("lang") === "en-GB" ||
       u.searchParams.get("lang") === "en-US") &&
     (u.searchParams.get("tlang") !== "zh-Hans" ||
       u.searchParams.get("tlang") === undefined)
@@ -207,7 +210,6 @@ async function selectChineseTranscriptAutomatically() {
     "[data-tooltip-target-id='ytp-settings-button']"
   );
   const controlPanelOuter = document.getElementById("ytp-id-18");
-  let controlPanelInner = controlPanelOuter.querySelector(".ytp-panel-menu");
 
   // 让控制栏显示
   chromeBottom.style.opacity = 1;
@@ -216,8 +218,17 @@ async function selectChineseTranscriptAutomatically() {
   await waitForSeconds(500);
   settingsButton.click();
   await waitForSeconds(500);
-  const transcriptOptions = controlPanelInner.children[2];
-  transcriptOptions.click();
+  let controlPanelInner = controlPanelOuter.querySelector(".ytp-panel-menu");
+  await waitForSeconds(500);
+  controlPanelInner.childNodes.forEach((child) => {
+    console.log(child.textContent);
+    if (
+      child.textContent.includes("字幕") ||
+      child.textContent.includes("Subtitles")
+    ) {
+      child.click();
+    }
+  });
   await waitForSeconds(500);
   controlPanelInner = controlPanelOuter.querySelector(".ytp-panel-menu");
   await waitForSeconds(500);
@@ -227,7 +238,10 @@ async function selectChineseTranscriptAutomatically() {
   // TODO: 这里需要考虑是英文环境时对应的自动翻译的英文是什么
   controlPanelInner.childNodes.forEach((child) => {
     console.log(child.textContent);
-    if (child.textContent === "自动翻译") {
+    if (
+      child.textContent === "自动翻译" ||
+      child.textContent === "Auto-translate"
+    ) {
       child.click();
     }
   });
@@ -237,7 +251,11 @@ async function selectChineseTranscriptAutomatically() {
   controlPanelInner = controlPanelOuter.querySelector(".ytp-panel-menu");
   console.log(controlPanelInner.children);
   controlPanelInner.childNodes.forEach((child) => {
-    if (child.textContent === "中文（简体）") {
+    console.log(child.textContent);
+    if (
+      child.textContent === "中文（简体）" ||
+      child.textContent === "Chinese (Simplified)"
+    ) {
       child.click();
     }
   });
@@ -267,7 +285,8 @@ export function addTranscriptStatusElementIfNotExist() {
 }
 
 function setEnglishTranscriptStatus(active) {
-  console.log("set english background", active);
+  isEnglishTranscriptExist = active;
+  console.log("set english background color", active);
   const element = document.getElementById(transcriptStatusEnglishElementId);
   element.style.backgroundColor = active
     ? activeStatusBackgroundColor
@@ -275,6 +294,8 @@ function setEnglishTranscriptStatus(active) {
 }
 
 function setChineseTranscriptStatus(active) {
+  isChineseTranscriptExist = active;
+  console.log("set Chinese background color", active);
   const element = document.getElementById(transcriptStatusChineseElementId);
   element.style.backgroundColor = active
     ? activeStatusBackgroundColor
@@ -306,7 +327,7 @@ function createTranscriptStatusElement() {
   englishDiv.textContent = "English";
   englishDiv.style.lineHeight = height;
   englishDiv.style.height = "100%";
-  englishDiv.style.backgroundColor = inActiveStatusBackgroundColor;
+  // englishDiv.style.backgroundColor = inActiveStatusBackgroundColor;
   englishDiv.style.borderRight = "1px solid #64748b";
 
   // 创建第二个子 div
@@ -315,7 +336,7 @@ function createTranscriptStatusElement() {
   chineseDiv.textContent = "中文";
   chineseDiv.style.lineHeight = height;
   chineseDiv.style.height = "100%";
-  chineseDiv.style.backgroundColor = inActiveStatusBackgroundColor;
+  // chineseDiv.style.backgroundColor = inActiveStatusBackgroundColor;
 
   // 创建第三个 div
   const automationDiv = document.createElement("div");
@@ -332,4 +353,16 @@ function createTranscriptStatusElement() {
 
   // 将容器添加到parent中
   parentNode.appendChild(container);
+  console.log("isEnglishTranscriptExist", isEnglishTranscriptExist);
+  console.log("isChineseTranscriptExist", isChineseTranscriptExist);
+  if (!isEnglishTranscriptExist) {
+    setEnglishTranscriptStatus(false);
+  } else {
+    setEnglishTranscriptStatus(true);
+  }
+  if (!isChineseTranscriptExist) {
+    setChineseTranscriptStatus(false);
+  } else {
+    setEnglishTranscriptStatus(true);
+  }
 }
