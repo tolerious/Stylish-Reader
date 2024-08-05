@@ -130,6 +130,8 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.url) {
     // 在这里执行你想要的操作
     // notifyContentScript({ type: "urlChanged", url: changeInfo.url });
+    console.log("url changed...");
+    notifyContentScript({ type: "urlChanged" });
   }
 });
 

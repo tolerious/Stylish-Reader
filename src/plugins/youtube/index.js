@@ -1,5 +1,6 @@
 import { logger } from "../utils/utils";
 import {
+  addTranscriptStatusElementIfNotExist,
   createYoutubeStylishReaderIcon,
   injectYoutubeVideoVuePage,
   registerEventListenerForBackendScript,
@@ -14,5 +15,6 @@ export function initializeYoutube() {
   setInterval(() => {
     createYoutubeStylishReaderIcon();
     toggleSubtitleBtn();
+    addTranscriptStatusElementIfNotExist();
   }, 1000);
 }
