@@ -86,23 +86,35 @@ function createYoutubeStylishIconElement() {
   return divElement;
 }
 
-function parseSubtitles(url, data) {
+function isCurrentSubtitleEnglish(url) {
   const u = new URL(url);
-  logger(u.searchParams.get("lang"));
-  if (
+
+  return (
     u.searchParams.get("lang") === "en" &&
     (u.searchParams.get("tlang") !== "zh-Hans" ||
       u.searchParams.get("tlang") === undefined)
-  ) {
-    currentYoutubeTranslationUrl = url;
-    currentYoutubeTranslationData = data;
-  }
-  if (
+  );
+}
+
+function isCurrentSubtitleChinese(url) {
+  const u = new URL(url);
+
+  return (
     u.searchParams.get("lang") === "zh" ||
     u.searchParams.get("tlang") === "zh-Hans"
-  ) {
+  );
+}
+
+function parseSubtitles(url, data) {
+  if (isCurrentSubtitleEnglish(url)) {
+    currentYoutubeTranslationUrl = url;
+    currentYoutubeTranslationData = data;
+    logger("English subtitle gotcha.");
+  }
+  if (isCurrentSubtitleChinese(url)) {
     currentYoutubeZhTranslationUrl = url;
     currentYoutubeZhTranslationData = data;
+    logger("Chinese subtitle gotcha.");
   }
 }
 
