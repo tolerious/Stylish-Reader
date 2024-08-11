@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch, type Ref } from 'vue';
-import { DELETE_WORD, GET_WORD_ID, SAVE_WORD, SEARCH_WORD } from './constants';
+import { CREATE_GROUP, DELETE_WORD, GET_WORD_ID, SAVE_WORD, SEARCH_WORD } from './constants';
 import { customPost } from './utils/customRequest';
 
 interface CustomEvent extends Event {
@@ -52,21 +52,61 @@ const audioPlayer: Ref<HTMLAudioElement | null> = ref(null);
 
 const isLiked = ref(false);
 
-async function markWord() {
+function shouldAddToDefaultGroup() {
+  const url = window.location.href;
+  if (url.includes('youtuber')) {
+    return false;
+  }
+  return true;
+}
+
+function getYoutubeId() {
+  const urlArray = window.location.href.split('/');
+  return urlArray[urlArray.length - 1];
+}
+
+async function addWord() {
+  let group;
+  if (!shouldAddToDefaultGroup()) {
+    group = await createGroup();
+  }
   if (isLiked.value) {
-    const t = await customPost(GET_WORD_ID, { en: currentWord.value.trim().toLocaleLowerCase() });
+    const t = await customPost(GET_WORD_ID, {
+      en: currentWord.value
+        .trim()
+        .toLocaleLowerCase()
+        .replace(',', '')
+        .replace('.', '')
+        .replace('"', '')
+        .replace('(', '')
+        .replace(')', '')
+    });
     const r = await customPost(DELETE_WORD, { id: t.data.data._id });
     if (r.data.code === 200) {
       isLiked.value = false;
       sendMessageToGeneralScript({ type: 'remove-word', message: currentWord.value.trim() });
     }
   } else {
-    const t = await customPost(SAVE_WORD, { en: currentWord.value.trim() });
+    let t;
+    if (group) {
+      t = await customPost(SAVE_WORD, {
+        en: currentWord.value.trim(),
+        groupId: group.data.data._id
+      });
+    } else {
+      t = await customPost(SAVE_WORD, { en: currentWord.value.trim() });
+    }
     if (t.data.code === 200) {
       isLiked.value = true;
       sendMessageToGeneralScript({ type: 'save-word' });
     }
   }
+}
+
+function addPhrase() {}
+
+async function markWord() {
+  addWord();
 }
 
 watch(currentWord, async (newVal) => {
@@ -162,7 +202,16 @@ function getTranslationFromYouDao(textToBeTranslated: string) {
     });
 }
 
-onMounted(() => {
+async function createGroup() {
+  const g = await customPost(CREATE_GROUP, {
+    youtubeId: getYoutubeId(),
+    name: document.title,
+    links: [window.location.href]
+  });
+  return g;
+}
+
+onMounted(async () => {
   listenEventFromGeneralScript();
 });
 
