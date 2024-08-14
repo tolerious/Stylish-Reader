@@ -26,8 +26,16 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch, type Ref } from 'vue';
-import { CREATE_GROUP, DELETE_WORD, GET_WORD_ID, SAVE_WORD, SEARCH_WORD } from './constants';
-import { customPost } from './utils/customRequest';
+import {
+  ADD_PHRASE,
+  CREATE_GROUP,
+  DELETE_WORD,
+  GET_WORD_ID,
+  SAVE_WORD,
+  SEARCH_WORD,
+  USER_SETTING
+} from './constants';
+import { customGet, customPost } from './utils/customRequest';
 
 interface CustomEvent extends Event {
   detail: string;
@@ -103,10 +111,30 @@ async function addWord() {
   }
 }
 
-function addPhrase() {}
+async function addPhrase() {
+  if (shouldAddToDefaultGroup()) {
+    const userSetting = await customGet(USER_SETTING);
+    const s = userSetting.data.data.defaultGroupID;
+    if (!s) {
+      alert('请在个人中心设置默认词组');
+      return;
+    }
+    const phrase = await customPost(ADD_PHRASE, { en: currentWord.value, groupId: s });
+    console.log(phrase);
+  } else {
+    const group = await createGroup();
+    if(isLiked.value){}else{}
+  }
+}
 
 async function markWord() {
-  addWord();
+  const text = currentWord.value.trim();
+  const textArray = text.split(' ');
+  if (textArray.length > 1) {
+    addPhrase();
+  } else {
+    addWord();
+  }
 }
 
 watch(currentWord, async (newVal) => {
