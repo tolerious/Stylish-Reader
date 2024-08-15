@@ -1,13 +1,12 @@
 <template>
   <div class="container mx-auto px-1 py-1">
     <div class="flex columns-2 flex-row">
-      <div class="basis-11/12 flex-col text-xl">{{ currentWord }}</div>
-      <div
-        class="flex w-9 basis-9 cursor-pointer select-none flex-row justify-around"
-        @click="markWord"
-      >
-        <span v-if="isLiked">❤️</span>
-        <span v-else>🤍</span>
+      <div class="basis-4/5 flex-col text-xl">{{ currentWord }}</div>
+      <div class="flex grow cursor-pointer select-none flex-row justify-around" @click="markWord">
+        <template v-if="isPhrase">
+          <span>➕ 添加词组</span>
+        </template>
+        <template v-else> <span v-if="isLiked">❤️</span> <span v-else>🤍</span></template>
       </div>
     </div>
     <div class="my-2 flex cursor-pointer flex-row space-x-2">
@@ -25,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch, type Ref } from 'vue';
+import { computed, onMounted, ref, watch, type Ref } from 'vue';
 import {
   ADD_PHRASE,
   CREATE_GROUP,
@@ -60,6 +59,8 @@ const audioPlayer: Ref<HTMLAudioElement | null> = ref(null);
 
 const isLiked = ref(false);
 
+const groupId = ref('');
+
 function shouldAddToDefaultGroup() {
   const url = window.location.href;
   if (url.includes('youtuber')) {
@@ -74,10 +75,6 @@ function getYoutubeId() {
 }
 
 async function addWord() {
-  let group;
-  if (!shouldAddToDefaultGroup()) {
-    group = await createGroup();
-  }
   if (isLiked.value) {
     const t = await customPost(GET_WORD_ID, {
       en: currentWord.value
@@ -96,14 +93,17 @@ async function addWord() {
     }
   } else {
     let t;
-    if (group) {
-      t = await customPost(SAVE_WORD, {
-        en: currentWord.value.trim(),
-        groupId: group.data.data._id
-      });
-    } else {
-      t = await customPost(SAVE_WORD, { en: currentWord.value.trim() });
-    }
+    t = await customPost(SAVE_WORD, {
+      en: currentWord.value
+        .trim()
+        .toLocaleLowerCase()
+        .replace(',', '')
+        .replace('.', '')
+        .replace('"', '')
+        .replace('(', '')
+        .replace(')', ''),
+      groupId: groupId.value
+    });
     if (t.data.code === 200) {
       isLiked.value = true;
       sendMessageToGeneralScript({ type: 'save-word' });
@@ -112,30 +112,26 @@ async function addWord() {
 }
 
 async function addPhrase() {
-  if (shouldAddToDefaultGroup()) {
-    const userSetting = await customGet(USER_SETTING);
-    const s = userSetting.data.data.defaultGroupID;
-    if (!s) {
-      alert('请在个人中心设置默认词组');
-      return;
-    }
-    const phrase = await customPost(ADD_PHRASE, { en: currentWord.value, groupId: s });
-    console.log(phrase);
-  } else {
-    const group = await createGroup();
-    if(isLiked.value){}else{}
+  if (!groupId.value) {
+    alert('请在个人中心设置默认单词本');
+    return;
   }
+  const phrase = await customPost(ADD_PHRASE, {
+    en: currentWord.value.trim(),
+    groupId: groupId.value
+  });
+  console.log(phrase);
 }
 
 async function markWord() {
-  const text = currentWord.value.trim();
-  const textArray = text.split(' ');
-  if (textArray.length > 1) {
+  if (isPhrase.value) {
     addPhrase();
   } else {
     addWord();
   }
 }
+
+const isPhrase = computed(() => currentWord.value.trim().split(' ').length > 1);
 
 watch(currentWord, async (newVal) => {
   if (newVal.trim().split(' ').length > 1) {
@@ -241,6 +237,13 @@ async function createGroup() {
 
 onMounted(async () => {
   listenEventFromGeneralScript();
+  if (!shouldAddToDefaultGroup()) {
+    const userSetting = (await customPost(USER_SETTING, {})).data.data;
+    groupId.value = userSetting.defaultGroupID;
+  } else {
+    const g = (await createGroup()).data.data;
+    groupId.value = g._id;
+  }
 });
 
 function sendMessageToGeneralScript(message: any) {
