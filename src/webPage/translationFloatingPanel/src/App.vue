@@ -116,11 +116,15 @@ async function addPhrase() {
     alert('请在个人中心设置默认单词本');
     return;
   }
-  const phrase = await customPost(ADD_PHRASE, {
+  const r = await customPost(ADD_PHRASE, {
     en: currentWord.value.trim(),
     groupId: groupId.value
   });
-  console.log(phrase);
+  if (r.data.code === 200) {
+    alert('添加成功');
+  } else {
+    alert(r.data.msg)
+  }
 }
 
 async function markWord() {
@@ -237,7 +241,7 @@ async function createGroup() {
 
 onMounted(async () => {
   listenEventFromGeneralScript();
-  if (!shouldAddToDefaultGroup()) {
+  if (shouldAddToDefaultGroup()) {
     const userSetting = (await customPost(USER_SETTING, {})).data.data;
     groupId.value = userSetting.defaultGroupID;
   } else {
