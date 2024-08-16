@@ -113,7 +113,7 @@ async function addWord() {
 
 async function addPhrase() {
   if (!groupId.value) {
-    alert('请在个人中心设置默认单词本');
+    alert('请在网站个人中心页面设置默认单词本');
     return;
   }
   const r = await customPost(ADD_PHRASE, {
@@ -123,7 +123,7 @@ async function addPhrase() {
   if (r.data.code === 200) {
     alert('添加成功');
   } else {
-    alert(r.data.msg)
+    alert(r.data.msg);
   }
 }
 
