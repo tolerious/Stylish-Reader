@@ -65,7 +65,15 @@ function removeUnMarkedWord(word) {
         .replace(",", "")
         .replace('"', "")
         .replace("(", "")
-        .replace(")", "") === word.trim()
+        .replace(")", "") ===
+      word
+        .trim()
+        .toLocaleLowerCase()
+        .replace(".", "")
+        .replace(",", "")
+        .replace('"', "")
+        .replace("(", "")
+        .replace(")", "")
     ) {
       const targetParentNode = node.parentNode;
       // 重新把被自定义span标签包裹的文本系欸但替换回来

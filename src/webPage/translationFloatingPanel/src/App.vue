@@ -172,7 +172,14 @@ function listenEventFromGeneralScript() {
         } else {
           isPlayAudioIconVisible.value = true;
         }
-        getTranslationFromYouDao(data.word);
+        getTranslationFromYouDao(
+          data.word
+            .replace('.', '')
+            .replace(',', '')
+            .replace('"', '')
+            .replace('(', '')
+            .replace(')', '')
+        );
         break;
       case 'play':
         if (isPlayAudioIconVisible.value) {
