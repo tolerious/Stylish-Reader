@@ -165,6 +165,7 @@ function listenEventFromGeneralScript() {
     const data = JSON.parse(ee.detail);
     switch (data.type) {
       case 'search-word':
+        dic.value = [];
         currentWord.value = data.word;
         if (data.word.trim().split(' ').length > 1) {
           isPlayAudioIconVisible.value = false;
