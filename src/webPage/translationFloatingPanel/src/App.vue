@@ -34,7 +34,7 @@ import {
   SEARCH_WORD,
   USER_SETTING
 } from './constants';
-import { customGet, customPost } from './utils/customRequest';
+import { customPost } from './utils/customRequest';
 
 interface CustomEvent extends Event {
   detail: string;
@@ -86,7 +86,7 @@ async function addWord() {
         .replace('(', '')
         .replace(')', '')
     });
-    const r = await customPost(DELETE_WORD, { id: t.data.data._id });
+    const r = await customPost(DELETE_WORD, { id: t.data.data._id, groupId: t.data.data.groupID });
     if (r.data.code === 200) {
       isLiked.value = false;
       sendMessageToGeneralScript({ type: 'remove-word', message: currentWord.value.trim() });
