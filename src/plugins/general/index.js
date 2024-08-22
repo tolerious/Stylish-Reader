@@ -4,13 +4,13 @@ import {
   customizeGeneralEvent,
   getWordList,
   goThroughDomAndGenerateCustomElement,
-  injectTranslationFloatingPanelVuePage,
+  injectTranslationFloatingPanelToShadowDom,
 } from "./utils";
 
 export async function initializeGeneralWebSite() {
   logger("initializeGeneralWebSite");
   checkAuthorize();
   customizeGeneralEvent();
-  injectTranslationFloatingPanelVuePage();
+  injectTranslationFloatingPanelToShadowDom();
   goThroughDomAndGenerateCustomElement(await getWordList());
 }

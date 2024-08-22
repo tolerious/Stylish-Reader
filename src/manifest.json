@@ -16,13 +16,9 @@
       "js": [
         "content_script.js",
         "assets/js/plyr.js",
-        "assets/js/stylish-reader-translation-panel.js",
         "assets/js/youtube-transport.js"
       ],
-      "css": [
-        "assets/css/plyr.css",
-        "assets/css/stylish-reader-translation-panel-index.css"
-      ],
+      "css": ["assets/css/plyr.css"],
       "run_at": "document_end"
     }
   ],

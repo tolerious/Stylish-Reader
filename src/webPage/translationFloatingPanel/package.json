@@ -11,8 +11,8 @@
     "test:unit": "vitest",
     "test:e2e": "start-server-and-test preview http://localhost:4173 'cypress run --e2e'",
     "test:e2e:dev": "start-server-and-test 'vite dev --port 4173' http://localhost:4173 'cypress open --e2e'",
-    "build-only": "vite build --mode development && cp -r ./dist/stylish-reader-translation-panel.js ../../assets/js && cp ./dist/stylish-reader-translation-panel-index.css ../../assets/css ",
-    "release-only": "vite build --mode production && cp -r ./dist/stylish-reader-translation-panel.js ../../assets/js && cp ./dist/stylish-reader-translation-panel-index.css ../../assets/css ",
+    "build-only": "vite build --mode development && cp -r ./dist/stylish-reader-translation-panel.js ../../assets/js && cp ./dist/stylish-reader-translation-panel-index.css ../../assets/css",
+    "release-only": "vite build --mode production && cp -r ./dist/stylish-reader-translation-panel.js ../../assets/js && cp ./dist/stylish-reader-translation-panel-index.css ../../assets/css",
     "type-check": "vue-tsc --build --force",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "format": "prettier --write src/"
@@ -20,6 +20,7 @@
   "dependencies": {
     "axios": "^1.7.2",
     "pinia": "^2.1.7",
+    "vite-plugin-css-injected-by-js": "^3.5.1",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
   },

@@ -248,6 +248,7 @@ async function createGroup() {
 }
 
 onMounted(async () => {
+  console.log('...')
   listenEventFromGeneralScript();
   if (shouldAddToDefaultGroup()) {
     const userSetting = (await customPost(USER_SETTING, {})).data.data;
