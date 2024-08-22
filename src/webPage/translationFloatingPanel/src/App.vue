@@ -1,7 +1,7 @@
 <template>
   <div class="container mx-auto px-1 py-1 text-[16px]">
     <div class="flex columns-2 flex-row">
-      <div class="basis-4/5 flex-col text-xl">{{ currentWord }}</div>
+      <div class="basis-4/5 flex-col text-[18px]">{{ currentWord }}</div>
       <div class="flex grow cursor-pointer select-none flex-row justify-around" @click="markWord">
         <template v-if="isPhrase">
           <span>➕ 添加词组</span>
