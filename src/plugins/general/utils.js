@@ -6,6 +6,7 @@ import {
   floatingIconSize,
   stylishReaderFloatingIconId,
   translationFloatingPanelId,
+  translationFloatingPanelShadowRootId,
   translationPanelSize,
 } from "./constants";
 
@@ -158,7 +159,7 @@ function customizeMouseDownEvent() {
     const mouseX = event.clientX;
     const mouseY = event.clientY;
     const floatingPanelContainer = document.getElementById(
-      translationFloatingPanelId
+      translationFloatingPanelShadowRootId
     );
     const floatingPanelContainerRect =
       floatingPanelContainer.getBoundingClientRect();
@@ -286,7 +287,9 @@ function calculateFloatingPanelPosition(targetElement) {
   const x = targetElement.getBoundingClientRect().left;
   const y = targetElement.getBoundingClientRect().top;
   showTranslationFloatingPanelTemporary();
-  const floatingPanel = document.getElementById(translationFloatingPanelId);
+  const floatingPanel = document.getElementById(
+    translationFloatingPanelShadowRootId
+  );
   const floatingPanelHeight = floatingPanel.offsetHeight;
   const floatingPanelWidth = floatingPanel.offsetWidth;
   let positionX = x - floatingPanelWidth / 2;
@@ -305,11 +308,14 @@ function calculateFloatingPanelPosition(targetElement) {
 
 // 临时显示下panel，但是是透明的，所以用户不会感觉到知识为了获取到它的宽高
 function showTranslationFloatingPanelTemporary() {
-  const floatingPanel = document.getElementById(translationFloatingPanelId);
+  const floatingPanel = document.getElementById(
+    translationFloatingPanelShadowRootId
+  );
   floatingPanel.style.display = "block";
   floatingPanel.style.opacity = 0;
   floatingPanel.style.top = 0;
   floatingPanel.style.left = 0;
+  floatingPanel.style.boxShadow = "none";
 }
 
 // source=selection,说明点击的是floating icon
@@ -317,7 +323,9 @@ export function showTranslationFloatingPanel(
   source = "selection",
   position = { x: 0, y: 0 }
 ) {
-  const translationPanel = document.getElementById(translationFloatingPanelId);
+  const translationPanel = document.getElementById(
+    translationFloatingPanelShadowRootId
+  );
   translationPanel.style.display = "block";
   if (source === "selection") {
     const selection = window.getSelection();
@@ -328,63 +336,84 @@ export function showTranslationFloatingPanel(
     translationPanel.style.top = y + "px";
     translationPanel.style.left = x + "px";
     translationPanel.style.opacity = 1;
+    translationPanel.style.boxShadow = "0 0 15px 5px grey";
   } else {
     translationPanel.style.top = position.y + "px";
     translationPanel.style.left = position.x + "px";
     translationPanel.style.opacity = 1;
+    translationPanel.style.boxShadow = "0 0 15px 5px grey";
   }
 }
 
 function hideTranslationFloatingPanel() {
-  const translationPanel = document.getElementById(translationFloatingPanelId);
+  const translationPanel = document.getElementById(
+    translationFloatingPanelShadowRootId
+  );
   if (translationPanel) {
     translationPanel.style.display = "none";
   }
 }
 
-function createTranslationFloatingPanel(x = 0, y = 0) {
-  const divElement = document.createElement("div");
-  divElement.id = translationFloatingPanelId;
-  divElement.style.display = "none";
-  divElement.style.boxSizing = "border-box";
-  divElement.style.borderRadius = "3px";
-  divElement.style.width = translationPanelSize.width + "px";
-  divElement.style.backgroundColor = "white";
-  divElement.style.boxShadow = "0 0 15px 5px grey";
-  divElement.style.position = "fixed";
-  divElement.style.top = y + "px";
-  divElement.style.left = x + "px";
-  divElement.style.zIndex = "9999";
-  document.body.appendChild(divElement);
+async function createTranslationFloatingPanel(x = 0, y = 0) {
+  const shadowRoot = document.createElement("div");
+  shadowRoot.id = translationFloatingPanelShadowRootId;
+  shadowRoot.style.display = "none";
+  shadowRoot.style.boxSizing = "border-box";
+  shadowRoot.style.borderRadius = "3px";
+  shadowRoot.style.width = translationPanelSize.width + "px";
+  shadowRoot.style.backgroundColor = "white";
+  shadowRoot.style.boxShadow = "0 0 15px 5px grey";
+  shadowRoot.style.position = "fixed";
+  shadowRoot.style.top = y + "px";
+  shadowRoot.style.left = x + "px";
+  shadowRoot.style.zIndex = "9999";
+  const shadow = shadowRoot.attachShadow({ mode: "open" });
+
+  // 创建挂载点
+  const mountPoint = document.createElement("div");
+  mountPoint.id = translationFloatingPanelId;
+
+  // 创建脚本挂载点
+  const vueScript = document.createElement("script");
+
+  // 创建样式挂载点
+  const styleElement = document.createElement("style");
+  styleElement.setAttribute("type", "text/css");
+  const cssCode = await injectTranslationFloatingPanelCss();
+  styleElement.appendChild(document.createTextNode(cssCode));
+
+  // 在shadow dom中添加挂载点
+  shadow.appendChild(mountPoint);
+
+  // 在shadow dom中添加脚本挂载点
+  const jsCode = await fetchFloatingPanelJsFile();
+  vueScript.textContent = jsCode;
+  shadow.appendChild(vueScript);
+
+  // 在shadow dom中添加样式挂载点
+  shadow.appendChild(styleElement);
+
+  // 添加到页面上
+  document.body.appendChild(shadowRoot);
+
+  eval(vueScript.textContent);
 }
 
 function checkIfTranslationFloatingPanelExist() {
-  return document.getElementById(translationFloatingPanelId);
+  return document.getElementById(translationFloatingPanelShadowRootId);
 }
 
-function injectInternalCSS(css) {
-  const style = document.createElement("style");
-  style.setAttribute("type", "text/css");
-  style.appendChild(document.createTextNode(css));
-  document.head.appendChild(style);
-}
-
-export function injectTranslationFloatingPanelCss() {
-  fetch(
-    browser.runtime.getURL(
-      "assets/css/stylish-reader-translation-panel-index.css"
+function injectTranslationFloatingPanelCss() {
+  return new Promise((resolve) => {
+    fetch(
+      browser.runtime.getURL(
+        "assets/css/stylish-reader-translation-panel-index.css"
+      )
     )
-  )
-    .then((response) => response.text())
-    .then((css) => injectInternalCSS(css))
-    .catch((error) => console.error("Error injecting CSS:", error));
-}
-
-export function injectTranslationFloatingPanelVuePage() {
-  if (checkIfTranslationFloatingPanelExist()) {
-    return;
-  }
-  createTranslationFloatingPanel();
+      .then((response) => response.text())
+      .then((css) => resolve(css))
+      .catch((error) => console.error("Error injecting CSS:", error));
+  });
 }
 
 export function listenFromFloatingPanelEvent() {
@@ -444,4 +473,23 @@ export function checkAuthorize() {
 
 function sendMessageToBackgroundScript(type, message) {
   browser.runtime.sendMessage({ type, message });
+}
+
+function fetchFloatingPanelJsFile() {
+  return new Promise((resolve) => {
+    fetch(
+      browser.runtime.getURL("assets/js/stylish-reader-translation-panel.js")
+    )
+      .then((response) => response.text())
+      .then((js) => {
+        resolve(js);
+      });
+  });
+}
+
+export async function injectTranslationFloatingPanelToShadowDom() {
+  if (checkIfTranslationFloatingPanelExist()) {
+    return;
+  }
+  createTranslationFloatingPanel();
 }

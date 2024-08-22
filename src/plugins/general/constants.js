@@ -2,6 +2,9 @@ export const stylishReaderFloatingIconId = "stylish-reader-floating-icon";
 
 export const translationFloatingPanelId = "stylish-reader-translation-panel";
 
+export const translationFloatingPanelShadowRootId =
+  "stylish-reader-translation-panel-shadow-root";
+
 export const clickableWordClassName = "stylish-reader-clickable-word";
 
 export const floatingIconSize = {
