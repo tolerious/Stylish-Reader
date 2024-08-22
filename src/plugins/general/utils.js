@@ -315,6 +315,7 @@ function showTranslationFloatingPanelTemporary() {
   floatingPanel.style.opacity = 0;
   floatingPanel.style.top = 0;
   floatingPanel.style.left = 0;
+  floatingPanel.style.boxShadow = "none";
 }
 
 // source=selection,说明点击的是floating icon
@@ -335,10 +336,12 @@ export function showTranslationFloatingPanel(
     translationPanel.style.top = y + "px";
     translationPanel.style.left = x + "px";
     translationPanel.style.opacity = 1;
+    translationPanel.style.boxShadow = "0 0 15px 5px grey";
   } else {
     translationPanel.style.top = position.y + "px";
     translationPanel.style.left = position.x + "px";
     translationPanel.style.opacity = 1;
+    translationPanel.style.boxShadow = "0 0 15px 5px grey";
   }
 }
 
@@ -392,6 +395,8 @@ async function createTranslationFloatingPanel(x = 0, y = 0) {
 
   // 添加到页面上
   document.body.appendChild(shadowRoot);
+
+  eval(vueScript.textContent);
 }
 
 function checkIfTranslationFloatingPanelExist() {

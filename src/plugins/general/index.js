@@ -10,7 +10,7 @@ import {
 export async function initializeGeneralWebSite() {
   logger("initializeGeneralWebSite");
   checkAuthorize();
+  await injectTranslationFloatingPanelToShadowDom();
   customizeGeneralEvent();
-  injectTranslationFloatingPanelToShadowDom();
   goThroughDomAndGenerateCustomElement(await getWordList());
 }
