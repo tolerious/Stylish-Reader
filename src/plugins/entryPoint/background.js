@@ -19,7 +19,7 @@ async function checkConnection() {
   let t = await pingPong();
   let j = await t.json();
   if (t.ok && j.code !== 200) {
-    browser.tabs.create({ url: "pages/login/dist/index.html" });
+    browser.tabs.create({ url: "loginPage/index.html" });
   }
 }
 
@@ -58,7 +58,7 @@ async function extensionIconClicked(tab, clickEvent) {
 
   if (token === undefined || token === null || token === "") {
     // Need login logic here...
-    browser.tabs.create({ url: "pages/login/dist/index.html" });
+    browser.tabs.create({ url: "loginPage/index.html" });
   } else {
     // already login, ping pong to server using token
     let t = await pingPong();
@@ -71,7 +71,7 @@ async function extensionIconClicked(tab, clickEvent) {
       //   notifyContentScript({ type: "saveArticleSuccess" });
       // }
     } else {
-      browser.tabs.create({ url: "pages/login/dist/index.html" });
+      browser.tabs.create({ url: "loginPage/index.html" });
     }
   }
 }
