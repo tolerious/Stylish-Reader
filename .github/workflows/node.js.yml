@@ -32,5 +32,5 @@ jobs:
         version: 8
     - run: pnpm install
       working-directory: ./src
-    - run: pnpm release --if-present
+    - run: pnpm release 
       working-directory: ./src
