@@ -46,15 +46,13 @@ jobs:
           path: |
             ./src/web-ext-artifacts/
                   - name: Upload to Release Action
-      
+    - name: Release package 
       uses: Shopify/upload-to-release@v2.0.0
       with:
         # Artifact name
-        name: 
+        name: stylish-reader-extension
         # Path to the file to upload
-        path: 
-        # Content type for the file
-        content-type: # optional, default is application/octet-stream
+        path: ./src/web-ext-artifacts/
         # secrets.GITHUB_TOKEN
         repo-token: secrets.GITHUB_TOKEN
               
