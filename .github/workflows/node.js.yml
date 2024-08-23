@@ -44,6 +44,6 @@ jobs:
       with:
           name: stylish-reader-extension
           path: |
-            ./src/web-ext-artifacts/
+            ./src/web-ext-artifacts/*.zip
                   - name: Upload to Release Action
     
