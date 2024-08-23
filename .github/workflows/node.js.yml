@@ -26,9 +26,11 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'pnpm'
-    - name: Install pnpm
-      run: npm install -g pnpm
-    - run: npm ci
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8
+    - run: pnpm install
       working-directory: ./src
-    - run: npm run release --if-present
+    - run: pnpm release --if-present
       working-directory: ./src
