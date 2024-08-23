@@ -36,3 +36,7 @@ jobs:
       working-directory: ./src
     - run: pnpm release 
       working-directory: ./src
+    - name: Package
+      run: web-ext build
+      working-directory: ./src
+      
