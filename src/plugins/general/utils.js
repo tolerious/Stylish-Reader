@@ -491,5 +491,5 @@ export async function injectTranslationFloatingPanelToShadowDom() {
   if (checkIfTranslationFloatingPanelExist()) {
     return;
   }
-  createTranslationFloatingPanel();
+  await createTranslationFloatingPanel();
 }
