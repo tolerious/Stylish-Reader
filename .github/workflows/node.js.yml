@@ -44,5 +44,5 @@ jobs:
       with:
           name: dist-without-markdown
           path: |
-            /src/web-ext-artifacts/
+            ./src/web-ext-artifacts/
       
