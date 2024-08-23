@@ -46,14 +46,15 @@ jobs:
           path: |
             ./src/web-ext-artifacts/
                   - name: Upload to Release Action
-    - name: Release package 
-      uses: Shopify/upload-to-release@v2.0.0
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
       with:
-        # Artifact name
-        name: stylish-reader-extension
-        # Path to the file to upload
-        path: ./src/web-ext-artifacts/
-        # secrets.GITHUB_TOKEN
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ github.ref }}  # 基于推送的标签名
+          release_name: Release ${{ github.ref }}
+          draft: false  # 设置为false以便立即发布
+          prerelease: true  # 如果这是预发布版本，设为true
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub提供的token自动注入
         
               
