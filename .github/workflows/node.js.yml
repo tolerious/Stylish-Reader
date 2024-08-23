@@ -39,4 +39,10 @@ jobs:
     - name: Package
       run: web-ext build
       working-directory: ./src
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v4.3.6
+      with:
+          name: dist-without-markdown
+          path: |
+            /src/web-ext-artifacts/
       
