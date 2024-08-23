@@ -1,4 +1,5 @@
 # Stylish Reader
+[![Stylish Reader Extension CI](https://github.com/tolerious/Stylish-Reader/actions/workflows/node.js.yml/badge.svg?branch=master)](https://github.com/tolerious/Stylish-Reader/actions/workflows/node.js.yml)
 
 Firefox extension that helps you learn English better and easier.
 
