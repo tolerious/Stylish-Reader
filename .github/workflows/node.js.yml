@@ -54,5 +54,6 @@ jobs:
         # Path to the file to upload
         path: ./src/web-ext-artifacts/
         # secrets.GITHUB_TOKEN
-        repo-token: secrets.GITHUB_TOKEN
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        
               
