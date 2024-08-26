@@ -32,3 +32,4 @@ Firefox extension that helps you learn English better and easier.
 
 You can see the real-time bilingual live subtitles while watching TED videos.
 ![alt text](assets/image-1.png)
+
