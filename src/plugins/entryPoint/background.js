@@ -11,15 +11,22 @@ import {
 // TED 网站，当前页面URL
 let tedCurrentUrl = "";
 
+// Content Script 是否已经准备完毕
 let isContentScriptReady = false;
+
+// login page 是否已经被打开过
+let loginHasBeenOpened = false;
 
 console.log("background.js loaded");
 
 async function checkConnection() {
   let t = await pingPong();
   let j = await t.json();
-  if (t.ok && j.code !== 200) {
+  if (t.ok && j.code !== 200 && !loginHasBeenOpened) {
     browser.tabs.create({ url: "loginPage/index.html" });
+    loginHasBeenOpened = true;
+  } else {
+    loginHasBeenOpened = false;
   }
 }
 
@@ -107,6 +114,7 @@ browser.browserAction.onClicked.addListener(extensionIconClicked);
 
 browser.webNavigation.onBeforeNavigate.addListener((details) => {
   isContentScriptReady = false;
+  loginHasBeenOpened = false;
 });
 
 // Listen for messages from pages(Mozilla://file pages, not web pages) and content scripts
