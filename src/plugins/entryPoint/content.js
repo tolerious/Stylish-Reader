@@ -1,22 +1,27 @@
 import { initializeBBC } from "../bbcLearningEnglish";
 import { initializeGeneralWebSite } from "../general";
 import { initializeTed } from "../ted";
+import {
+  isBBCLearningEnglishWebSite,
+  isTedWebSite,
+  isYouTubeWebSite,
+} from "../utils/utils";
 import { initializeYoutube } from "../youtube";
 
 // 所有的网站上都执行的插件
 initializeGeneralWebSite();
 
 // 插件 Ted
-if (window.location.hostname.includes("ted.com")) {
+if (isTedWebSite()) {
   initializeTed();
 }
 
 // 插件 BBC Learning English
-if (window.location.href.includes("bbc.co.uk/learningenglish")) {
+if (isBBCLearningEnglishWebSite()) {
   initializeBBC();
 }
 
 // 插件 Youtube
-if (window.location.hostname.includes("youtube.com")) {
+if (isYouTubeWebSite()) {
   initializeYoutube();
 }

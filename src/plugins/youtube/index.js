@@ -3,13 +3,11 @@ import {
   addTranscriptStatusElementIfNotExist,
   createYoutubeStylishReaderIcon,
   injectYoutubeVideoVuePage,
-  registerEventListenerForBackendScript,
   toggleSubtitleBtn,
 } from "./utils";
 
 export function initializeYoutube() {
   logger("Initialize Youtube...");
-  registerEventListenerForBackendScript();
   injectYoutubeVideoVuePage();
 
   setInterval(() => {

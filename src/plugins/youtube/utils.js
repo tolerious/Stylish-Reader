@@ -129,7 +129,7 @@ function isCurrentSubtitleChinese(url) {
   );
 }
 
-function parseSubtitles(url, data) {
+export function parseSubtitles(url, data) {
   if (isCurrentSubtitleEnglish(url)) {
     currentYoutubeTranslationUrl = url;
     currentYoutubeTranslationData = data;
@@ -142,23 +142,6 @@ function parseSubtitles(url, data) {
     logger("Chinese subtitle gotcha.");
     setChineseTranscriptStatus(true);
   }
-}
-
-export function registerEventListenerForBackendScript() {
-  browser.runtime.onMessage.addListener((message) => {
-    switch (message.type) {
-      case "youtube":
-        parseSubtitles(message.url, message.data);
-        break;
-      case "urlChanged":
-        setEnglishTranscriptStatus(false);
-        setChineseTranscriptStatus(false);
-        console.log("url changed, called from youtube content script");
-        break;
-      default:
-        break;
-    }
-  });
 }
 
 function sendMessageToYoutubeVideoPage(message) {
@@ -284,7 +267,7 @@ export function addTranscriptStatusElementIfNotExist() {
   }
 }
 
-function setEnglishTranscriptStatus(active) {
+export function setEnglishTranscriptStatus(active) {
   isEnglishTranscriptExist = active;
   console.log("set english background color", active);
   const element = document.getElementById(transcriptStatusEnglishElementId);
@@ -293,7 +276,7 @@ function setEnglishTranscriptStatus(active) {
     : inActiveStatusBackgroundColor;
 }
 
-function setChineseTranscriptStatus(active) {
+export function setChineseTranscriptStatus(active) {
   isChineseTranscriptExist = active;
   console.log("set Chinese background color", active);
   const element = document.getElementById(transcriptStatusChineseElementId);
