@@ -4,6 +4,11 @@
   "description": "Help you learn English better and easier.",
   "developer": { "name": "Toly Feng", "url": "https://stylishreader.com" },
   "version": "0.0.3",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "toly.feng@gmail.com"
+    }
+  },
   "icons": {
     "48": "icons/stylish-reader-48.png"
   },
