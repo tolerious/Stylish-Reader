@@ -121,8 +121,9 @@ browser.webNavigation.onBeforeNavigate.addListener((details) => {
 browser.runtime.onMessage.addListener(async (message) => {
   switch (message.type) {
     case "login-success":
-      setLoginToken(message.data.data.token);
+      await setLoginToken(message.data.data.token);
       browser.tabs.remove(await getCurrentTabId());
+      browser.tabs.reload();
       break;
     case "tedContentScriptLoaded":
       if (tedCurrentUrl && isContentScriptReady) {
