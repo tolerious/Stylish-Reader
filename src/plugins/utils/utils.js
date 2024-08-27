@@ -2,6 +2,11 @@
 
 import { developmentEnvironment } from "../ted/constants";
 import { fetchTranscript, sendMessageToBackground } from "../ted/utils";
+import {
+  parseSubtitles,
+  setChineseTranscriptStatus,
+  setEnglishTranscriptStatus,
+} from "../youtube/utils";
 
 // 创建一个Stylish Reader图标元素,不包括事件监听器,事件监听器在各个plugin中自行添加
 export function createStylishIconElement(
@@ -190,22 +195,42 @@ function fetchTextData(url, code) {
   });
 }
 
+export function isYouTubeWebSite() {
+  return window.location.hostname.includes("youtube.com");
+}
 
-export function registerEventFromBackground() {
+export function isTedWebSite() {
+  return window.location.hostname.includes("ted.com");
+}
+
+export function isBBCLearningEnglishWebSite() {
+  return window.location.href.includes("bbc.co.uk/learningenglish");
+}
+
+export function sendMessageFromContentScriptToBackgroundScript(
+  type,
+  message = ""
+) {
+  browser.runtime.sendMessage({ type, message });
+}
+
+export function waitEventFromBackgroundScriptInContentScript() {
   browser.runtime.onMessage.addListener((message) => {
     switch (message.type) {
-      case "show":
-        break;
-      case "saveArticleSuccess":
+      case "youtube":
+        if (isYouTubeWebSite) {
+          parseSubtitles(message.url, message.data);
+        }
         break;
       case "urlChanged":
-        // url发生变化了以后去执行逻辑
-        console.log("background script detect url changed.");
-        break;
-      case "intercept":
+        if (isYouTubeWebSite()) {
+          setEnglishTranscriptStatus(false);
+          setChineseTranscriptStatus(false);
+        }
         break;
       default:
         break;
     }
   });
+  sendMessageFromContentScriptToBackgroundScript("content-script-ready");
 }

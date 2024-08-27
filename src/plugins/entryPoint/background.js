@@ -11,7 +11,7 @@ import {
 // TED 网站，当前页面URL
 let tedCurrentUrl = "";
 
-let contentScriptLoaded = false;
+let isContentScriptReady = false;
 
 console.log("background.js loaded");
 
@@ -25,8 +25,10 @@ async function checkConnection() {
 
 // 向 content script 发送消息
 async function notifyContentScript(messageObject) {
-  const tabId = await getCurrentTabId();
-  browser.tabs.sendMessage(tabId, messageObject);
+  if (isContentScriptReady) {
+    const tabId = await getCurrentTabId();
+    browser.tabs.sendMessage(tabId, messageObject);
+  }
 }
 
 // 通知 content script 扩展图标被点击
@@ -88,8 +90,8 @@ function detailsHandler(details) {
     console.log("*************************");
     tedCurrentUrl = details.url;
     browser.storage.local.set({ "ted-transcript-url": tedCurrentUrl });
-    console.log(contentScriptLoaded);
-    if (contentScriptLoaded && tedCurrentUrl) {
+    console.log(isContentScriptReady);
+    if (isContentScriptReady && tedCurrentUrl) {
       notifyContentScript({ type: "intercept", url: tedCurrentUrl });
     }
   }
@@ -103,6 +105,10 @@ function tempDetailsHandler(details) {
 }
 browser.browserAction.onClicked.addListener(extensionIconClicked);
 
+browser.webNavigation.onBeforeNavigate.addListener((details) => {
+  isContentScriptReady = false;
+});
+
 // Listen for messages from pages(Mozilla://file pages, not web pages) and content scripts
 browser.runtime.onMessage.addListener(async (message) => {
   switch (message.type) {
@@ -111,10 +117,12 @@ browser.runtime.onMessage.addListener(async (message) => {
       browser.tabs.remove(await getCurrentTabId());
       break;
     case "tedContentScriptLoaded":
-      contentScriptLoaded = true;
-      if (tedCurrentUrl && contentScriptLoaded) {
+      if (tedCurrentUrl && isContentScriptReady) {
         notifyContentScript({ type: "intercept", url: tedCurrentUrl });
       }
+      break;
+    case "content-script-ready":
+      isContentScriptReady = true;
       break;
     case "check-authorize":
       checkConnection();
@@ -128,9 +136,6 @@ browser.runtime.onMessage.addListener(async (message) => {
 browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   // 检查URL是否改变
   if (changeInfo.url) {
-    // 在这里执行你想要的操作
-    // notifyContentScript({ type: "urlChanged", url: changeInfo.url });
-    console.log("url changed...");
     notifyContentScript({ type: "urlChanged" });
   }
 });

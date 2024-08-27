@@ -1,6 +1,7 @@
 import { backendServerUrl } from "../entryPoint/constants";
 import { getLoginToken } from "../entryPoint/utils/background.utils";
 import { stylishReaderMainColor } from "../utils/constants";
+import { sendMessageFromContentScriptToBackgroundScript } from "../utils/utils";
 import {
   clickableWordClassName,
   floatingIconSize,
@@ -468,11 +469,7 @@ async function getUserSettings(token) {
 }
 
 export function checkAuthorize() {
-  sendMessageToBackgroundScript("check-authorize", "");
-}
-
-function sendMessageToBackgroundScript(type, message) {
-  browser.runtime.sendMessage({ type, message });
+  sendMessageFromContentScriptToBackgroundScript("check-authorize", "");
 }
 
 function fetchFloatingPanelJsFile() {

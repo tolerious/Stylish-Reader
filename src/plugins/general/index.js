@@ -1,4 +1,4 @@
-import { logger } from "../utils/utils";
+import { logger, waitEventFromBackgroundScriptInContentScript } from "../utils/utils";
 import {
   checkAuthorize,
   customizeGeneralEvent,
@@ -9,6 +9,7 @@ import {
 
 export async function initializeGeneralWebSite() {
   logger("initializeGeneralWebSite");
+  waitEventFromBackgroundScriptInContentScript();
   checkAuthorize();
   await injectTranslationFloatingPanelToShadowDom();
   customizeGeneralEvent();
