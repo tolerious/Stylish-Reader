@@ -85,6 +85,7 @@ async function addWord() {
         .replace('"', '')
         .replace('(', '')
         .replace(')', '')
+        .replace(':', '')
     });
     const r = await customPost(DELETE_WORD, { id: t.data.data._id, groupId: t.data.data.groupID });
     if (r.data.code === 200) {
@@ -101,7 +102,8 @@ async function addWord() {
         .replace('.', '')
         .replace('"', '')
         .replace('(', '')
-        .replace(')', ''),
+        .replace(')', '')
+        .replace(':', ''),
       groupId: groupId.value
     });
     if (t.data.code === 200) {
@@ -150,6 +152,7 @@ watch(currentWord, async (newVal) => {
       .replace('"', '')
       .replace('(', '')
       .replace(')', '')
+      .replace(':', '')
   });
   isLiked.value = t.data.data.isLiked;
 });
@@ -180,6 +183,7 @@ function listenEventFromGeneralScript() {
             .replace('"', '')
             .replace('(', '')
             .replace(')', '')
+            .replace(':', '')
         );
         break;
       case 'play':
