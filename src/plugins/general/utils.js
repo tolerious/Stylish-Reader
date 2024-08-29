@@ -11,6 +11,8 @@ import {
   translationPanelSize,
 } from "./constants";
 
+let currentSelectionContent = "";
+
 /**
  * 遍历页面上所有dom节点， 根据单词列表，构建自定义元素
  * @param {Array} targetWordList 目标词典单词列表
@@ -182,6 +184,10 @@ function customizeMouseDownEvent() {
 
     // 点击的是floatingIcon
     if ([stylishReaderFloatingIconId].includes(event.target.id)) {
+      sendMessageFromGeneralScriptToFloatingPanel({
+        type: "search-word",
+        word: currentSelectionContent.toString().trim(),
+      });
       showTranslationFloatingPanel();
       sendMessageFromGeneralScriptToFloatingPanel({
         type: "play",
@@ -234,10 +240,7 @@ function addSelectionChangeEvent() {
       let y = calculateSelectionPosition(rect, floatingIconSize).y;
       // FIXME: 这里没有考虑到selection的位置可能会超出屏幕的情况
       showFloatingIcon(x, y);
-      sendMessageFromGeneralScriptToFloatingPanel({
-        type: "search-word",
-        word: selection.toString().trim(),
-      });
+      currentSelectionContent = selection.toString().trim();
     }
   });
 }
