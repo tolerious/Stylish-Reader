@@ -17,6 +17,8 @@ let isContentScriptReady = false;
 // login page 是否已经被打开过
 let loginHasBeenOpened = false;
 
+// 已经打开的 login page 的 id
+let loginPageTabId = -1;
 console.log("background.js loaded");
 
 // 向 content script 发送消息
@@ -49,28 +51,7 @@ function handleError(error) {
 }
 
 // 扩展图标被点击
-async function extensionIconClicked(tab, clickEvent) {
-  let token = await getLoginToken();
-
-  if (token === undefined || token === null || token === "") {
-    // Need login logic here...
-    browser.tabs.create({ url: "loginPage/index.html" });
-  } else {
-    // already login, ping pong to server using token
-    let t = await pingPong();
-    let j = await t.json();
-    if (t.ok && j.code === 200) {
-      //   let t = await saveArticle();
-      // let j = await t.json();
-      // Notify content script
-      // if (t.ok && j.code === 200) {
-      //   notifyContentScript({ type: "saveArticleSuccess" });
-      // }
-    } else {
-      browser.tabs.create({ url: "loginPage/index.html" });
-    }
-  }
-}
+async function extensionIconClicked(tab, clickEvent) {}
 
 function detailsHandler(details) {
   if (
@@ -98,20 +79,32 @@ function tempDetailsHandler(details) {
 }
 browser.browserAction.onClicked.addListener(extensionIconClicked);
 
-browser.webNavigation.onBeforeNavigate.addListener((details) => {
-  isContentScriptReady = false;
-  loginHasBeenOpened = false;
+browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
+  console.log(tabId, removeInfo);
+  if (tabId === loginPageTabId) {
+    loginHasBeenOpened = false;
+  }
 });
 
+browser.webNavigation.onBeforeNavigate.addListener((details) => {
+  isContentScriptReady = false;
+});
+let openCount = 0;
 // Listen for messages from pages(Mozilla://file pages, not web pages) and content scripts
 browser.runtime.onMessage.addListener(async (message) => {
   switch (message.type) {
     case "open-login":
+      console.log(`loginHasBeenOpened: ${loginHasBeenOpened}`);
       if (!loginHasBeenOpened) {
-        browser.tabs.create({ url: "loginPage/index.html" });
         loginHasBeenOpened = true;
-      } else {
-        loginHasBeenOpened = false;
+        console.log(`openCount: ${openCount}`);
+        const result = await browser.tabs.create({
+          active: false,
+          url: "loginPage/index.html",
+        });
+        console.log(result);
+        loginPageTabId = result.id;
+        openCount++;
       }
       break;
     case "login-success":

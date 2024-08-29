@@ -1,6 +1,7 @@
 import { backendServerUrl } from "../entryPoint/constants";
 import { getLoginToken } from "../entryPoint/utils/background.utils";
 import { stylishReaderMainColor } from "../utils/constants";
+import { checkUserLoginStatus } from "../utils/utils";
 import {
   clickableWordClassName,
   floatingIconSize,
@@ -11,6 +12,10 @@ import {
 } from "./constants";
 
 let currentSelectionContent = "";
+
+let selectionRange = null;
+
+let gSelectionPosition = { x: 0, y: 0 };
 
 /**
  * 遍历页面上所有dom节点， 根据单词列表，构建自定义元素
@@ -183,6 +188,7 @@ function customizeMouseDownEvent() {
 
     // 点击的是floatingIcon
     if ([stylishReaderFloatingIconId].includes(event.target.id)) {
+      console.log("executed...");
       sendMessageFromGeneralScriptToFloatingPanel({
         type: "search-word",
         word: currentSelectionContent.toString().trim(),
@@ -237,6 +243,11 @@ function addSelectionChangeEvent() {
       const rect = range.getBoundingClientRect();
       let x = calculateSelectionPosition(rect, floatingIconSize).x;
       let y = calculateSelectionPosition(rect, floatingIconSize).y;
+      gSelectionPosition = calculateSelectionPosition(
+        rect,
+        translationPanelSize
+      );
+      gSelectionPosition.y = rect.top;
       // FIXME: 这里没有考虑到selection的位置可能会超出屏幕的情况
       showFloatingIcon(x, y);
       currentSelectionContent = selection.toString().trim();
@@ -329,21 +340,29 @@ export async function showTranslationFloatingPanel(
   source = "selection",
   position = { x: 0, y: 0 }
 ) {
+  await checkUserLoginStatus();
+
   const translationPanel = document.getElementById(
     translationFloatingPanelShadowRootId
   );
   translationPanel.style.display = "block";
   if (source === "selection") {
-    const selection = window.getSelection();
-    const range = selection.getRangeAt(0);
     showTranslationFloatingPanelTemporary();
-    let x = calculateFloatingPanelPosition(range).x;
-    let y = calculateFloatingPanelPosition(range).y;
+    let x = gSelectionPosition.x;
+    let y = gSelectionPosition.y;
+    console.log(x, y);
     translationPanel.style.top = y + "px";
     translationPanel.style.left = x + "px";
     translationPanel.style.opacity = 1;
     translationPanel.style.boxShadow = "0 0 15px 5px grey";
   } else {
+    const selection = window.getSelection();
+    const range = selection.getRangeAt(0);
+    position.x = calculateFloatingPanelPosition(range).x;
+    position.y = calculateFloatingPanelPosition(range).y;
+
+    console.log(position);
+
     translationPanel.style.top = position.y + "px";
     translationPanel.style.left = position.x + "px";
     translationPanel.style.opacity = 1;
