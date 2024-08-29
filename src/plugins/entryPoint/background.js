@@ -19,23 +19,10 @@ let loginHasBeenOpened = false;
 
 console.log("background.js loaded");
 
-async function checkConnection() {
-  let t = await pingPong();
-  let j = await t.json();
-  if (t.ok && j.code !== 200 && !loginHasBeenOpened) {
-    browser.tabs.create({ url: "loginPage/index.html" });
-    loginHasBeenOpened = true;
-  } else {
-    loginHasBeenOpened = false;
-  }
-}
-
 // 向 content script 发送消息
 async function notifyContentScript(messageObject) {
-  if (isContentScriptReady) {
-    const tabId = await getCurrentTabId();
-    browser.tabs.sendMessage(tabId, messageObject);
-  }
+  const tabId = await getCurrentTabId();
+  browser.tabs.sendMessage(tabId, messageObject);
 }
 
 // 通知 content script 扩展图标被点击
@@ -97,8 +84,7 @@ function detailsHandler(details) {
     console.log("*************************");
     tedCurrentUrl = details.url;
     browser.storage.local.set({ "ted-transcript-url": tedCurrentUrl });
-    console.log(isContentScriptReady);
-    if (isContentScriptReady && tedCurrentUrl) {
+    if (tedCurrentUrl) {
       notifyContentScript({ type: "intercept", url: tedCurrentUrl });
     }
   }
@@ -120,21 +106,23 @@ browser.webNavigation.onBeforeNavigate.addListener((details) => {
 // Listen for messages from pages(Mozilla://file pages, not web pages) and content scripts
 browser.runtime.onMessage.addListener(async (message) => {
   switch (message.type) {
+    case "open-login":
+      if (!loginHasBeenOpened) {
+        browser.tabs.create({ url: "loginPage/index.html" });
+        loginHasBeenOpened = true;
+      } else {
+        loginHasBeenOpened = false;
+      }
+      break;
     case "login-success":
       await setLoginToken(message.data.data.token);
       browser.tabs.remove(await getCurrentTabId());
       browser.tabs.reload();
       break;
     case "tedContentScriptLoaded":
-      if (tedCurrentUrl && isContentScriptReady) {
+      if (tedCurrentUrl) {
         notifyContentScript({ type: "intercept", url: tedCurrentUrl });
       }
-      break;
-    case "content-script-ready":
-      isContentScriptReady = true;
-      break;
-    case "check-authorize":
-      checkConnection();
       break;
     default:
       break;

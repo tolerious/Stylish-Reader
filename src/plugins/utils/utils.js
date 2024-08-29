@@ -1,5 +1,6 @@
 // 此处存放工具函数供所有plugin使用
 
+import { backendServerUrl, loginTokenKey } from "../entryPoint/constants";
 import { developmentEnvironment } from "../ted/constants";
 import { fetchTranscript, sendMessageToBackground } from "../ted/utils";
 import {
@@ -232,5 +233,39 @@ export function waitEventFromBackgroundScriptInContentScript() {
         break;
     }
   });
-  sendMessageFromContentScriptToBackgroundScript("content-script-ready");
+}
+
+// 获取登录token
+async function getLoginToken() {
+  const value = await browser.storage.local.get(loginTokenKey);
+  return Promise.resolve(value[loginTokenKey]);
+}
+
+export async function checkUserLoginStatus() {
+  const status = await isUserLoggedIn();
+  if (!status) {
+    sendMessageFromContentScriptToBackgroundScript("open-login");
+  }
+}
+
+async function isUserLoggedIn() {
+  const headers = new Headers();
+  const token = await getLoginToken();
+  headers.append("Authorization", `Bearer ${token}`);
+  headers.append("Content-Type", "application/json");
+  const r = await fetch(`${backendServerUrl}/logic/pingpong`, {
+    method: "GET",
+    headers: headers,
+  });
+  try {
+    const { code, msg, data } = await r.json();
+    if (code !== 200) {
+      return Promise.resolve(false);
+    } else {
+      return Promise.resolve(true);
+    }
+  } catch (error) {
+    console.log(error);
+    return Promise.resolve(false);
+  }
 }

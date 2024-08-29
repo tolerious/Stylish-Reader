@@ -1,7 +1,6 @@
 import { backendServerUrl } from "../entryPoint/constants";
 import { getLoginToken } from "../entryPoint/utils/background.utils";
 import { stylishReaderMainColor } from "../utils/constants";
-import { sendMessageFromContentScriptToBackgroundScript } from "../utils/utils";
 import {
   clickableWordClassName,
   floatingIconSize,
@@ -326,7 +325,7 @@ function showTranslationFloatingPanelTemporary() {
 }
 
 // source=selection,说明点击的是floating icon
-export function showTranslationFloatingPanel(
+export async function showTranslationFloatingPanel(
   source = "selection",
   position = { x: 0, y: 0 }
 ) {
@@ -472,10 +471,6 @@ async function getUserSettings(token) {
   });
   const j = await r.json();
   return j.data;
-}
-
-export function checkAuthorize() {
-  sendMessageFromContentScriptToBackgroundScript("check-authorize", "");
 }
 
 function fetchFloatingPanelJsFile() {
