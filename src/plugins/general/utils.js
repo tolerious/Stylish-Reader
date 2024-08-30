@@ -188,7 +188,6 @@ function customizeMouseDownEvent() {
 
     // 点击的是floatingIcon
     if ([stylishReaderFloatingIconId].includes(event.target.id)) {
-      console.log("executed...");
       sendMessageFromGeneralScriptToFloatingPanel({
         type: "search-word",
         word: currentSelectionContent.toString().trim(),
@@ -350,7 +349,6 @@ export async function showTranslationFloatingPanel(
     showTranslationFloatingPanelTemporary();
     let x = gSelectionPosition.x;
     let y = gSelectionPosition.y;
-    console.log(x, y);
     translationPanel.style.top = y + "px";
     translationPanel.style.left = x + "px";
     translationPanel.style.opacity = 1;
@@ -360,8 +358,6 @@ export async function showTranslationFloatingPanel(
     const range = selection.getRangeAt(0);
     position.x = calculateFloatingPanelPosition(range).x;
     position.y = calculateFloatingPanelPosition(range).y;
-
-    console.log(position);
 
     translationPanel.style.top = position.y + "px";
     translationPanel.style.left = position.x + "px";

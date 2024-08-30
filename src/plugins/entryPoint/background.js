@@ -80,7 +80,6 @@ function tempDetailsHandler(details) {
 browser.browserAction.onClicked.addListener(extensionIconClicked);
 
 browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
-  console.log(tabId, removeInfo);
   if (tabId === loginPageTabId) {
     loginHasBeenOpened = false;
   }
@@ -89,22 +88,18 @@ browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
 browser.webNavigation.onBeforeNavigate.addListener((details) => {
   isContentScriptReady = false;
 });
-let openCount = 0;
+
 // Listen for messages from pages(Mozilla://file pages, not web pages) and content scripts
 browser.runtime.onMessage.addListener(async (message) => {
   switch (message.type) {
     case "open-login":
-      console.log(`loginHasBeenOpened: ${loginHasBeenOpened}`);
       if (!loginHasBeenOpened) {
         loginHasBeenOpened = true;
-        console.log(`openCount: ${openCount}`);
         const result = await browser.tabs.create({
           active: false,
           url: "loginPage/index.html",
         });
-        console.log(result);
         loginPageTabId = result.id;
-        openCount++;
       }
       break;
     case "login-success":
