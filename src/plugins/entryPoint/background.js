@@ -96,7 +96,6 @@ browser.runtime.onMessage.addListener(async (message) => {
       if (!loginHasBeenOpened) {
         loginHasBeenOpened = true;
         const result = await browser.tabs.create({
-          active: false,
           url: "loginPage/index.html",
         });
         loginPageTabId = result.id;
