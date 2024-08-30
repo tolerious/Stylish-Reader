@@ -3,8 +3,6 @@
 import {
   getCurrentTabId,
   getCurrentTabUrl,
-  getLoginToken,
-  pingPong,
   setLoginToken,
 } from "./utils/background.utils";
 

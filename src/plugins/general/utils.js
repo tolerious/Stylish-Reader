@@ -235,7 +235,11 @@ function addMouseDownEvent() {
  * 监听selectionchange事件，当用户选中文本时，显示悬浮图标
  */
 function addSelectionChangeEvent() {
-  document.addEventListener("selectionchange", function () {
+  document.addEventListener("selectionchange", async function () {
+    sendMessageFromGeneralScriptToFloatingPanel({
+      type: "token",
+      message: await getLoginToken(),
+    });
     const selection = window.getSelection();
     const range = selection.getRangeAt(0);
     if (selection.toString().trim()) {
