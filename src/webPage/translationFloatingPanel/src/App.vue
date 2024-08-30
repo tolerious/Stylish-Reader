@@ -34,7 +34,7 @@ import {
   SEARCH_WORD,
   USER_SETTING
 } from './constants';
-import { customPost } from './utils/customRequest';
+import { customGet, customPost } from './utils/customRequest';
 
 interface CustomEvent extends Event {
   detail: string;
@@ -163,7 +163,7 @@ function handleClick() {
 }
 
 function listenEventFromGeneralScript() {
-  document.addEventListener('generalScriptEvent', (e: Event) => {
+  document.addEventListener('generalScriptEvent', async (e: Event) => {
     const ee = e as CustomEvent;
     const data = JSON.parse(ee.detail);
     switch (data.type) {
@@ -192,7 +192,17 @@ function listenEventFromGeneralScript() {
         }
         break;
       case 'token':
-        localStorage.setItem('token', data.message);
+        localStorage.setItem('floatingPanelToken', data.message);
+        if (!groupId.value) {
+          if (shouldAddToDefaultGroup()) {
+            const userSetting = await customGet(USER_SETTING);
+            groupId.value = userSetting.data.data.defaultGroupID;
+          } else {
+            const g = (await createGroup()).data.data;
+            groupId.value = g._id;
+          }
+        }
+
         break;
       default:
         break;
@@ -253,13 +263,6 @@ async function createGroup() {
 
 onMounted(async () => {
   listenEventFromGeneralScript();
-  if (shouldAddToDefaultGroup()) {
-    const userSetting = (await customPost(USER_SETTING, {})).data.data;
-    groupId.value = userSetting.defaultGroupID;
-  } else {
-    const g = (await createGroup()).data.data;
-    groupId.value = g._id;
-  }
 });
 
 function sendMessageToGeneralScript(message: any) {

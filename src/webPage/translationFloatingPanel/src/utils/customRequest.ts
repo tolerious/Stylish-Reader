@@ -8,21 +8,28 @@ const instance = axios.create({
   }
 });
 
+axios.interceptors.request.use((config) => {
+  return config;
+});
+
 axios.interceptors.response.use((response) => {
   return response;
 });
 
 export const customGet = async (url: string) => {
-  instance.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
+  instance.defaults.headers.common['Authorization'] =
+    `Bearer ${localStorage.getItem('floatingPanelToken')}`;
   return instance.get(url);
 };
 
 export const customPost = async (url: string, data: any) => {
-  instance.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
+  instance.defaults.headers.common['Authorization'] =
+    `Bearer ${localStorage.getItem('floatingPanelToken')}`;
   return instance.post(url, data);
 };
 
 export const customDelete = async (url: string, data: any) => {
-  instance.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
+  instance.defaults.headers.common['Authorization'] =
+    `Bearer ${localStorage.getItem('floatingPanelToken')}`;
   return instance.delete(url, data);
 };

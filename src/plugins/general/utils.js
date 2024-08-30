@@ -157,14 +157,14 @@ function convertCurrentTextNodeContent(textNode, targetWordList) {
 
 export function customizeGeneralEvent() {
   addSelectionChangeEvent();
-  customizeMouseDownEvent();
+  addMouseDownEvent();
   listenFromFloatingPanelEvent();
 }
 
 /**
  * 监听mousedown事件，当用户点击悬浮图标时，显示翻译面板
  */
-function customizeMouseDownEvent() {
+function addMouseDownEvent() {
   document.addEventListener("mousedown", async function (event) {
     const mouseX = event.clientX;
     const mouseY = event.clientY;
@@ -235,17 +235,18 @@ function customizeMouseDownEvent() {
  * 监听selectionchange事件，当用户选中文本时，显示悬浮图标
  */
 function addSelectionChangeEvent() {
-  document.addEventListener("selectionchange", function () {
+  document.addEventListener("selectionchange", async function () {
+    sendMessageFromGeneralScriptToFloatingPanel({
+      type: "token",
+      message: await getLoginToken(),
+    });
     const selection = window.getSelection();
     const range = selection.getRangeAt(0);
     if (selection.toString().trim()) {
       const rect = range.getBoundingClientRect();
-      let x = calculateSelectionPosition(rect, floatingIconSize).x;
-      let y = calculateSelectionPosition(rect, floatingIconSize).y;
-      gSelectionPosition = calculateSelectionPosition(
-        rect,
-        translationPanelSize
-      );
+      let x = calculateFloatingIconPosition(rect, floatingIconSize).x;
+      let y = calculateFloatingIconPosition(rect, floatingIconSize).y;
+      gSelectionPosition = calculateFloatingPanelPosition(range);
       gSelectionPosition.y = rect.top;
       // FIXME: 这里没有考虑到selection的位置可能会超出屏幕的情况
       showFloatingIcon(x, y);
@@ -254,7 +255,7 @@ function addSelectionChangeEvent() {
   });
 }
 
-function calculateSelectionPosition(rect, baseElementSize) {
+function calculateFloatingIconPosition(rect, baseElementSize) {
   return {
     x: (rect.right - rect.left) / 2 + rect.left - baseElementSize.width / 2,
     y: rect.top - baseElementSize.height,
