@@ -149,7 +149,8 @@ function addMouseDownEvent() {
       mouseX >= floatingPanelContainerRect.left &&
       mouseX <= floatingPanelContainerRect.right &&
       mouseY >= floatingPanelContainerRect.top &&
-      mouseY <= floatingPanelContainerRect.bottom
+      mouseY <= floatingPanelContainerRect.bottom &&
+      event.target.id === translationFloatingPanelShadowRootId
     ) {
       event.stopPropagation();
       event.preventDefault();
@@ -303,6 +304,7 @@ function showTranslationFloatingPanelTemporary() {
   floatingPanel.style.top = 0;
   floatingPanel.style.left = 0;
   floatingPanel.style.boxShadow = "none";
+  floatingPanel.style.zIndex = 1;
 }
 
 // source=selection,说明点击的是floating icon
