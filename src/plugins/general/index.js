@@ -1,6 +1,8 @@
-import { logger, waitEventFromBackgroundScriptInContentScript } from "../utils/utils";
 import {
-  checkAuthorize,
+  logger,
+  waitEventFromBackgroundScriptInContentScript,
+} from "../utils/utils";
+import {
   customizeGeneralEvent,
   getWordList,
   goThroughDomAndGenerateCustomElement,
@@ -10,7 +12,6 @@ import {
 export async function initializeGeneralWebSite() {
   logger("initializeGeneralWebSite");
   waitEventFromBackgroundScriptInContentScript();
-  checkAuthorize();
   await injectTranslationFloatingPanelToShadowDom();
   customizeGeneralEvent();
   goThroughDomAndGenerateCustomElement(await getWordList());
