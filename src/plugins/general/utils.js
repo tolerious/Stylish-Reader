@@ -66,24 +66,8 @@ function removeUnMarkedWord(word) {
   markedNodeList.forEach((node) => {
     // 说明取消的是这个节点
     if (
-      node.textContent
-        .trim()
-        .toLocaleLowerCase()
-        .replace(".", "")
-        .replace(",", "")
-        .replace('"', "")
-        .replace("(", "")
-        .replace(")", "")
-        .replace(":", "") ===
-      word
-        .trim()
-        .toLocaleLowerCase()
-        .replace(".", "")
-        .replace(",", "")
-        .replace('"', "")
-        .replace("(", "")
-        .replace(")", "")
-        .replace(":", "")
+      convertStringToLowerCaseAndRemoveSpecialCharacter(node.textContent) ===
+      convertStringToLowerCaseAndRemoveSpecialCharacter(word)
     ) {
       const targetParentNode = node.parentNode;
       // 重新把被自定义span标签包裹的文本系欸但替换回来
@@ -97,26 +81,12 @@ function convertCurrentTextNodeContent(textNode, targetWordList) {
   // 判断并找出当前文本节点中包含的目标单词
   const textContent = textNode.textContent;
   const targetWordSet = new Set(targetWordList);
-  const splitedTextContentStringList = textContent.split(" ");
+  const splittedTextContentStringList = textContent.split(" ");
+  // 存放的是目标单词在splittedTextContentStringList中的索引
   const indexList = [];
-  splitedTextContentStringList.filter((s, index) => {
-    /**
-     *  FIXME: 这里没有处理的一点是如果是被特殊服务包裹起来的字符，
-     * 例如"hello, world",这里world"会被当成一个单词，所以使用set中的has
-     * 函数就无法判断出来，这里需要单独处理下这种情况
-     *
-     * */
+  splittedTextContentStringList.filter((s, index) => {
     if (
-      targetWordSet.has(
-        s
-          .toLowerCase()
-          .replace(".", "")
-          .replace(",", "")
-          .replace('"', "")
-          .replace("(", "")
-          .replace(")", "")
-          .replace(":", "")
-      )
+      targetWordSet.has(convertStringToLowerCaseAndRemoveSpecialCharacter(s))
     ) {
       indexList.push(index);
     }
@@ -126,7 +96,7 @@ function convertCurrentTextNodeContent(textNode, targetWordList) {
   const newNodeList = [];
   // 遍历indexList，重新构造#text节点
   if (indexList.length > 0) {
-    splitedTextContentStringList.forEach((s, index) => {
+    splittedTextContentStringList.forEach((s, index) => {
       // 这段文本不包含目标单词
       const stt = s + " ";
       if (indexList.indexOf(index) > -1) {
@@ -158,7 +128,7 @@ function convertCurrentTextNodeContent(textNode, targetWordList) {
 export function customizeGeneralEvent() {
   addSelectionChangeEvent();
   addMouseDownEvent();
-  listenFromFloatingPanelEvent();
+  listenEventFromFloatingPanelEvent();
 }
 
 /**
@@ -376,7 +346,7 @@ function hideTranslationFloatingPanel() {
   }
 }
 
-async function createTranslationFloatingPanel(x = 0, y = 0) {
+async function createTranslationFloatingPanelToShadowDom(x = 0, y = 0) {
   const shadowRoot = document.createElement("div");
   shadowRoot.id = translationFloatingPanelShadowRootId;
   shadowRoot.style.display = "none";
@@ -438,7 +408,7 @@ function injectTranslationFloatingPanelCss() {
   });
 }
 
-export function listenFromFloatingPanelEvent() {
+export function listenEventFromFloatingPanelEvent() {
   document.addEventListener("floatingPanelEvent", async (event) => {
     const detail = JSON.parse(event.detail);
     switch (detail.type) {
@@ -505,5 +475,17 @@ export async function injectTranslationFloatingPanelToShadowDom() {
   if (checkIfTranslationFloatingPanelExist()) {
     return;
   }
-  await createTranslationFloatingPanel();
+  await createTranslationFloatingPanelToShadowDom();
+}
+
+function convertStringToLowerCaseAndRemoveSpecialCharacter(s) {
+  return s
+    .trim()
+    .toLowerCase()
+    .replaceAll(".", "")
+    .replaceAll(",", "")
+    .replaceAll('"', "")
+    .replaceAll("(", "")
+    .replaceAll(")", "")
+    .replaceAll(":", "");
 }
