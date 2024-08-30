@@ -77,15 +77,7 @@ function getYoutubeId() {
 async function addWord() {
   if (isLiked.value) {
     const t = await customPost(GET_WORD_ID, {
-      en: currentWord.value
-        .trim()
-        .toLocaleLowerCase()
-        .replace(',', '')
-        .replace('.', '')
-        .replace('"', '')
-        .replace('(', '')
-        .replace(')', '')
-        .replace(':', '')
+      en: convertStringToLowerCaseAndRemoveSpecialCharacter(currentWord.value.trim())
     });
     const r = await customPost(DELETE_WORD, { id: t.data.data._id, groupId: t.data.data.groupID });
     if (r.data.code === 200) {
@@ -95,15 +87,7 @@ async function addWord() {
   } else {
     let t;
     t = await customPost(SAVE_WORD, {
-      en: currentWord.value
-        .trim()
-        .toLocaleLowerCase()
-        .replace(',', '')
-        .replace('.', '')
-        .replace('"', '')
-        .replace('(', '')
-        .replace(')', '')
-        .replace(':', ''),
+      en: convertStringToLowerCaseAndRemoveSpecialCharacter(currentWord.value.trim()),
       groupId: groupId.value
     });
     if (t.data.code === 200) {
@@ -144,15 +128,7 @@ watch(currentWord, async (newVal) => {
     return;
   }
   const t = await customPost(SEARCH_WORD, {
-    en: newVal
-      .trim()
-      .toLowerCase()
-      .replace(',', '')
-      .replace('.', '')
-      .replace('"', '')
-      .replace('(', '')
-      .replace(')', '')
-      .replace(':', '')
+    en: convertStringToLowerCaseAndRemoveSpecialCharacter(newVal.trim())
   });
   isLiked.value = t.data.data.isLiked;
 });
@@ -176,15 +152,7 @@ function listenEventFromGeneralScript() {
         } else {
           isPlayAudioIconVisible.value = true;
         }
-        getTranslationFromYouDao(
-          data.word
-            .replace('.', '')
-            .replace(',', '')
-            .replace('"', '')
-            .replace('(', '')
-            .replace(')', '')
-            .replace(':', '')
-        );
+        getTranslationFromYouDao(convertStringToLowerCaseAndRemoveSpecialCharacter(data.word));
         break;
       case 'play':
         if (isPlayAudioIconVisible.value) {
@@ -270,6 +238,18 @@ function sendMessageToGeneralScript(message: any) {
     detail: JSON.stringify(message)
   });
   document.dispatchEvent(event);
+}
+
+function convertStringToLowerCaseAndRemoveSpecialCharacter(s: string) {
+  return s
+    .trim()
+    .toLowerCase()
+    .replace(/\./g, '')
+    .replace(/,/g, '')
+    .replace(/"/g, '')
+    .replace(/\(/g, '')
+    .replace(/\)/g, '')
+    .replace(/:/g, '');
 }
 </script>
 

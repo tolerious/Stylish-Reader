@@ -215,7 +215,7 @@ export function sendMessageFromContentScriptToBackgroundScript(
   browser.runtime.sendMessage({ type, message });
 }
 
-export function waitEventFromBackgroundScriptInContentScript() {
+export function listenEventFromBackgroundScript() {
   browser.runtime.onMessage.addListener((message) => {
     switch (message.type) {
       case "youtube":
