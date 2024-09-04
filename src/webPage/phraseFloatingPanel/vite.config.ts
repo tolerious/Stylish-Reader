@@ -10,9 +10,11 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        entryFileNames: 'stylish-reader-phrase-floating-panel.js',
-        chunkFileNames: 'stylish-reader-phrase-floating-panel-[name].js',
-        assetFileNames: 'stylish-reader-phrase-floating-panel-[name].[ext]'
+        // entryFileNames: 'stylish-reader-phrase-floating-panel.js',
+        // chunkFileNames: 'stylish-reader-phrase-floating-panel-[name].js',
+        assetFileNames: 'stylish-reader-phrase-floating-panel-[name].[ext]',
+        inlineDynamicImports: true,
+        entryFileNames: 'stylish-reader-phrase-floating-panel.js'
       }
     }
   },
