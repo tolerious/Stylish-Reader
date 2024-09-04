@@ -5,6 +5,11 @@ export const translationFloatingPanelId = "stylish-reader-translation-panel";
 export const translationFloatingPanelShadowRootId =
   "stylish-reader-translation-panel-shadow-root";
 
+export const phraseFloatingPanelShadowRootId =
+  "stylish-reader-phrase-floating-panel-shadow-root";
+
+export const phraseFloatingPanelId = "stylish-reader-phrase-panel";
+
 export const clickableWordClassName = "stylish-reader-clickable-word";
 
 export const floatingIconSize = {

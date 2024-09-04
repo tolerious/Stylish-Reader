@@ -5,6 +5,7 @@ import { checkUserLoginStatus } from "../utils/utils";
 import {
   clickableWordClassName,
   floatingIconSize,
+  phraseFloatingPanelShadowRootId,
   stylishReaderFloatingIconId,
   translationFloatingPanelId,
   translationFloatingPanelShadowRootId,
@@ -348,6 +349,55 @@ function hideTranslationFloatingPanel() {
   }
 }
 
+async function createPhraseFloatingPanelToShadowDom() {
+  const shadowRoot = document.createElement("div");
+  shadowRoot.id = phraseFloatingPanelShadowRootId;
+  shadowRoot.style.height = "40px";
+  shadowRoot.style.width = "40px";
+  shadowRoot.style.borderRadius = "40px";
+  shadowRoot.textContent = "11";
+  shadowRoot.style.boxShadow = "0 0 15px 5px grey";
+  shadowRoot.style.position = "fixed";
+  shadowRoot.style.top = "0";
+  shadowRoot.style.left = "0";
+  shadowRoot.style.zIndex = "9999";
+  const shadow = shadowRoot.attachShadow({ mode: "open" });
+
+  // 创建挂载点
+  const mountPoint = document.createElement("div");
+  mountPoint.id = translationFloatingPanelId;
+
+  // 创建脚本挂载点
+  const vueScript = document.createElement("script");
+
+  // 创建样式挂载点
+  const styleElement = document.createElement("style");
+  styleElement.setAttribute("type", "text/css");
+  const cssCode = await injectCssToShadowDom(
+    "assets/css/stylish-reader-phrase-floating-panel-index.css"
+  );
+  styleElement.appendChild(document.createTextNode(cssCode));
+
+  // 在shadow dom中添加挂载点
+  shadow.appendChild(mountPoint);
+
+  // 在shadow dom中添加脚本挂载点
+  const jsCode = await injectJsToShadowDom(
+    "assets/js/stylish-reader-phrase-floating-panel.js"
+  );
+
+  vueScript.textContent = jsCode;
+  shadow.appendChild(vueScript);
+
+  // 在shadow dom中添加样式挂载点
+  shadow.appendChild(styleElement);
+
+  // 添加到页面上
+  document.body.appendChild(shadowRoot);
+
+  eval(vueScript.textContent);
+}
+
 async function createTranslationFloatingPanelToShadowDom(x = 0, y = 0) {
   const shadowRoot = document.createElement("div");
   shadowRoot.id = translationFloatingPanelShadowRootId;
@@ -373,14 +423,18 @@ async function createTranslationFloatingPanelToShadowDom(x = 0, y = 0) {
   // 创建样式挂载点
   const styleElement = document.createElement("style");
   styleElement.setAttribute("type", "text/css");
-  const cssCode = await injectTranslationFloatingPanelCss();
+  const cssCode = await injectCssToShadowDom(
+    "assets/css/stylish-reader-translation-panel-index.css"
+  );
   styleElement.appendChild(document.createTextNode(cssCode));
 
   // 在shadow dom中添加挂载点
   shadow.appendChild(mountPoint);
 
   // 在shadow dom中添加脚本挂载点
-  const jsCode = await fetchFloatingPanelJsFile();
+  const jsCode = await injectJsToShadowDom(
+    "assets/js/stylish-reader-translation-panel.js"
+  );
   vueScript.textContent = jsCode;
   shadow.appendChild(vueScript);
 
@@ -397,13 +451,13 @@ function checkIfTranslationFloatingPanelExist() {
   return document.getElementById(translationFloatingPanelShadowRootId);
 }
 
-function injectTranslationFloatingPanelCss() {
+function checkIfPhraseFloatingPanelExist() {
+  return document.getElementById(phraseFloatingPanelShadowRootId);
+}
+
+function injectCssToShadowDom(cssFileUrl) {
   return new Promise((resolve) => {
-    fetch(
-      browser.runtime.getURL(
-        "assets/css/stylish-reader-translation-panel-index.css"
-      )
-    )
+    fetch(browser.runtime.getURL(cssFileUrl))
       .then((response) => response.text())
       .then((css) => resolve(css))
       .catch((error) => console.error("Error injecting CSS:", error));
@@ -461,16 +515,21 @@ async function getUserSettings(token) {
   return j.data;
 }
 
-function fetchFloatingPanelJsFile() {
+function injectJsToShadowDom(jsFileUrl) {
   return new Promise((resolve) => {
-    fetch(
-      browser.runtime.getURL("assets/js/stylish-reader-translation-panel.js")
-    )
+    fetch(browser.runtime.getURL(jsFileUrl))
       .then((response) => response.text())
       .then((js) => {
         resolve(js);
       });
   });
+}
+
+export async function injectPhraseFloatingPanelToShadowDom() {
+  if (checkIfPhraseFloatingPanelExist()) {
+    return;
+  }
+  await createPhraseFloatingPanelToShadowDom();
 }
 
 export async function injectTranslationFloatingPanelToShadowDom() {
