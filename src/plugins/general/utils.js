@@ -5,6 +5,7 @@ import { checkUserLoginStatus } from "../utils/utils";
 import {
   clickableWordClassName,
   floatingIconSize,
+  phraseFloatingPanelId,
   phraseFloatingPanelShadowRootId,
   stylishReaderFloatingIconId,
   translationFloatingPanelId,
@@ -355,7 +356,6 @@ async function createPhraseFloatingPanelToShadowDom() {
   shadowRoot.style.height = "40px";
   shadowRoot.style.width = "40px";
   shadowRoot.style.borderRadius = "40px";
-  shadowRoot.textContent = "11";
   shadowRoot.style.boxShadow = "0 0 15px 5px grey";
   shadowRoot.style.position = "fixed";
   shadowRoot.style.top = "0";
@@ -365,7 +365,7 @@ async function createPhraseFloatingPanelToShadowDom() {
 
   // 创建挂载点
   const mountPoint = document.createElement("div");
-  mountPoint.id = translationFloatingPanelId;
+  mountPoint.id = phraseFloatingPanelId;
 
   // 创建脚本挂载点
   const vueScript = document.createElement("script");

@@ -11,4 +11,10 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(router)
 
-app.mount('#app')
+const shadow = document.getElementById(
+  'stylish-reader-phrase-floating-panel-shadow-root'
+)?.shadowRoot
+
+const mountPoint = shadow?.getElementById('stylish-reader-phrase-panel')
+
+app.mount(mountPoint!)
