@@ -15,6 +15,7 @@ const shadow = document.getElementById(
   'stylish-reader-phrase-floating-panel-shadow-root'
 )?.shadowRoot
 
-const mountPoint = shadow?.getElementById('stylish-reader-phrase-panel')
-
-app.mount(mountPoint!)
+const mountPoint =
+  shadow?.getElementById('stylish-reader-phrase-panel') ?? '#stylish-reader-phrase-panel'
+console.log(mountPoint)
+app.mount(mountPoint)
