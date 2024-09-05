@@ -5,6 +5,7 @@ import { checkUserLoginStatus } from "../utils/utils";
 import {
   clickableWordClassName,
   floatingIconSize,
+  phraseFloatingIconSize,
   phraseFloatingPanelId,
   phraseFloatingPanelShadowRootId,
   stylishReaderFloatingIconId,
@@ -350,17 +351,50 @@ function hideTranslationFloatingPanel() {
   }
 }
 
+let isDragging = false;
+
+function phraseFloatingPanelMouseDownHandler(e) {
+  e.preventDefault();
+  const shadowRoot = document.getElementById(phraseFloatingPanelShadowRootId);
+  shadowRoot.style.cursor = "grabbing";
+  isDragging = true;
+}
+
+function documentMouseMoveHandler(e) {
+  if (isDragging) {
+    const shadowRoot = document.getElementById(phraseFloatingPanelShadowRootId);
+    shadowRoot.style.cursor = "grabbing";
+    setPhrasePanelPosition(
+      e.clientX - phraseFloatingIconSize.width / 2,
+      e.clientY - phraseFloatingIconSize.height / 2
+    );
+  }
+}
+function phraseFloatingPanelMouseUpHandler(e) {
+  isDragging = false;
+  const shadowRoot = document.getElementById(phraseFloatingPanelShadowRootId);
+  shadowRoot.style.cursor = "grab";
+}
+
+function setPhrasePanelPosition(x, y) {
+  const shadowRoot = document.getElementById(phraseFloatingPanelShadowRootId);
+  shadowRoot.style.top = y + "px";
+  shadowRoot.style.left = x + "px";
+}
+
 async function createPhraseFloatingPanelToShadowDom() {
   const shadowRoot = document.createElement("div");
   shadowRoot.id = phraseFloatingPanelShadowRootId;
-  shadowRoot.style.height = "40px";
-  shadowRoot.style.width = "40px";
-  shadowRoot.style.borderRadius = "40px";
+  shadowRoot.style.height = `${phraseFloatingIconSize.height}px`;
+  shadowRoot.style.width = `${phraseFloatingIconSize.width}px`;
+  shadowRoot.style.borderRadius = `${phraseFloatingIconSize.width}px`;
   shadowRoot.style.boxShadow = "0 0 15px 5px grey";
   shadowRoot.style.position = "fixed";
-  shadowRoot.style.top = "0";
-  shadowRoot.style.left = "0";
+  shadowRoot.style.top = `${window.innerHeight / 3}px`;
+  shadowRoot.style.cursor = "grab";
+  shadowRoot.style.right = "20px";
   shadowRoot.style.zIndex = "9999";
+  shadowRoot.style.backgroundColor = "white";
   const shadow = shadowRoot.attachShadow({ mode: "open" });
 
   // 创建挂载点
@@ -394,6 +428,15 @@ async function createPhraseFloatingPanelToShadowDom() {
 
   // 添加到页面上
   document.body.appendChild(shadowRoot);
+
+  // 添加mousedown事件监听
+  shadowRoot.addEventListener("mousedown", phraseFloatingPanelMouseDownHandler);
+
+  // 添加 document mousemove事件监听
+  document.addEventListener("mousemove", documentMouseMoveHandler);
+
+  // 添加mouseup事件监听
+  shadowRoot.addEventListener("mouseup", phraseFloatingPanelMouseUpHandler);
 
   eval(vueScript.textContent);
 }
