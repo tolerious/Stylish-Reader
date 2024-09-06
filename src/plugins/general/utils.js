@@ -8,6 +8,7 @@ import {
   phraseFloatingIconSize,
   phraseFloatingPanelId,
   phraseFloatingPanelShadowRootId,
+  phraseFloatingPanelSize,
   stylishReaderFloatingIconId,
   translationFloatingPanelId,
   translationFloatingPanelShadowRootId,
@@ -19,6 +20,8 @@ let currentSelectionContent = "";
 let selectionRange = null;
 
 let gSelectionPosition = { x: 0, y: 0 };
+
+let isPhraseFloatingPanelOpen = false;
 
 /**
  * 遍历页面上所有dom节点， 根据单词列表，构建自定义元素
@@ -354,6 +357,8 @@ function hideTranslationFloatingPanel() {
 let isDragging = false;
 
 function phraseFloatingPanelMouseDownHandler(e) {
+  console.log("phrase floating panel mousedown event.");
+
   e.preventDefault();
   const shadowRoot = document.getElementById(phraseFloatingPanelShadowRootId);
   shadowRoot.style.cursor = "grabbing";
@@ -370,7 +375,20 @@ function documentMouseMoveHandler(e) {
     );
   }
 }
+
+function phraseFloatingPanelClickHandler(e) {
+  console.log("phrase floating panel click event.");
+  sendMessageFromGeneralScriptToPhraseFloatingPanelShadowDom({
+    type: "show-or-hide-phrase-icon",
+  });
+  if (!isPhraseFloatingPanelOpen) {
+    showPhraseFloatingPanel();
+  }
+}
+
 function phraseFloatingPanelMouseUpHandler(e) {
+  console.log("phrase floating panel mouseup event.");
+
   isDragging = false;
   const shadowRoot = document.getElementById(phraseFloatingPanelShadowRootId);
   shadowRoot.style.cursor = "grab";
@@ -380,6 +398,22 @@ function setPhrasePanelPosition(x, y) {
   const shadowRoot = document.getElementById(phraseFloatingPanelShadowRootId);
   shadowRoot.style.top = y + "px";
   shadowRoot.style.left = x + "px";
+}
+
+function showPhraseFloatingPanel() {
+  const shadowRoot = document.getElementById(phraseFloatingPanelShadowRootId);
+  shadowRoot.style.height = `${phraseFloatingPanelSize.height}px`;
+  shadowRoot.style.width = `${phraseFloatingPanelSize.width}px`;
+  shadowRoot.style.borderRadius = 0;
+  shadowRoot.style.cursor = "default";
+}
+
+function showPhraseFloatingIcon() {
+  const shadowRoot = document.getElementById(phraseFloatingPanelShadowRootId);
+  shadowRoot.style.height = `${phraseFloatingIconSize.height}px`;
+  shadowRoot.style.width = `${phraseFloatingIconSize.width}px`;
+  shadowRoot.style.borderRadius = `${phraseFloatingIconSize.width}px`;
+  shadowRoot.style.cursor = "grab";
 }
 
 async function createPhraseFloatingPanelToShadowDom() {
@@ -437,6 +471,9 @@ async function createPhraseFloatingPanelToShadowDom() {
 
   // 添加mouseup事件监听
   shadowRoot.addEventListener("mouseup", phraseFloatingPanelMouseUpHandler);
+
+  // 添加click事件监听
+  shadowRoot.addEventListener("click", phraseFloatingPanelClickHandler);
 
   eval(vueScript.textContent);
 }
@@ -527,6 +564,15 @@ export function listenEventFromFloatingPanelEvent() {
 
 function sendMessageFromGeneralScriptToFloatingPanel(message) {
   const event = new CustomEvent("generalScriptEvent", {
+    detail: JSON.stringify(message),
+  });
+  document.dispatchEvent(event);
+}
+
+function sendMessageFromGeneralScriptToPhraseFloatingPanelShadowDom(message) {
+  const event = new CustomEvent("phraseFloatingPanelEvent", {
+    bubbles: true,
+    composed: true,
     detail: JSON.stringify(message),
   });
   document.dispatchEvent(event);
