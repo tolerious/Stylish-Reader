@@ -38,6 +38,9 @@ importers:
 
   webPage/phraseFloatingPanel:
     dependencies:
+      axios:
+        specifier: ^1.7.2
+        version: 1.7.2(debug@4.3.5)
       pinia:
         specifier: ^2.1.7
         version: 2.1.7(typescript@5.4.5)(vue@3.4.33)

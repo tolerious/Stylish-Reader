@@ -49,9 +49,19 @@ function goBackHandler() {
 
 function listenEventFromGeneralScript() {
   document.addEventListener("phraseFloatingPanelEvent", (e: Event) => {
-    // const data = JSON.parse((e as CustomEvent).detail);
-    if (isPhraseFloatingIconVisible.value) {
-      isPhraseFloatingIconVisible.value = false;
+    const data = JSON.parse((e as CustomEvent).detail);
+    switch (data.type) {
+      case "token":
+        console.log(data.message);
+        localStorage.setItem("phraseFloatingPanelToken", data.message);
+        break;
+      case "show-or-hide-phrase-icon":
+        if (isPhraseFloatingIconVisible.value) {
+          isPhraseFloatingIconVisible.value = false;
+        }
+        break;
+      default:
+        break;
     }
   });
 }

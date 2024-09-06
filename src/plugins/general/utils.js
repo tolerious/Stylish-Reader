@@ -473,6 +473,11 @@ async function createPhraseFloatingPanelToShadowDom() {
   shadowRoot.addEventListener("click", phraseFloatingPanelClickHandler);
 
   eval(vueScript.textContent);
+
+  sendMessageFromGeneralScriptToPhraseFloatingPanelShadowDom({
+    type: "token",
+    message: await getLoginToken(),
+  });
 }
 
 async function createTranslationFloatingPanelToShadowDom(x = 0, y = 0) {
