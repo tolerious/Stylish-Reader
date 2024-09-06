@@ -1,7 +1,7 @@
 import { backendServerUrl } from "../entryPoint/constants";
 import { getLoginToken } from "../entryPoint/utils/background.utils";
 import { stylishReaderMainColor } from "../utils/constants";
-import { checkUserLoginStatus } from "../utils/utils";
+import { checkUserLoginStatus, getCurrentPageUrl } from "../utils/utils";
 import {
   clickableWordClassName,
   floatingIconSize,
@@ -650,4 +650,12 @@ function convertStringToLowerCaseAndRemoveSpecialCharacter(s) {
     .replaceAll("(", "")
     .replaceAll(")", "")
     .replaceAll(":", "");
+}
+
+/**
+ * 为当前页面创建group，如果词组已经存在，则不创建，如果词组不存在，则创建。
+ * 并且设置默认的group为当前页面的group
+ */
+function createAndSetDefaultGroupForCurrentPage() {
+  const url = getCurrentPageUrl();
 }

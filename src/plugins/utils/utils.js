@@ -269,3 +269,15 @@ async function isUserLoggedIn() {
     return Promise.resolve(false);
   }
 }
+
+/**
+ * 获取当前页面的url，格式为：hostname:port/pathname, 不区分协议，但区分端口号
+ * 例如: www.baidu.com:8080/search, www.baidu.com/search
+ *  */
+export function getCurrentPageUrl() {
+  const fullUrl = new URL(window.location.href);
+  const port = fullUrl.port;
+  return port
+    ? `${fullUrl.hostname}:${port}${fullUrl.pathname}`
+    : `${fullUrl.hostname}${fullUrl.pathname}`;
+}
