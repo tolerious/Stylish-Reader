@@ -135,6 +135,7 @@ export function customizeGeneralEvent() {
   addSelectionChangeEvent();
   addMouseDownEvent();
   listenEventFromFloatingPanelEvent();
+  listenEventFromPhraseFloatingPanelEvent();
 }
 
 /**
@@ -357,8 +358,6 @@ function hideTranslationFloatingPanel() {
 let isDragging = false;
 
 function phraseFloatingPanelMouseDownHandler(e) {
-  console.log("phrase floating panel mousedown event.");
-
   e.preventDefault();
   const shadowRoot = document.getElementById(phraseFloatingPanelShadowRootId);
   shadowRoot.style.cursor = "grabbing";
@@ -377,18 +376,16 @@ function documentMouseMoveHandler(e) {
 }
 
 function phraseFloatingPanelClickHandler(e) {
-  console.log("phrase floating panel click event.");
-  sendMessageFromGeneralScriptToPhraseFloatingPanelShadowDom({
-    type: "show-or-hide-phrase-icon",
-  });
   if (!isPhraseFloatingPanelOpen) {
+    sendMessageFromGeneralScriptToPhraseFloatingPanelShadowDom({
+      type: "show-or-hide-phrase-icon",
+    });
     showPhraseFloatingPanel();
+    isPhraseFloatingPanelOpen = true;
   }
 }
 
 function phraseFloatingPanelMouseUpHandler(e) {
-  console.log("phrase floating panel mouseup event.");
-
   isDragging = false;
   const shadowRoot = document.getElementById(phraseFloatingPanelShadowRootId);
   shadowRoot.style.cursor = "grab";
@@ -544,7 +541,17 @@ function injectCssToShadowDom(cssFileUrl) {
   });
 }
 
-export function listenEventFromFloatingPanelEvent() {
+export function listenEventFromPhraseFloatingPanelEvent() {
+  document.addEventListener("eventSendFromPhraseFloatingPanel", (e) => {
+    const detail = JSON.parse(e.detail);
+    if (detail.type === "phrase-floating-panel-show-icon") {
+      showPhraseFloatingIcon();
+      isPhraseFloatingPanelOpen = false;
+    }
+  });
+}
+
+function listenEventFromFloatingPanelEvent() {
   document.addEventListener("floatingPanelEvent", async (event) => {
     const detail = JSON.parse(event.detail);
     switch (detail.type) {
