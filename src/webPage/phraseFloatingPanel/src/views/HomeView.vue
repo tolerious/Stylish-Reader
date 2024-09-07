@@ -3,7 +3,7 @@
     v-if="isPhraseFloatingIconVisible"
     class="bg-pink-400 w-[40px] h-[40px] rounded-full cursor-pointer flex justify-center items-center font-bold font-mono select-none"
   >
-    <span>12</span>
+    <span>{{ phraseCount }}</span>
   </div>
   <div v-else class="select-none">
     <div
@@ -13,38 +13,68 @@
       <span>🔙 点击返回</span>
     </div>
     <div class="max-h-[380px] h-[380px] overflow-y-scroll p-2 scrollbar">
-      <div v-for="i in 30" :key="i" class="mb-1 border-2 border-slate-200 rounded py-1 px-1">
+      <div
+        v-for="(i, index) in phraseList"
+        :key="index"
+        class="mb-1 border-2 border-slate-200 rounded py-1 px-1"
+      >
         <div class="grid grid-rows-1 grid-cols-[1fr_30px]">
-          <div>{{ i }}. Get off</div>
+          <div>{{ index + 1 }}. {{ i.en }}</div>
           <div class="cursor-pointer flex justify-center items-start">
-            <span v-if="isLiked">❤️</span> <span v-else>🤍</span>
+            <span>❤️</span>
           </div>
         </div>
-        <div>下班下班下班下班下班下班下班下班下班下班</div>
+        <div></div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { customPost } from "@/utils/customRequest";
+import { onMounted, ref, type Ref } from "vue";
 
 // interface CustomEvent extends Event {
 //   detail: string;
 // }
 
+interface Phrase {
+  en: string;
+}
+
 const isPhraseFloatingIconVisible = ref(true);
 
-const isLiked = ref(false);
+const groupId = ref("");
+
+const phraseCount = ref(0);
+
+const phraseList: Ref<Phrase[]> = ref([]);
 
 onMounted(() => {
   console.log("home view mounted.");
   listenEventFromGeneralScript();
+  listenEventFromFloatingPanel();
 });
 
 function goBackHandler() {
   isPhraseFloatingIconVisible.value = true;
   sendMessageToGeneralScript({ type: "phrase-floating-panel-show-icon" });
+}
+
+async function getPhraseList() {
+  const phrases = await customPost("/phrase/list", { groupId: groupId.value });
+  console.log(phrases);
+  phraseList.value = phrases.data;
+  phraseCount.value = phrases.data.length;
+}
+
+// 监听来自floatingPanel的消息，发送过来的是添加词组成功的消息，然后在这里调接口，展示有多少个phrase
+function listenEventFromFloatingPanel() {
+  document.addEventListener("phraseAddedSuccessfully", (e: Event) => {
+    // 目前只有一个event，所以没有进行处理
+    // const data = JSON.parse((e as CustomEvent).detail);
+    getPhraseList();
+  });
 }
 
 function listenEventFromGeneralScript() {
@@ -60,6 +90,11 @@ function listenEventFromGeneralScript() {
           isPhraseFloatingIconVisible.value = false;
         }
         break;
+      case "group-id": {
+        groupId.value = data.groupId;
+        getPhraseList();
+        break;
+      }
       default:
         break;
     }

@@ -61,19 +61,6 @@ const isLiked = ref(false);
 
 const groupId = ref('');
 
-function shouldAddToDefaultGroup() {
-  const url = window.location.href;
-  if (url.includes('youtuber')) {
-    return false;
-  }
-  return true;
-}
-
-function getYoutubeId() {
-  const urlArray = window.location.href.split('/');
-  return urlArray[urlArray.length - 1];
-}
-
 async function addWord() {
   if (isLiked.value) {
     const t = await customPost(GET_WORD_ID, {
@@ -107,7 +94,8 @@ async function addPhrase() {
     groupId: groupId.value
   });
   if (r.data.code === 200) {
-    alert('添加成功');
+    sendMessageToPhraseFloatingPanel({ type: 'phrase-added' });
+    // alert('添加成功');
   } else {
     alert(r.data.msg);
   }
@@ -143,6 +131,10 @@ function listenEventFromGeneralScript() {
     const ee = e as CustomEvent;
     const data = JSON.parse(ee.detail);
     switch (data.type) {
+      case 'group-id':
+        groupId.value = data.groupId;
+        console.log('floating panel group id:', groupId.value);
+        break;
       case 'search-word':
         dic.value = [];
         currentWord.value = data.word;
@@ -161,16 +153,6 @@ function listenEventFromGeneralScript() {
         break;
       case 'token':
         localStorage.setItem('floatingPanelToken', data.message);
-        if (!groupId.value) {
-          if (shouldAddToDefaultGroup()) {
-            const userSetting = await customGet(USER_SETTING);
-            groupId.value = userSetting.data.data.defaultGroupID;
-          } else {
-            const g = (await createGroup()).data.data;
-            groupId.value = g._id;
-          }
-        }
-
         break;
       default:
         break;
@@ -220,18 +202,18 @@ function getTranslationFromYouDao(textToBeTranslated: string) {
     });
 }
 
-async function createGroup() {
-  const g = await customPost(CREATE_GROUP, {
-    youtubeId: getYoutubeId(),
-    name: document.title,
-    links: [window.location.href]
-  });
-  return g;
-}
-
 onMounted(async () => {
   listenEventFromGeneralScript();
 });
+
+function sendMessageToPhraseFloatingPanel(message: any) {
+  const event = new CustomEvent('phraseAddedSuccessfully', {
+    detail: JSON.stringify(message),
+    bubbles: true,
+    composed: true
+  });
+  document.dispatchEvent(event);
+}
 
 function sendMessageToGeneralScript(message: any) {
   const event = new CustomEvent('floatingPanelEvent', {

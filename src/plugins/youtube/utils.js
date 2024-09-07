@@ -252,8 +252,6 @@ export function toggleSubtitleBtn() {
   }
 }
 
-export function filterYoutubeFloatingPanelData() {}
-
 export function addTranscriptStatusElementIfNotExist() {
   const container = document.getElementById(transcriptStatusElementId);
   if (container) {

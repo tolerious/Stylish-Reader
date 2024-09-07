@@ -319,6 +319,7 @@ export async function showTranslationFloatingPanel(
   source = "selection",
   position = { x: 0, y: 0 }
 ) {
+  await createAndSetDefaultGroupForCurrentPage();
   await checkUserLoginStatus();
 
   const translationPanel = document.getElementById(
@@ -577,6 +578,8 @@ function listenEventFromFloatingPanelEvent() {
 function sendMessageFromGeneralScriptToFloatingPanel(message) {
   const event = new CustomEvent("generalScriptEvent", {
     detail: JSON.stringify(message),
+    bubbles: true,
+    composed: true,
   });
   document.dispatchEvent(event);
 }
@@ -658,6 +661,14 @@ function convertStringToLowerCaseAndRemoveSpecialCharacter(s) {
  */
 export async function createAndSetDefaultGroupForCurrentPage() {
   const g = await createGroup();
+  sendMessageFromGeneralScriptToFloatingPanel({
+    type: "group-id",
+    groupId: g.data._id,
+  });
+  sendMessageFromGeneralScriptToPhraseFloatingPanelShadowDom({
+    type: "group-id",
+    groupId: g.data._id,
+  });
   await setDefaultGroup(g.data._id);
 }
 
