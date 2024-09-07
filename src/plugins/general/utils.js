@@ -656,6 +656,42 @@ function convertStringToLowerCaseAndRemoveSpecialCharacter(s) {
  * 为当前页面创建group，如果词组已经存在，则不创建，如果词组不存在，则创建。
  * 并且设置默认的group为当前页面的group
  */
-function createAndSetDefaultGroupForCurrentPage() {
-  const url = getCurrentPageUrl();
+export async function createAndSetDefaultGroupForCurrentPage() {
+  const g = await createGroup();
+  await setDefaultGroup(g.data._id);
+}
+
+async function fetchWrapper(url, method = "GET", body = {}) {
+  const token = await getLoginToken();
+  const requestOptions = {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(body),
+  };
+  return new Promise(async (resolve, reject) => {
+    const r = await fetch(url, requestOptions);
+    if (!r.ok) {
+      reject(-1);
+    }
+    const j = await r.json();
+    resolve(j);
+  });
+}
+
+async function setDefaultGroup(groupId) {
+  await fetchWrapper(`${backendServerUrl}/usersetting`, "POST", {
+    defaultGroupID: groupId,
+  });
+}
+
+async function createGroup() {
+  const g = await fetchWrapper(`${backendServerUrl}/wordgroup/`, "POST", {
+    name: document.title,
+    createdSource: "extension",
+    originalPageUrl: getCurrentPageUrl(),
+  });
+  return g;
 }
