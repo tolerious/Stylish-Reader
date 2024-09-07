@@ -593,7 +593,7 @@ function sendMessageFromGeneralScriptToPhraseFloatingPanelShadowDom(message) {
 export async function getWordList() {
   const token = await getLoginToken();
   const userSetting = await getUserSettings(token);
-  const r = await fetch(`${backendServerUrl}/word/bygroup`, {
+  const r = await fetch(`${backendServerUrl}/word/whole`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,

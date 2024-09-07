@@ -10,7 +10,7 @@
       class="h-[45px] px-2 py-1 cursor-pointer flex justify-start items-center"
       @click.stop="goBackHandler"
     >
-      <span>🔙 Go Back</span>
+      <span>🔙 点击返回</span>
     </div>
     <div class="max-h-[380px] h-[380px] overflow-y-scroll p-2 scrollbar">
       <div v-for="i in 30" :key="i" class="mb-1 border-2 border-slate-200 rounded py-1 px-1">
