@@ -51,7 +51,6 @@ const phraseCount = ref(0);
 const phraseList: Ref<Phrase[]> = ref([]);
 
 onMounted(() => {
-  console.log("home view mounted.");
   listenEventFromGeneralScript();
   listenEventFromFloatingPanel();
 });
@@ -63,7 +62,6 @@ function goBackHandler() {
 
 async function getPhraseList() {
   const phrases = await customPost("/phrase/list", { groupId: groupId.value });
-  console.log(phrases);
   phraseList.value = phrases.data;
   phraseCount.value = phrases.data.length;
 }
@@ -82,7 +80,6 @@ function listenEventFromGeneralScript() {
     const data = JSON.parse((e as CustomEvent).detail);
     switch (data.type) {
       case "token":
-        console.log(data.message);
         localStorage.setItem("phraseFloatingPanelToken", data.message);
         break;
       case "show-or-hide-phrase-icon":
