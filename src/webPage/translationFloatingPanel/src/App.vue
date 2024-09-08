@@ -136,6 +136,8 @@ function listenEventFromGeneralScript() {
         console.log('floating panel group id:', groupId.value);
         break;
       case 'search-word':
+        sendMessageToGeneralScript({ type: 'go-through-content' });
+
         dic.value = [];
         currentWord.value = data.word;
         if (data.word.trim().split(' ').length > 1) {

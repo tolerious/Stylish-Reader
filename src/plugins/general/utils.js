@@ -569,6 +569,9 @@ function listenEventFromFloatingPanelEvent() {
       case "save-word":
         goThroughDomAndGenerateCustomElement(await getWordList());
         break;
+      case "go-through-content":
+        goThroughDomAndGenerateCustomElement(await getWordList());
+        break;
       default:
         break;
     }
