@@ -311,7 +311,7 @@ function showTranslationFloatingPanelTemporary() {
   floatingPanel.style.top = 0;
   floatingPanel.style.left = 0;
   floatingPanel.style.boxShadow = "none";
-  floatingPanel.style.zIndex = 980;
+  floatingPanel.style.zIndex = 99;
 }
 
 // source=selection,说明点击的是floating icon
@@ -334,6 +334,7 @@ export async function showTranslationFloatingPanel(
     translationPanel.style.left = x + "px";
     translationPanel.style.opacity = 1;
     translationPanel.style.boxShadow = "0 0 15px 5px grey";
+    translationPanel.style.width = translationPanelSize.width + "px";
   } else {
     const selection = window.getSelection();
     const range = selection.getRangeAt(0);
