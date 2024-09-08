@@ -28,8 +28,9 @@
 </template>
 
 <script setup lang="ts">
+import axios from 'axios';
 import { computed, onMounted, ref, watch, type Ref } from 'vue';
-import { ADD_PHRASE, DELETE_WORD, GET_WORD_ID, SAVE_WORD, SEARCH_WORD } from './constants';
+import { ADD_PHRASE, DELETE_WORD, GET_WORD_ID, SAVE_WORD, SEARCH_WORD, YOUDAO } from './constants';
 import { customPost } from './utils/customRequest';
 
 interface CustomEvent extends Event {
@@ -125,8 +126,16 @@ function goToCambridgeWebsite() {
   window.open(`https://dictionary.cambridge.org/dictionary/english/${currentWord.value}`);
 }
 
-function handleClick() {
-  audioUrl.value = `https://dict.youdao.com/dictvoice?type=1&audio=${currentWord.value}`;
+async function handleClick() {
+  const response = await axios({
+    url: `${import.meta.env.VITE_BACKEND_URL}${YOUDAO}`, // 后端 API
+    method: 'POST',
+    data: { word: currentWord.value },
+    responseType: 'blob' // 获取音频为 Blob
+  });
+  const audioBlob = response.data;
+  const u = URL.createObjectURL(audioBlob);
+  audioUrl.value = u;
   audioPlayer.value?.play();
 }
 

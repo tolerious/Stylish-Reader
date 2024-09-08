@@ -11,3 +11,5 @@ export const SEARCH_WORD = '/word/search';
 export const ADD_PHRASE = '/phrase';
 
 export const USER_SETTING = '/usersetting';
+
+export const YOUDAO = '/youdao/';
