@@ -311,7 +311,7 @@ function showTranslationFloatingPanelTemporary() {
   floatingPanel.style.top = 0;
   floatingPanel.style.left = 0;
   floatingPanel.style.boxShadow = "none";
-  floatingPanel.style.zIndex = 1;
+  floatingPanel.style.zIndex = 980;
 }
 
 // source=selection,说明点击的是floating icon

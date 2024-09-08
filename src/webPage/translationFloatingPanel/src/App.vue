@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto px-1 py-1 text-[16px]">
+  <div class="container mx-auto bg-white px-1 py-1 text-[16px]">
     <div class="flex columns-2 flex-row">
       <div class="basis-4/5 flex-col text-[18px]">{{ currentWord }}</div>
       <div class="flex grow cursor-pointer select-none flex-row justify-around" @click="markWord">
@@ -15,6 +15,10 @@
       </div>
       <div v-if="isPlayAudioIconVisible" @click="handleClick">🔊</div>
     </div>
+    <div class="my-2 flex justify-start gap-5 text-pink-500">
+      <span class="cursor-pointer underline" @click="goToLangManWebsite">🔗朗文词典</span
+      ><span class="cursor-pointer underline" @click="goToCambridgeWebsite">🔗剑桥词典</span>
+    </div>
     <div class="flex flex-row flex-nowrap" v-for="item in dic" :key="item.pos">
       <div>{{ item.pos }}</div>
       <div>{{ item.zh }}</div>
@@ -25,16 +29,8 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch, type Ref } from 'vue';
-import {
-  ADD_PHRASE,
-  CREATE_GROUP,
-  DELETE_WORD,
-  GET_WORD_ID,
-  SAVE_WORD,
-  SEARCH_WORD,
-  USER_SETTING
-} from './constants';
-import { customGet, customPost } from './utils/customRequest';
+import { ADD_PHRASE, DELETE_WORD, GET_WORD_ID, SAVE_WORD, SEARCH_WORD } from './constants';
+import { customPost } from './utils/customRequest';
 
 interface CustomEvent extends Event {
   detail: string;
@@ -120,6 +116,14 @@ watch(currentWord, async (newVal) => {
   });
   isLiked.value = t.data.data.isLiked;
 });
+
+function goToLangManWebsite() {
+  window.open(`https://www.ldoceonline.com/dictionary/${currentWord.value}`);
+}
+
+function goToCambridgeWebsite() {
+  window.open(`https://dictionary.cambridge.org/dictionary/english/${currentWord.value}`);
+}
 
 function handleClick() {
   audioUrl.value = `https://dict.youdao.com/dictvoice?type=1&audio=${currentWord.value}`;
