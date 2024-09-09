@@ -13,3 +13,5 @@ export const ADD_PHRASE = '/phrase';
 export const USER_SETTING = '/usersetting';
 
 export const YOUDAO = '/youdao/';
+
+export const TRANSLATION_CONTENT = '/translation/content';

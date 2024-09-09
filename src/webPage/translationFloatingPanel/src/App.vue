@@ -30,7 +30,15 @@
 <script setup lang="ts">
 import axios from 'axios';
 import { computed, onMounted, ref, watch, type Ref } from 'vue';
-import { ADD_PHRASE, DELETE_WORD, GET_WORD_ID, SAVE_WORD, SEARCH_WORD, YOUDAO } from './constants';
+import {
+  ADD_PHRASE,
+  DELETE_WORD,
+  GET_WORD_ID,
+  SAVE_WORD,
+  SEARCH_WORD,
+  TRANSLATION_CONTENT,
+  YOUDAO
+} from './constants';
 import { customPost } from './utils/customRequest';
 
 interface CustomEvent extends Event {
@@ -175,46 +183,11 @@ function listenEventFromGeneralScript() {
   });
 }
 
-function getTranslationFromYouDao(textToBeTranslated: string) {
-  fetch(`https://dict.youdao.com/result?word=${textToBeTranslated}&lang=en`)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok ' + response.statusText);
-      }
-      return response.text();
-    })
-    .then((html) => {
-      phonetic.value = '';
-      dic.value = [];
-      const parse = new DOMParser();
-      const doc = parse.parseFromString(html, 'text/html');
-      const dictBook = doc.querySelectorAll('.basic .word-exp');
-      const phoneticResult = doc.querySelector('.phonetic');
-      phonetic.value = phoneticResult?.textContent ?? '';
-      dictBook.forEach((book) => {
-        const pos = book.querySelector('.pos');
-        const translation = book.querySelector('.trans');
-        dic.value.push({
-          pos: pos?.textContent ?? '',
-          zh: translation?.textContent ?? ''
-        });
-      });
-      // 选中的不是单词，是句子或者是其他
-      if (dictBook.length === 0) {
-        const backupDicBook = doc.querySelectorAll('.dict-book .trans-content');
-        backupDicBook.forEach((book) => {
-          const pos = '';
-          const translation = book.textContent;
-          dic.value.push({
-            pos,
-            zh: translation?.trim() ?? ''
-          });
-        });
-      }
-    })
-    .catch((error) => {
-      console.error('There was a problem with the fetch operation:', error);
-    });
+async function getTranslationFromYouDao(textToBeTranslated: string) {
+  const d = await customPost(TRANSLATION_CONTENT, { word: textToBeTranslated });
+  const data = d.data.data;
+  phonetic.value = data.phonetic;
+  dic.value = data.dicList;
 }
 
 onMounted(async () => {
