@@ -157,7 +157,8 @@ function listenEventFromGeneralScript() {
         console.log('floating panel group id:', groupId.value);
         break;
       case 'search-word':
-        sendMessageToGeneralScript({ type: 'go-through-content' });
+        // Don't do this, 会导致一个死循环在这里general/utils.js:57
+        // sendMessageToGeneralScript({ type: 'go-through-content' });
 
         dic.value = [];
         currentWord.value = data.word;

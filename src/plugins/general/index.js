@@ -6,11 +6,13 @@ import {
   goThroughDomAndGenerateCustomElement,
   injectPhraseFloatingPanelToShadowDom,
   injectTranslationFloatingPanelToShadowDom,
+  listenEventFromOfficialWebsite,
 } from "./utils";
 
 export async function initializeGeneralWebSite() {
   logger("initializeGeneralWebSite");
   listenEventFromBackgroundScript();
+  listenEventFromOfficialWebsite();
   await injectTranslationFloatingPanelToShadowDom();
   await injectPhraseFloatingPanelToShadowDom();
   customizeGeneralEvent();

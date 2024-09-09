@@ -209,6 +209,19 @@ function addMouseDownEvent() {
   });
 }
 
+export function listenEventFromOfficialWebsite() {
+  document.addEventListener(
+    "officialWebsiteYouTubeVideoPageReady",
+    async function () {
+      // TODO: 这里需要等待页面加载完成，然后再去遍历dom节点，生成自定义元素，临时解决方案是等待2.5s
+      setTimeout(async () => {
+        goThroughDomAndGenerateCustomElement(await getWordList());
+      }, 2500);
+      console.log("go through dom and generate custom element");
+    }
+  );
+}
+
 /**
  * 监听selectionchange事件，当用户选中文本时，显示悬浮图标
  */
@@ -334,6 +347,7 @@ export async function showTranslationFloatingPanel(
     translationPanel.style.left = x + "px";
     translationPanel.style.opacity = 1;
     translationPanel.style.boxShadow = "0 0 15px 5px grey";
+    translationPanel.style.zIndex = 9999;
     translationPanel.style.width = translationPanelSize.width + "px";
   } else {
     const selection = window.getSelection();
@@ -344,6 +358,7 @@ export async function showTranslationFloatingPanel(
     translationPanel.style.top = position.y + "px";
     translationPanel.style.left = position.x + "px";
     translationPanel.style.opacity = 1;
+    translationPanel.style.zIndex = 9999;
     translationPanel.style.boxShadow = "0 0 15px 5px grey";
   }
 }
