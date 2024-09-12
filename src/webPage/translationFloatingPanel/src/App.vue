@@ -16,8 +16,9 @@
       <div v-if="isPlayAudioIconVisible" @click="handleClick">🔊</div>
     </div>
     <div class="my-2 flex justify-start gap-5 text-pink-500">
-      <span class="cursor-pointer underline" @click="goToLangManWebsite">🔗朗文词典</span
-      ><span class="cursor-pointer underline" @click="goToCambridgeWebsite">🔗剑桥词典</span>
+      <span class="cursor-pointer underline" @click="goToLangManWebsite">🔗朗文词典</span>
+      <span class="cursor-pointer underline" @click="goToCambridgeWebsite">🔗剑桥词典</span>
+      <span class="cursor-pointer underline" @click="goToGoogleTranslate">🔗Google翻译</span>
     </div>
     <div class="flex flex-row flex-nowrap" v-for="item in dic" :key="item.pos">
       <div>{{ item.pos }}</div>
@@ -132,6 +133,12 @@ function goToLangManWebsite() {
 
 function goToCambridgeWebsite() {
   window.open(`https://dictionary.cambridge.org/dictionary/english/${currentWord.value}`);
+}
+
+function goToGoogleTranslate() {
+  window.open(
+    `https://translate.google.com/?sl=auto&tl=zh-CN&text=${currentWord.value}&op=translate`
+  );
 }
 
 async function handleClick() {
