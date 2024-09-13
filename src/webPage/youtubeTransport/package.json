@@ -11,8 +11,8 @@
     "test:unit": "vitest",
     "test:e2e": "start-server-and-test preview http://localhost:4173 'cypress run --e2e'",
     "test:e2e:dev": "start-server-and-test 'vite dev --port 4173' http://localhost:4173 'cypress open --e2e'",
-    "build-only": "vite build --mode development && cp -r ./dist/youtube-transport.js ../../assets/js",
-    "release-only": "vite build && cp -r ./dist/youtube-transport.js ../../assets/js",
+    "build-only": "vite build --mode development && cp -r ./dist/youtube-transport.js ../../assets/js && cp -r ./dist/youtube-transport-style.css ../../assets/css",
+    "release-only": "vite build && cp -r ./dist/youtube-transport.js ../../assets/js && cp -r ./dist/youtube-transport-style.css ../../assets/css",
     "type-check": "vue-tsc --build --force",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "format": "prettier --write src/"

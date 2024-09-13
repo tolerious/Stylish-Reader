@@ -6,6 +6,7 @@ import {
   transcriptStatusChineseElementId,
   transcriptStatusElementId,
   transcriptStatusEnglishElementId,
+  youtubeShadowRootId,
   youtubeStylishReaderIconId,
   youtubeVuePageMountPoint,
 } from "./constants";
@@ -147,6 +148,8 @@ export function parseSubtitles(url, data) {
 function sendMessageToYoutubeVideoPage(message) {
   const event = new CustomEvent("fromYoutubeVideoContentScript", {
     detail: JSON.stringify(message),
+    bubbles: true,
+    composed: true,
   });
   document.dispatchEvent(event);
   currentYoutubeZhTranslationUrl = "";
@@ -163,11 +166,11 @@ export function injectYoutubeVideoVuePage() {
   if (isYoutubeVideoPageExist()) {
     return;
   }
-  createYoutubeVuePageMountPoint();
+  createYoutubeMiddlewareToShadowDom();
 }
 
 function isYoutubeVideoPageExist() {
-  return document.getElementById(youtubeVuePageMountPoint);
+  return document.getElementById(youtubeShadowRootId);
 }
 
 function waitForSeconds(millionSeconds) {
@@ -178,12 +181,70 @@ function waitForSeconds(millionSeconds) {
   });
 }
 
-function createYoutubeVuePageMountPoint() {
-  logger("createYoutubeVuePageMountPoint");
-  const divElement = document.createElement("div");
-  divElement.id = youtubeVuePageMountPoint;
-  divElement.style.display = "block";
-  document.body.appendChild(divElement);
+function injectCssToShadowDom(cssFileUrl) {
+  return new Promise((resolve) => {
+    fetch(browser.runtime.getURL(cssFileUrl))
+      .then((response) => response.text())
+      .then((css) => resolve(css))
+      .catch((error) => console.error("Error injecting CSS:", error));
+  });
+}
+
+function injectJsToShadowDom(jsFileUrl) {
+  return new Promise((resolve) => {
+    fetch(browser.runtime.getURL(jsFileUrl))
+      .then((response) => response.text())
+      .then((js) => {
+        resolve(js);
+      });
+  });
+}
+
+async function createYoutubeMiddlewareToShadowDom() {
+  const shadowRoot = document.createElement("div");
+  shadowRoot.id = youtubeShadowRootId;
+  shadowRoot.style.display = "none";
+  shadowRoot.style.boxSizing = "border-box";
+  shadowRoot.style.borderRadius = "3px";
+  shadowRoot.style.width = 1 + "px";
+  shadowRoot.style.backgroundColor = "white";
+  shadowRoot.style.boxShadow = "0 0 15px 5px grey";
+  shadowRoot.style.position = "fixed";
+  shadowRoot.style.right = 0;
+  shadowRoot.style.left = 0;
+  shadowRoot.style.zIndex = "11";
+  const shadow = shadowRoot.attachShadow({ mode: "open" });
+
+  // 创建挂载点
+  const mountPoint = document.createElement("div");
+  mountPoint.id = youtubeVuePageMountPoint;
+
+  // 创建脚本挂载点
+  const vueScript = document.createElement("script");
+
+  // 创建样式挂载点
+  const styleElement = document.createElement("style");
+  styleElement.setAttribute("type", "text/css");
+  const cssCode = await injectCssToShadowDom(
+    "assets/css/youtube-transport-style.css"
+  );
+  styleElement.appendChild(document.createTextNode(cssCode));
+
+  // 在shadow dom中添加挂载点
+  shadow.appendChild(mountPoint);
+
+  // 在shadow dom中添加脚本挂载点
+  const jsCode = await injectJsToShadowDom("assets/js/youtube-transport.js");
+  vueScript.textContent = jsCode;
+  shadow.appendChild(vueScript);
+
+  // 在shadow dom中添加样式挂载点
+  shadow.appendChild(styleElement);
+
+  // 添加到页面上
+  document.body.appendChild(shadowRoot);
+
+  eval(vueScript.textContent);
 }
 
 async function selectChineseTranscriptAutomatically() {
@@ -197,14 +258,12 @@ async function selectChineseTranscriptAutomatically() {
   // 让控制栏显示
   chromeBottom.style.opacity = 1;
   // 点击设置图标，弹出Panel
-  console.log(settingsButton);
   await waitForSeconds(500);
   settingsButton.click();
   await waitForSeconds(500);
   let controlPanelInner = controlPanelOuter.querySelector(".ytp-panel-menu");
   await waitForSeconds(500);
   controlPanelInner.childNodes.forEach((child) => {
-    console.log(child.textContent);
     if (
       child.textContent.includes("字幕") ||
       child.textContent.includes("Subtitles")
@@ -216,11 +275,9 @@ async function selectChineseTranscriptAutomatically() {
   controlPanelInner = controlPanelOuter.querySelector(".ytp-panel-menu");
   await waitForSeconds(500);
 
-  console.log(controlPanelInner.children);
   // 找出自动翻译这一选项，并点击
   // TODO: 这里需要考虑是英文环境时对应的自动翻译的英文是什么
   controlPanelInner.childNodes.forEach((child) => {
-    console.log(child.textContent);
     if (
       child.textContent === "自动翻译" ||
       child.textContent === "Auto-translate"
@@ -232,9 +289,7 @@ async function selectChineseTranscriptAutomatically() {
 
   await waitForSeconds(500);
   controlPanelInner = controlPanelOuter.querySelector(".ytp-panel-menu");
-  console.log(controlPanelInner.children);
   controlPanelInner.childNodes.forEach((child) => {
-    console.log(child.textContent);
     if (
       child.textContent === "中文（简体）" ||
       child.textContent === "Chinese (Simplified)"
@@ -251,8 +306,6 @@ export function toggleSubtitleBtn() {
     subtitleBtn.click();
   }
 }
-
-export function filterYoutubeFloatingPanelData() {}
 
 export function addTranscriptStatusElementIfNotExist() {
   const container = document.getElementById(transcriptStatusElementId);

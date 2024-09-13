@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto px-1 py-1 text-[16px]">
+  <div class="container mx-auto bg-white px-1 py-1 text-[16px]">
     <div class="flex columns-2 flex-row">
       <div class="basis-4/5 flex-col text-[18px]">{{ currentWord }}</div>
       <div class="flex grow cursor-pointer select-none flex-row justify-around" @click="markWord">
@@ -15,6 +15,11 @@
       </div>
       <div v-if="isPlayAudioIconVisible" @click="handleClick">🔊</div>
     </div>
+    <div class="my-2 flex justify-start gap-5 text-pink-500">
+      <span class="cursor-pointer underline" @click="goToLangManWebsite">🔗朗文词典</span>
+      <span class="cursor-pointer underline" @click="goToCambridgeWebsite">🔗剑桥词典</span>
+      <span class="cursor-pointer underline" @click="goToGoogleTranslate">🔗Google翻译</span>
+    </div>
     <div class="flex flex-row flex-nowrap" v-for="item in dic" :key="item.pos">
       <div>{{ item.pos }}</div>
       <div>{{ item.zh }}</div>
@@ -24,17 +29,18 @@
 </template>
 
 <script setup lang="ts">
+import axios from 'axios';
 import { computed, onMounted, ref, watch, type Ref } from 'vue';
 import {
   ADD_PHRASE,
-  CREATE_GROUP,
   DELETE_WORD,
   GET_WORD_ID,
   SAVE_WORD,
   SEARCH_WORD,
-  USER_SETTING
+  TRANSLATION_CONTENT,
+  YOUDAO
 } from './constants';
-import { customGet, customPost } from './utils/customRequest';
+import { customPost } from './utils/customRequest';
 
 interface CustomEvent extends Event {
   detail: string;
@@ -60,19 +66,6 @@ const audioPlayer: Ref<HTMLAudioElement | null> = ref(null);
 const isLiked = ref(false);
 
 const groupId = ref('');
-
-function shouldAddToDefaultGroup() {
-  const url = window.location.href;
-  if (url.includes('youtuber')) {
-    return false;
-  }
-  return true;
-}
-
-function getYoutubeId() {
-  const urlArray = window.location.href.split('/');
-  return urlArray[urlArray.length - 1];
-}
 
 async function addWord() {
   if (isLiked.value) {
@@ -107,7 +100,8 @@ async function addPhrase() {
     groupId: groupId.value
   });
   if (r.data.code === 200) {
-    alert('添加成功');
+    sendMessageToPhraseFloatingPanel({ type: 'phrase-added' });
+    // alert('添加成功');
   } else {
     alert(r.data.msg);
   }
@@ -133,8 +127,30 @@ watch(currentWord, async (newVal) => {
   isLiked.value = t.data.data.isLiked;
 });
 
-function handleClick() {
-  audioUrl.value = `https://dict.youdao.com/dictvoice?type=1&audio=${currentWord.value}`;
+function goToLangManWebsite() {
+  window.open(`https://www.ldoceonline.com/dictionary/${currentWord.value}`);
+}
+
+function goToCambridgeWebsite() {
+  window.open(`https://dictionary.cambridge.org/dictionary/english/${currentWord.value}`);
+}
+
+function goToGoogleTranslate() {
+  window.open(
+    `https://translate.google.com/?sl=auto&tl=zh-CN&text=${currentWord.value}&op=translate`
+  );
+}
+
+async function handleClick() {
+  const response = await axios({
+    url: `${import.meta.env.VITE_BACKEND_URL}${YOUDAO}`, // 后端 API
+    method: 'POST',
+    data: { word: currentWord.value },
+    responseType: 'blob' // 获取音频为 Blob
+  });
+  const audioBlob = response.data;
+  const u = URL.createObjectURL(audioBlob);
+  audioUrl.value = u;
   audioPlayer.value?.play();
 }
 
@@ -143,7 +159,14 @@ function listenEventFromGeneralScript() {
     const ee = e as CustomEvent;
     const data = JSON.parse(ee.detail);
     switch (data.type) {
+      case 'group-id':
+        groupId.value = data.groupId;
+        console.log('floating panel group id:', groupId.value);
+        break;
       case 'search-word':
+        // Don't do this, 会导致一个死循环在这里general/utils.js:57
+        // sendMessageToGeneralScript({ type: 'go-through-content' });
+
         dic.value = [];
         currentWord.value = data.word;
         if (data.word.trim().split(' ').length > 1) {
@@ -161,16 +184,6 @@ function listenEventFromGeneralScript() {
         break;
       case 'token':
         localStorage.setItem('floatingPanelToken', data.message);
-        if (!groupId.value) {
-          if (shouldAddToDefaultGroup()) {
-            const userSetting = await customGet(USER_SETTING);
-            groupId.value = userSetting.data.data.defaultGroupID;
-          } else {
-            const g = (await createGroup()).data.data;
-            groupId.value = g._id;
-          }
-        }
-
         break;
       default:
         break;
@@ -178,60 +191,25 @@ function listenEventFromGeneralScript() {
   });
 }
 
-function getTranslationFromYouDao(textToBeTranslated: string) {
-  fetch(`https://dict.youdao.com/result?word=${textToBeTranslated}&lang=en`)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok ' + response.statusText);
-      }
-      return response.text();
-    })
-    .then((html) => {
-      phonetic.value = '';
-      dic.value = [];
-      const parse = new DOMParser();
-      const doc = parse.parseFromString(html, 'text/html');
-      const dictBook = doc.querySelectorAll('.basic .word-exp');
-      const phoneticResult = doc.querySelector('.phonetic');
-      phonetic.value = phoneticResult?.textContent ?? '';
-      dictBook.forEach((book) => {
-        const pos = book.querySelector('.pos');
-        const translation = book.querySelector('.trans');
-        dic.value.push({
-          pos: pos?.textContent ?? '',
-          zh: translation?.textContent ?? ''
-        });
-      });
-      // 选中的不是单词，是句子或者是其他
-      if (dictBook.length === 0) {
-        const backupDicBook = doc.querySelectorAll('.dict-book .trans-content');
-        backupDicBook.forEach((book) => {
-          const pos = '';
-          const translation = book.textContent;
-          dic.value.push({
-            pos,
-            zh: translation?.trim() ?? ''
-          });
-        });
-      }
-    })
-    .catch((error) => {
-      console.error('There was a problem with the fetch operation:', error);
-    });
-}
-
-async function createGroup() {
-  const g = await customPost(CREATE_GROUP, {
-    youtubeId: getYoutubeId(),
-    name: document.title,
-    links: [window.location.href]
-  });
-  return g;
+async function getTranslationFromYouDao(textToBeTranslated: string) {
+  const d = await customPost(TRANSLATION_CONTENT, { word: textToBeTranslated });
+  const data = d.data.data;
+  phonetic.value = data.phonetic;
+  dic.value = data.dicList;
 }
 
 onMounted(async () => {
   listenEventFromGeneralScript();
 });
+
+function sendMessageToPhraseFloatingPanel(message: any) {
+  const event = new CustomEvent('phraseAddedSuccessfully', {
+    detail: JSON.stringify(message),
+    bubbles: true,
+    composed: true
+  });
+  document.dispatchEvent(event);
+}
 
 function sendMessageToGeneralScript(message: any) {
   const event = new CustomEvent('floatingPanelEvent', {

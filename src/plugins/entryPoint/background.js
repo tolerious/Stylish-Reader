@@ -102,7 +102,17 @@ browser.runtime.onMessage.addListener(async (message) => {
     case "login-success":
       await setLoginToken(message.data.data.token);
       browser.tabs.remove(await getCurrentTabId());
-      browser.tabs.reload();
+      // 登陆成功后刷新所有tab
+      browser.tabs
+        .query({})
+        .then((tabs) => {
+          for (let tab of tabs) {
+            browser.tabs.reload(tab.id);
+          }
+        })
+        .catch((error) => {
+          console.error(`Error: ${error}`);
+        });
       break;
     case "tedContentScriptLoaded":
       if (tedCurrentUrl) {

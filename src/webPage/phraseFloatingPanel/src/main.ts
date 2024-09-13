@@ -1,14 +1,20 @@
-import './assets/main.css'
+import "./assets/main.css";
 
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+import { createApp } from "vue";
+import { createPinia } from "pinia";
 
-import App from './App.vue'
-import router from './router'
+import App from "./App.vue";
+import router from "./router";
 
-const app = createApp(App)
+const app = createApp(App);
 
-app.use(createPinia())
-app.use(router)
+app.use(createPinia());
+app.use(router);
 
-app.mount('#app')
+const shadow = document.getElementById(
+  "stylish-reader-phrase-floating-panel-shadow-root"
+)?.shadowRoot;
+
+const mountPoint =
+  shadow?.getElementById("stylish-reader-phrase-panel") ?? "#stylish-reader-phrase-panel";
+app.mount(mountPoint);

@@ -1,10 +1,14 @@
 import { backendServerUrl } from "../entryPoint/constants";
 import { getLoginToken } from "../entryPoint/utils/background.utils";
 import { stylishReaderMainColor } from "../utils/constants";
-import { checkUserLoginStatus } from "../utils/utils";
+import { checkUserLoginStatus, getCurrentPageUrl } from "../utils/utils";
 import {
   clickableWordClassName,
   floatingIconSize,
+  phraseFloatingIconSize,
+  phraseFloatingPanelId,
+  phraseFloatingPanelShadowRootId,
+  phraseFloatingPanelSize,
   stylishReaderFloatingIconId,
   translationFloatingPanelId,
   translationFloatingPanelShadowRootId,
@@ -16,6 +20,8 @@ let currentSelectionContent = "";
 let selectionRange = null;
 
 let gSelectionPosition = { x: 0, y: 0 };
+
+let isPhraseFloatingPanelOpen = false;
 
 /**
  * 遍历页面上所有dom节点， 根据单词列表，构建自定义元素
@@ -129,6 +135,7 @@ export function customizeGeneralEvent() {
   addSelectionChangeEvent();
   addMouseDownEvent();
   listenEventFromFloatingPanelEvent();
+  listenEventFromPhraseFloatingPanelEvent();
 }
 
 /**
@@ -200,6 +207,19 @@ function addMouseDownEvent() {
     hideFloatingIcon();
     hideTranslationFloatingPanel();
   });
+}
+
+export function listenEventFromOfficialWebsite() {
+  document.addEventListener(
+    "officialWebsiteYouTubeVideoPageReady",
+    async function () {
+      // TODO: 这里需要等待页面加载完成，然后再去遍历dom节点，生成自定义元素，临时解决方案是等待2.5s
+      setTimeout(async () => {
+        goThroughDomAndGenerateCustomElement(await getWordList());
+      }, 2500);
+      console.log("go through dom and generate custom element");
+    }
+  );
 }
 
 /**
@@ -304,7 +324,7 @@ function showTranslationFloatingPanelTemporary() {
   floatingPanel.style.top = 0;
   floatingPanel.style.left = 0;
   floatingPanel.style.boxShadow = "none";
-  floatingPanel.style.zIndex = 1;
+  floatingPanel.style.zIndex = 99;
 }
 
 // source=selection,说明点击的是floating icon
@@ -312,6 +332,7 @@ export async function showTranslationFloatingPanel(
   source = "selection",
   position = { x: 0, y: 0 }
 ) {
+  await createAndSetDefaultGroupForCurrentPage();
   await checkUserLoginStatus();
 
   const translationPanel = document.getElementById(
@@ -326,6 +347,8 @@ export async function showTranslationFloatingPanel(
     translationPanel.style.left = x + "px";
     translationPanel.style.opacity = 1;
     translationPanel.style.boxShadow = "0 0 15px 5px grey";
+    translationPanel.style.zIndex = 9999;
+    translationPanel.style.width = translationPanelSize.width + "px";
   } else {
     const selection = window.getSelection();
     const range = selection.getRangeAt(0);
@@ -335,6 +358,7 @@ export async function showTranslationFloatingPanel(
     translationPanel.style.top = position.y + "px";
     translationPanel.style.left = position.x + "px";
     translationPanel.style.opacity = 1;
+    translationPanel.style.zIndex = 9999;
     translationPanel.style.boxShadow = "0 0 15px 5px grey";
   }
 }
@@ -346,6 +370,131 @@ function hideTranslationFloatingPanel() {
   if (translationPanel) {
     translationPanel.style.display = "none";
   }
+}
+
+let isDragging = false;
+
+function phraseFloatingPanelMouseDownHandler(e) {
+  e.preventDefault();
+  const shadowRoot = document.getElementById(phraseFloatingPanelShadowRootId);
+  shadowRoot.style.cursor = "grabbing";
+  isDragging = true;
+}
+
+function documentMouseMoveHandler(e) {
+  if (isDragging) {
+    const shadowRoot = document.getElementById(phraseFloatingPanelShadowRootId);
+    shadowRoot.style.cursor = "grabbing";
+    setPhrasePanelPosition(
+      e.clientX - phraseFloatingIconSize.width / 2,
+      e.clientY - phraseFloatingIconSize.height / 2
+    );
+  }
+}
+
+function phraseFloatingPanelClickHandler(e) {
+  if (!isPhraseFloatingPanelOpen) {
+    sendMessageFromGeneralScriptToPhraseFloatingPanelShadowDom({
+      type: "show-or-hide-phrase-icon",
+    });
+    showPhraseFloatingPanel();
+    isPhraseFloatingPanelOpen = true;
+  }
+}
+
+function phraseFloatingPanelMouseUpHandler(e) {
+  isDragging = false;
+  const shadowRoot = document.getElementById(phraseFloatingPanelShadowRootId);
+  shadowRoot.style.cursor = "grab";
+}
+
+function setPhrasePanelPosition(x, y) {
+  const shadowRoot = document.getElementById(phraseFloatingPanelShadowRootId);
+  shadowRoot.style.top = y + "px";
+  shadowRoot.style.left = x + "px";
+}
+
+function showPhraseFloatingPanel() {
+  const shadowRoot = document.getElementById(phraseFloatingPanelShadowRootId);
+  shadowRoot.style.height = `${phraseFloatingPanelSize.height}px`;
+  shadowRoot.style.width = `${phraseFloatingPanelSize.width}px`;
+  shadowRoot.style.borderRadius = 0;
+  shadowRoot.style.cursor = "default";
+}
+
+function showPhraseFloatingIcon() {
+  const shadowRoot = document.getElementById(phraseFloatingPanelShadowRootId);
+  shadowRoot.style.height = `${phraseFloatingIconSize.height}px`;
+  shadowRoot.style.width = `${phraseFloatingIconSize.width}px`;
+  shadowRoot.style.borderRadius = `${phraseFloatingIconSize.width}px`;
+  shadowRoot.style.cursor = "grab";
+}
+
+async function createPhraseFloatingPanelToShadowDom() {
+  const shadowRoot = document.createElement("div");
+  shadowRoot.id = phraseFloatingPanelShadowRootId;
+  shadowRoot.style.height = `${phraseFloatingIconSize.height}px`;
+  shadowRoot.style.width = `${phraseFloatingIconSize.width}px`;
+  shadowRoot.style.borderRadius = `${phraseFloatingIconSize.width}px`;
+  shadowRoot.style.boxShadow = "0 0 15px 5px grey";
+  shadowRoot.style.position = "fixed";
+  shadowRoot.style.top = `${window.innerHeight / 3}px`;
+  shadowRoot.style.cursor = "grab";
+  shadowRoot.style.right = "20px";
+  shadowRoot.style.zIndex = "9999";
+  shadowRoot.style.backgroundColor = "white";
+  const shadow = shadowRoot.attachShadow({ mode: "open" });
+
+  // 创建挂载点
+  const mountPoint = document.createElement("div");
+  mountPoint.id = phraseFloatingPanelId;
+
+  // 创建脚本挂载点
+  const vueScript = document.createElement("script");
+
+  // 创建样式挂载点
+  const styleElement = document.createElement("style");
+  styleElement.setAttribute("type", "text/css");
+  const cssCode = await injectCssToShadowDom(
+    "assets/css/stylish-reader-phrase-floating-panel-index.css"
+  );
+  styleElement.appendChild(document.createTextNode(cssCode));
+
+  // 在shadow dom中添加挂载点
+  shadow.appendChild(mountPoint);
+
+  // 在shadow dom中添加脚本挂载点
+  const jsCode = await injectJsToShadowDom(
+    "assets/js/stylish-reader-phrase-floating-panel.js"
+  );
+
+  vueScript.textContent = jsCode;
+  shadow.appendChild(vueScript);
+
+  // 在shadow dom中添加样式挂载点
+  shadow.appendChild(styleElement);
+
+  // 添加到页面上
+  document.body.appendChild(shadowRoot);
+
+  // 添加mousedown事件监听
+  shadowRoot.addEventListener("mousedown", phraseFloatingPanelMouseDownHandler);
+
+  // 添加 document mousemove事件监听
+  document.addEventListener("mousemove", documentMouseMoveHandler);
+
+  // 添加mouseup事件监听
+  shadowRoot.addEventListener("mouseup", phraseFloatingPanelMouseUpHandler);
+
+  // 添加click事件监听
+  shadowRoot.addEventListener("click", phraseFloatingPanelClickHandler);
+
+  eval(vueScript.textContent);
+
+  sendMessageFromGeneralScriptToPhraseFloatingPanelShadowDom({
+    type: "token",
+    message: await getLoginToken(),
+  });
 }
 
 async function createTranslationFloatingPanelToShadowDom(x = 0, y = 0) {
@@ -373,14 +522,18 @@ async function createTranslationFloatingPanelToShadowDom(x = 0, y = 0) {
   // 创建样式挂载点
   const styleElement = document.createElement("style");
   styleElement.setAttribute("type", "text/css");
-  const cssCode = await injectTranslationFloatingPanelCss();
+  const cssCode = await injectCssToShadowDom(
+    "assets/css/stylish-reader-translation-panel-index.css"
+  );
   styleElement.appendChild(document.createTextNode(cssCode));
 
   // 在shadow dom中添加挂载点
   shadow.appendChild(mountPoint);
 
   // 在shadow dom中添加脚本挂载点
-  const jsCode = await fetchFloatingPanelJsFile();
+  const jsCode = await injectJsToShadowDom(
+    "assets/js/stylish-reader-translation-panel.js"
+  );
   vueScript.textContent = jsCode;
   shadow.appendChild(vueScript);
 
@@ -397,20 +550,30 @@ function checkIfTranslationFloatingPanelExist() {
   return document.getElementById(translationFloatingPanelShadowRootId);
 }
 
-function injectTranslationFloatingPanelCss() {
+function checkIfPhraseFloatingPanelExist() {
+  return document.getElementById(phraseFloatingPanelShadowRootId);
+}
+
+function injectCssToShadowDom(cssFileUrl) {
   return new Promise((resolve) => {
-    fetch(
-      browser.runtime.getURL(
-        "assets/css/stylish-reader-translation-panel-index.css"
-      )
-    )
+    fetch(browser.runtime.getURL(cssFileUrl))
       .then((response) => response.text())
       .then((css) => resolve(css))
       .catch((error) => console.error("Error injecting CSS:", error));
   });
 }
 
-export function listenEventFromFloatingPanelEvent() {
+export function listenEventFromPhraseFloatingPanelEvent() {
+  document.addEventListener("eventSendFromPhraseFloatingPanel", (e) => {
+    const detail = JSON.parse(e.detail);
+    if (detail.type === "phrase-floating-panel-show-icon") {
+      showPhraseFloatingIcon();
+      isPhraseFloatingPanelOpen = false;
+    }
+  });
+}
+
+function listenEventFromFloatingPanelEvent() {
   document.addEventListener("floatingPanelEvent", async (event) => {
     const detail = JSON.parse(event.detail);
     switch (detail.type) {
@@ -422,6 +585,9 @@ export function listenEventFromFloatingPanelEvent() {
       case "save-word":
         goThroughDomAndGenerateCustomElement(await getWordList());
         break;
+      case "go-through-content":
+        goThroughDomAndGenerateCustomElement(await getWordList());
+        break;
       default:
         break;
     }
@@ -431,6 +597,17 @@ export function listenEventFromFloatingPanelEvent() {
 function sendMessageFromGeneralScriptToFloatingPanel(message) {
   const event = new CustomEvent("generalScriptEvent", {
     detail: JSON.stringify(message),
+    bubbles: true,
+    composed: true,
+  });
+  document.dispatchEvent(event);
+}
+
+function sendMessageFromGeneralScriptToPhraseFloatingPanelShadowDom(message) {
+  const event = new CustomEvent("phraseFloatingPanelEvent", {
+    bubbles: true,
+    composed: true,
+    detail: JSON.stringify(message),
   });
   document.dispatchEvent(event);
 }
@@ -438,7 +615,7 @@ function sendMessageFromGeneralScriptToFloatingPanel(message) {
 export async function getWordList() {
   const token = await getLoginToken();
   const userSetting = await getUserSettings(token);
-  const r = await fetch(`${backendServerUrl}/word/bygroup`, {
+  const r = await fetch(`${backendServerUrl}/word/whole`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -461,16 +638,21 @@ async function getUserSettings(token) {
   return j.data;
 }
 
-function fetchFloatingPanelJsFile() {
+function injectJsToShadowDom(jsFileUrl) {
   return new Promise((resolve) => {
-    fetch(
-      browser.runtime.getURL("assets/js/stylish-reader-translation-panel.js")
-    )
+    fetch(browser.runtime.getURL(jsFileUrl))
       .then((response) => response.text())
       .then((js) => {
         resolve(js);
       });
   });
+}
+
+export async function injectPhraseFloatingPanelToShadowDom() {
+  if (checkIfPhraseFloatingPanelExist()) {
+    return;
+  }
+  await createPhraseFloatingPanelToShadowDom();
 }
 
 export async function injectTranslationFloatingPanelToShadowDom() {
@@ -490,4 +672,56 @@ function convertStringToLowerCaseAndRemoveSpecialCharacter(s) {
     .replaceAll("(", "")
     .replaceAll(")", "")
     .replaceAll(":", "");
+}
+
+/**
+ * 为当前页面创建group，如果词组已经存在，则不创建，如果词组不存在，则创建。
+ * 并且设置默认的group为当前页面的group
+ */
+export async function createAndSetDefaultGroupForCurrentPage() {
+  const g = await createGroup();
+  sendMessageFromGeneralScriptToFloatingPanel({
+    type: "group-id",
+    groupId: g.data._id,
+  });
+  sendMessageFromGeneralScriptToPhraseFloatingPanelShadowDom({
+    type: "group-id",
+    groupId: g.data._id,
+  });
+  await setDefaultGroup(g.data._id);
+}
+
+async function fetchWrapper(url, method = "GET", body = {}) {
+  const token = await getLoginToken();
+  const requestOptions = {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(body),
+  };
+  return new Promise(async (resolve, reject) => {
+    const r = await fetch(url, requestOptions);
+    if (!r.ok) {
+      reject(-1);
+    }
+    const j = await r.json();
+    resolve(j);
+  });
+}
+
+async function setDefaultGroup(groupId) {
+  await fetchWrapper(`${backendServerUrl}/usersetting`, "POST", {
+    defaultGroupID: groupId,
+  });
+}
+
+async function createGroup() {
+  const g = await fetchWrapper(`${backendServerUrl}/wordgroup/`, "POST", {
+    name: document.title,
+    createdSource: "extension",
+    originalPageUrl: getCurrentPageUrl(),
+  });
+  return g;
 }
