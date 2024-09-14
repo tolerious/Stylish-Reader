@@ -29,13 +29,14 @@ export function createYoutubeStylishReaderIcon() {
   const toolBar = document.querySelector(".ytp-right-controls");
   if (toolBar) {
     const element = createYoutubeStylishIconElement();
-    element.addEventListener("click", onClickStylishReaderIcon);
+    logger("add icon...");
+    // element.addEventListener("click", onClickStylishReaderIcon);
     toolBar.appendChild(element);
   }
 }
 
 async function onClickStylishReaderIcon(e) {
-  logger(currentYoutubeTranslationUrl);
+  logger(`currentYoutubeTranslationUrl: ${currentYoutubeTranslationUrl}`);
   logger(currentYoutubeZhTranslationUrl);
   if (
     currentYoutubeTranslationUrl.trim() === "" ||
@@ -146,6 +147,7 @@ export function parseSubtitles(url, data) {
 }
 
 function sendMessageToYoutubeVideoPage(message) {
+  logger("sendMessageToYoutubeVideoPage");
   const event = new CustomEvent("fromYoutubeVideoContentScript", {
     detail: JSON.stringify(message),
     bubbles: true,
@@ -201,6 +203,7 @@ function injectJsToShadowDom(jsFileUrl) {
 }
 
 async function createYoutubeMiddlewareToShadowDom() {
+  logger("createYoutubeMiddlewareToShadowDom");
   const shadowRoot = document.createElement("div");
   shadowRoot.id = youtubeShadowRootId;
   shadowRoot.style.display = "none";
@@ -244,7 +247,7 @@ async function createYoutubeMiddlewareToShadowDom() {
   // 添加到页面上
   document.body.appendChild(shadowRoot);
 
-  eval(vueScript.textContent);
+  // eval(vueScript.textContent);
 }
 
 async function selectChineseTranscriptAutomatically() {
@@ -346,11 +349,11 @@ function createTranscriptStatusElement() {
   const container = document.createElement("div");
   container.id = transcriptStatusElementId;
   container.style.height = height;
-  container.style.width = "150px";
+  container.style.width = "200px";
   container.style.backgroundColor = "white";
   container.style.border = "1px solid #94a3b8";
   container.style.display = "grid";
-  container.style.gridTemplateColumns = "1fr 1fr 1fr";
+  container.style.gridTemplateColumns = "1fr 1fr 1fr 1fr";
   container.style.gridTemplateRows = "1fr";
   container.style.alignItems = "center";
   container.style.textAlign = "center";
@@ -363,8 +366,10 @@ function createTranscriptStatusElement() {
   englishDiv.textContent = "English";
   englishDiv.style.lineHeight = height;
   englishDiv.style.height = "100%";
+  englishDiv.style.cursor = "not-allowed";
   // englishDiv.style.backgroundColor = inActiveStatusBackgroundColor;
   englishDiv.style.borderRight = "1px solid #64748b";
+  englishDiv.style.cursor = "not-allowed";
 
   // 创建第二个子 div
   const chineseDiv = document.createElement("div");
@@ -372,6 +377,8 @@ function createTranscriptStatusElement() {
   chineseDiv.textContent = "中文";
   chineseDiv.style.lineHeight = height;
   chineseDiv.style.height = "100%";
+  chineseDiv.style.cursor = "not-allowed";
+  chineseDiv.style.borderRight = "1px solid #64748b";
   // chineseDiv.style.backgroundColor = inActiveStatusBackgroundColor;
 
   // 创建第三个 div
@@ -379,11 +386,22 @@ function createTranscriptStatusElement() {
   automationDiv.textContent = "Auto";
   automationDiv.style.lineHeight = height;
   automationDiv.style.height = "100%";
+  automationDiv.style.borderRight = "1px solid #64748b";
+  automationDiv.style.cursor = "pointer";
+
+  // 创建第四个 div
+  const addVideoDiv = document.createElement("div");
+  addVideoDiv.textContent = "Add";
+  addVideoDiv.style.lineHeight = height;
+  addVideoDiv.style.height = "100%";
+  addVideoDiv.style.cursor = "pointer";
+  addVideoDiv.addEventListener("click", onClickStylishReaderIcon);
 
   // 将子 div 添加到父容器
   container.appendChild(englishDiv);
   container.appendChild(chineseDiv);
   container.appendChild(automationDiv);
+  container.appendChild(addVideoDiv);
 
   automationDiv.addEventListener("click", selectChineseTranscriptAutomatically);
 

@@ -7,6 +7,9 @@ const serverUrl = import.meta.env.VITE_SERVER
 
 function registerEventListenerFromContentScript() {
   document.addEventListener('fromYoutubeVideoContentScript', async (event: any) => {
+    console.log('---------------------------')
+    console.log('添加视频')
+    console.log('---------------------------')
     const detail = JSON.parse(event.detail)
     console.log(detail.data)
     const d = detail.data
@@ -54,6 +57,9 @@ async function checkIfVideoExist(videoId: string, token: string) {
 }
 
 onMounted(() => {
+  console.log('___________________________________')
+  console.log('youtubeTransport mounted.')
+  console.log('___________________________________')
   registerEventListenerFromContentScript()
 })
 </script>
