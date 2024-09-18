@@ -160,7 +160,7 @@ function processResponse(details) {
     try {
       let json = JSON.parse(responseBody);
       console.log("Response JSON data: ", json);
-      console.log(details.url);
+      console.log(`Subtitles url: ${details.url}`);
       notifyContentScript({ type: "youtube", url: details.url, data: json });
       // 在这里处理 JSON 数据
     } catch (e) {

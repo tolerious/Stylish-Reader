@@ -36,8 +36,10 @@ export function createYoutubeStylishReaderIcon() {
 }
 
 async function onClickStylishReaderIcon(e) {
-  logger(`currentYoutubeTranslationUrl: ${currentYoutubeTranslationUrl}`);
-  logger(currentYoutubeZhTranslationUrl);
+  console.log(currentYoutubeTranslationUrl);
+  console.log(currentYoutubeZhTranslationUrl);
+  console.log(isChineseTranscriptExist);
+  console.log(isEnglishTranscriptExist);
   if (
     currentYoutubeTranslationUrl.trim() === "" ||
     currentYoutubeZhTranslationUrl.trim() === ""
@@ -132,17 +134,34 @@ function isCurrentSubtitleChinese(url) {
 }
 
 export function parseSubtitles(url, data) {
+  console.log(`Subtitles url: \n ${url}`);
   if (isCurrentSubtitleEnglish(url)) {
+    console.log(url);
+    console.log(data);
     currentYoutubeTranslationUrl = url;
     currentYoutubeTranslationData = data;
-    logger("English subtitle gotcha.");
-    setEnglishTranscriptStatus(true);
+    if (!url) {
+      logger(`English url is empty`);
+    } else if (!data) {
+      logger(`English data is empty`);
+    } else {
+      logger("English subtitle gotcha.");
+      setEnglishTranscriptStatus(true);
+    }
   }
   if (isCurrentSubtitleChinese(url)) {
+    console.log(url);
+    console.log(data);
     currentYoutubeZhTranslationUrl = url;
     currentYoutubeZhTranslationData = data;
-    logger("Chinese subtitle gotcha.");
-    setChineseTranscriptStatus(true);
+    if (!url) {
+      logger(`Chinese url is empty`);
+    } else if (!data) {
+      logger(`Chinese data is empty`);
+    } else {
+      logger("Chinese subtitle gotcha.");
+      setChineseTranscriptStatus(true);
+    }
   }
 }
 
@@ -250,13 +269,14 @@ async function createYoutubeMiddlewareToShadowDom() {
   // eval(vueScript.textContent);
 }
 
-async function selectChineseTranscriptAutomatically() {
-  logger("Get transcript automatically.");
+async function autoSelectChineseSubtitle() {
   const chromeBottom = document.querySelector(".ytp-chrome-bottom");
   const settingsButton = document.querySelector(
     "[data-tooltip-target-id='ytp-settings-button']"
   );
-  const controlPanelOuter = document.getElementById("ytp-id-18");
+  const controlPanelOuter = document.querySelector(
+    ".ytp-popup.ytp-settings-menu"
+  );
 
   // 让控制栏显示
   chromeBottom.style.opacity = 1;
@@ -302,6 +322,75 @@ async function selectChineseTranscriptAutomatically() {
   });
 }
 
+async function autoSelectEnglishSubtitle() {
+  const chromeBottom = document.querySelector(".ytp-chrome-bottom");
+  const settingsButton = document.querySelector(
+    "[data-tooltip-target-id='ytp-settings-button']"
+  );
+  const controlPanelOuter = document.querySelector(
+    ".ytp-popup.ytp-settings-menu"
+  );
+
+  // 让控制栏显示
+  chromeBottom.style.opacity = 1;
+  // 点击设置图标，弹出Panel
+  await waitForSeconds(500);
+  settingsButton.click();
+  await waitForSeconds(500);
+  let controlPanelInner = controlPanelOuter.querySelector(".ytp-panel-menu");
+  await waitForSeconds(500);
+  controlPanelInner.childNodes.forEach((child) => {
+    if (
+      child.textContent.includes("字幕") ||
+      child.textContent.includes("Subtitles")
+    ) {
+      child.click();
+    }
+  });
+  await waitForSeconds(500);
+  controlPanelInner = controlPanelOuter.querySelector(".ytp-panel-menu");
+  await waitForSeconds(500);
+  console.log(controlPanelInner);
+  // 所有带有“英语”或者english字眼的项目集合
+  const englishElements = [];
+  controlPanelInner.childNodes.forEach((child) => {
+    const childTextContent = child.textContent.toLowerCase();
+    if (
+      (childTextContent.includes("english") ||
+        childTextContent.includes("英语")) &&
+      !childTextContent.includes(">>")
+    ) {
+      englishElements.push(child);
+    }
+  });
+
+  console.log(englishElements);
+  // 集合里面可能不止有一个选项，选择字数最短的那个一般是“英语”或者“english”
+  if (englishElements.length === 0) {
+    logger("没有英文字幕");
+  } else {
+    let e = englishElements[0];
+    englishElements.forEach((element) => {
+      if (element.textContent.length < e.textContent.length) {
+        e = element;
+      }
+    });
+    e.click();
+  }
+}
+
+async function selectChineseTranscriptAutomatically() {
+  logger("Get transcript automatically.");
+  console.log(`isChineseTranscriptExist: ${isChineseTranscriptExist}`);
+  console.log(`isEnglishTranscriptExist: ${isEnglishTranscriptExist}`);
+  if (isChineseTranscriptExist) {
+    await autoSelectEnglishSubtitle();
+  }
+  if (isEnglishTranscriptExist) {
+    await autoSelectChineseSubtitle();
+  }
+}
+
 export function toggleSubtitleBtn() {
   const subtitleBtn = document.querySelector("[aria-keyshortcuts='c']");
   const value = subtitleBtn.getAttribute("aria-pressed");
@@ -325,7 +414,9 @@ export function addTranscriptStatusElementIfNotExist() {
 
 export function setEnglishTranscriptStatus(active) {
   isEnglishTranscriptExist = active;
-  console.log("set english background color", active);
+  console.log(
+    `set english background color: ${active}, isEnglishTranscriptExist: ${isEnglishTranscriptExist}`
+  );
   const element = document.getElementById(transcriptStatusEnglishElementId);
   element.style.backgroundColor = active
     ? activeStatusBackgroundColor
@@ -334,7 +425,9 @@ export function setEnglishTranscriptStatus(active) {
 
 export function setChineseTranscriptStatus(active) {
   isChineseTranscriptExist = active;
-  console.log("set Chinese background color", active);
+  console.log(
+    `set Chinese background color: ${active}, isChineseTranscriptExist: ${isChineseTranscriptExist}`
+  );
   const element = document.getElementById(transcriptStatusChineseElementId);
   element.style.backgroundColor = active
     ? activeStatusBackgroundColor
@@ -409,14 +502,16 @@ function createTranscriptStatusElement() {
   parentNode.appendChild(container);
   console.log("isEnglishTranscriptExist", isEnglishTranscriptExist);
   console.log("isChineseTranscriptExist", isChineseTranscriptExist);
-  if (!isEnglishTranscriptExist) {
-    setEnglishTranscriptStatus(false);
-  } else {
-    setEnglishTranscriptStatus(true);
-  }
-  if (!isChineseTranscriptExist) {
-    setChineseTranscriptStatus(false);
-  } else {
-    setEnglishTranscriptStatus(true);
-  }
+  setChineseTranscriptStatus(isChineseTranscriptExist);
+  setEnglishTranscriptStatus(isEnglishTranscriptExist);
+  // if (!isEnglishTranscriptExist) {
+  //   setEnglishTranscriptStatus(false);
+  // } else {
+  //   setEnglishTranscriptStatus(true);
+  // }
+  // if (!isChineseTranscriptExist) {
+  //   setChineseTranscriptStatus(false);
+  // } else {
+  //   setEnglishTranscriptStatus(true);
+  // }
 }
