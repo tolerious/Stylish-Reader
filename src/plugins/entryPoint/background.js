@@ -150,9 +150,8 @@ function processResponse(details) {
   let data = [];
 
   filter.ondata = (event) => {
-    let str = decoder.decode(event.data, { stream: true });
+    let str = decoder.decode(event.data);
     data.push(str);
-    filter.write(encoder.encode(event.data));
   };
 
   filter.onstop = (event) => {
@@ -163,6 +162,9 @@ function processResponse(details) {
       console.log(`Subtitles url: ${details.url}`);
       notifyContentScript({ type: "youtube", url: details.url, data: json });
       // 在这里处理 JSON 数据
+      data.forEach((d) => {
+        filter.write(encoder.encode(d));
+      });
     } catch (e) {
       alert("视频处理失败，请刷新页面重试");
     }
