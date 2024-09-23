@@ -499,6 +499,51 @@ async function createPhraseFloatingPanelToShadowDom() {
 
 async function createTranslationFloatingPanelToShadowDom(x = 0, y = 0) {
   const shadowRoot = document.createElement("div");
+
+  shadowRoot.id = translationFloatingPanelShadowRootId;
+  shadowRoot.style.display = "none";
+  shadowRoot.style.boxSizing = "border-box";
+  shadowRoot.style.borderRadius = "3px";
+  shadowRoot.style.width = translationPanelSize.width + "px";
+  shadowRoot.style.backgroundColor = "white";
+  shadowRoot.style.boxShadow = "0 0 15px 5px grey";
+  shadowRoot.style.position = "fixed";
+  shadowRoot.style.top = y + "px";
+  shadowRoot.style.left = x + "px";
+  shadowRoot.style.zIndex = "9999";
+  document.body.appendChild(shadowRoot);
+
+  const shadow = shadowRoot.attachShadow({ mode: "open" });
+
+  // 创建挂载点
+  const mountPoint = document.createElement("div");
+  mountPoint.id = translationFloatingPanelId;
+
+  // 添加挂载点到shadow dom中
+  shadow.appendChild(mountPoint);
+
+  // 创建script标签
+  const script = document.createElement("script");
+  script.src = browser.runtime.getURL(
+    "assets/js/stylish-reader-translation-panel.js"
+  );
+
+  // 创建style标签
+  const styleElement = document.createElement("link");
+  styleElement.setAttribute("rel", "stylesheet");
+  styleElement.href = browser.runtime.getURL(
+    "assets/css/stylish-reader-translation-panel-index.css"
+  );
+
+  // 添加script标签到shadow dom中，script中的内容会自动运行
+  shadow.appendChild(script);
+
+  // 添加style标签到shadow dom中
+  shadow.appendChild(styleElement);
+}
+
+async function createTranslationFloatingPanelToShadowDom_back(x = 0, y = 0) {
+  const shadowRoot = document.createElement("div");
   shadowRoot.id = translationFloatingPanelShadowRootId;
   shadowRoot.style.display = "none";
   shadowRoot.style.boxSizing = "border-box";
@@ -543,7 +588,7 @@ async function createTranslationFloatingPanelToShadowDom(x = 0, y = 0) {
   // 添加到页面上
   document.body.appendChild(shadowRoot);
 
-  eval(vueScript.textContent);
+  // eval(vueScript.textContent);
 }
 
 function checkIfTranslationFloatingPanelExist() {

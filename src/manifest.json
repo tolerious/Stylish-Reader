@@ -21,7 +21,8 @@
   "web_accessible_resources": [
     "assets/stylish-reader-48.png",
     "assets/right-arrow.png",
-    "assets/cancel-button.png"
+    "assets/cancel-button.png",
+    "assets/js/stylish-reader-translation-panel.js"
   ],
   "permissions": [
     "activeTab",
