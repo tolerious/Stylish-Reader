@@ -22,7 +22,8 @@
     "assets/stylish-reader-48.png",
     "assets/right-arrow.png",
     "assets/cancel-button.png",
-    "assets/js/stylish-reader-translation-panel.js"
+    "assets/js/stylish-reader-translation-panel.js",
+    "assets/css/stylish-reader-translation-panel-index.css"
   ],
   "permissions": [
     "activeTab",
