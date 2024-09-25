@@ -85,7 +85,9 @@ function removeUnMarkedWord(word) {
 
 function convertCurrentTextNodeContent(textNode, targetWordList) {
   // 判断并找出当前文本节点中包含的目标单词
-  const textContent = textNode.textContent;
+  const textContent = textNode.textContent
+    .replaceAll("\n", " ")
+    .replaceAll("\t", " ");
   const targetWordSet = new Set(targetWordList);
   const splittedTextContentStringList = textContent.split(" ");
   // 存放的是目标单词在splittedTextContentStringList中的索引
