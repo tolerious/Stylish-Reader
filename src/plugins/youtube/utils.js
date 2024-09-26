@@ -29,14 +29,13 @@ export function createYoutubeStylishReaderIcon() {
   const toolBar = document.querySelector(".ytp-right-controls");
   if (toolBar) {
     const element = createYoutubeStylishIconElement();
-    element.addEventListener("click", onClickStylishReaderIcon);
+    logger("add icon...");
+    // element.addEventListener("click", onClickStylishReaderIcon);
     toolBar.appendChild(element);
   }
 }
 
 async function onClickStylishReaderIcon(e) {
-  logger(currentYoutubeTranslationUrl);
-  logger(currentYoutubeZhTranslationUrl);
   if (
     currentYoutubeTranslationUrl.trim() === "" ||
     currentYoutubeZhTranslationUrl.trim() === ""
@@ -44,22 +43,20 @@ async function onClickStylishReaderIcon(e) {
     logger("No translation found");
     alert("请切换中英双语字母后再保存");
   } else {
-    console.log("en", currentYoutubeTranslationUrl);
-    console.log("zh", currentYoutubeZhTranslationUrl);
     const token = await getLoginToken();
-    console.log({
-      type: "subtitle",
-      data: {
-        enUrl: currentYoutubeTranslationUrl,
-        enData: currentYoutubeTranslationData,
-        zhUrl: currentYoutubeZhTranslationUrl,
-        zhData: currentYoutubeZhTranslationData,
-        videoId: getVideoId(),
-        token,
-        link: window.location.href,
-        title: document.title,
-      },
-    });
+    // console.log({
+    //   type: "subtitle",
+    //   data: {
+    //     enUrl: currentYoutubeTranslationUrl,
+    //     enData: currentYoutubeTranslationData,
+    //     zhUrl: currentYoutubeZhTranslationUrl,
+    //     zhData: currentYoutubeZhTranslationData,
+    //     videoId: getVideoId(),
+    //     token,
+    //     link: window.location.href,
+    //     title: document.title,
+    //   },
+    // });
     sendMessageToYoutubeVideoPage({
       type: "subtitle",
       data: {
@@ -134,18 +131,31 @@ export function parseSubtitles(url, data) {
   if (isCurrentSubtitleEnglish(url)) {
     currentYoutubeTranslationUrl = url;
     currentYoutubeTranslationData = data;
-    logger("English subtitle gotcha.");
-    setEnglishTranscriptStatus(true);
+    if (!url) {
+      logger(`English url is empty`);
+    } else if (!data) {
+      logger(`English data is empty`);
+    } else {
+      logger("English subtitle gotcha.");
+      setEnglishTranscriptStatus(true);
+    }
   }
   if (isCurrentSubtitleChinese(url)) {
     currentYoutubeZhTranslationUrl = url;
     currentYoutubeZhTranslationData = data;
-    logger("Chinese subtitle gotcha.");
-    setChineseTranscriptStatus(true);
+    if (!url) {
+      logger(`Chinese url is empty`);
+    } else if (!data) {
+      logger(`Chinese data is empty`);
+    } else {
+      logger("Chinese subtitle gotcha.");
+      setChineseTranscriptStatus(true);
+    }
   }
 }
 
 function sendMessageToYoutubeVideoPage(message) {
+  logger("sendMessageToYoutubeVideoPage");
   const event = new CustomEvent("fromYoutubeVideoContentScript", {
     detail: JSON.stringify(message),
     bubbles: true,
@@ -201,6 +211,7 @@ function injectJsToShadowDom(jsFileUrl) {
 }
 
 async function createYoutubeMiddlewareToShadowDom() {
+  logger("createYoutubeMiddlewareToShadowDom");
   const shadowRoot = document.createElement("div");
   shadowRoot.id = youtubeShadowRootId;
   shadowRoot.style.display = "none";
@@ -243,17 +254,16 @@ async function createYoutubeMiddlewareToShadowDom() {
 
   // 添加到页面上
   document.body.appendChild(shadowRoot);
-
-  eval(vueScript.textContent);
 }
 
-async function selectChineseTranscriptAutomatically() {
-  logger("Get transcript automatically.");
+async function autoSelectChineseSubtitle() {
   const chromeBottom = document.querySelector(".ytp-chrome-bottom");
   const settingsButton = document.querySelector(
     "[data-tooltip-target-id='ytp-settings-button']"
   );
-  const controlPanelOuter = document.getElementById("ytp-id-18");
+  const controlPanelOuter = document.querySelector(
+    ".ytp-popup.ytp-settings-menu"
+  );
 
   // 让控制栏显示
   chromeBottom.style.opacity = 1;
@@ -299,6 +309,71 @@ async function selectChineseTranscriptAutomatically() {
   });
 }
 
+async function autoSelectEnglishSubtitle() {
+  const chromeBottom = document.querySelector(".ytp-chrome-bottom");
+  const settingsButton = document.querySelector(
+    "[data-tooltip-target-id='ytp-settings-button']"
+  );
+  const controlPanelOuter = document.querySelector(
+    ".ytp-popup.ytp-settings-menu"
+  );
+
+  // 让控制栏显示
+  chromeBottom.style.opacity = 1;
+  // 点击设置图标，弹出Panel
+  await waitForSeconds(500);
+  settingsButton.click();
+  await waitForSeconds(500);
+  let controlPanelInner = controlPanelOuter.querySelector(".ytp-panel-menu");
+  await waitForSeconds(500);
+  controlPanelInner.childNodes.forEach((child) => {
+    if (
+      child.textContent.includes("字幕") ||
+      child.textContent.includes("Subtitles")
+    ) {
+      child.click();
+    }
+  });
+  await waitForSeconds(500);
+  controlPanelInner = controlPanelOuter.querySelector(".ytp-panel-menu");
+  await waitForSeconds(500);
+  // 所有带有“英语”或者english字眼的项目集合
+  const englishElements = [];
+  controlPanelInner.childNodes.forEach((child) => {
+    const childTextContent = child.textContent.toLowerCase();
+    if (
+      (childTextContent.includes("english") ||
+        childTextContent.includes("英语")) &&
+      !childTextContent.includes(">>")
+    ) {
+      englishElements.push(child);
+    }
+  });
+
+  // 集合里面可能不止有一个选项，选择字数最短的那个一般是“英语”或者“english”
+  if (englishElements.length === 0) {
+    logger("没有英文字幕");
+  } else {
+    let e = englishElements[0];
+    englishElements.forEach((element) => {
+      if (element.textContent.length < e.textContent.length) {
+        e = element;
+      }
+    });
+    e.click();
+  }
+}
+
+async function selectChineseTranscriptAutomatically() {
+  logger("Get transcript automatically.");
+  if (isChineseTranscriptExist) {
+    await autoSelectEnglishSubtitle();
+  }
+  if (isEnglishTranscriptExist) {
+    await autoSelectChineseSubtitle();
+  }
+}
+
 export function toggleSubtitleBtn() {
   const subtitleBtn = document.querySelector("[aria-keyshortcuts='c']");
   const value = subtitleBtn.getAttribute("aria-pressed");
@@ -322,7 +397,6 @@ export function addTranscriptStatusElementIfNotExist() {
 
 export function setEnglishTranscriptStatus(active) {
   isEnglishTranscriptExist = active;
-  console.log("set english background color", active);
   const element = document.getElementById(transcriptStatusEnglishElementId);
   element.style.backgroundColor = active
     ? activeStatusBackgroundColor
@@ -331,7 +405,6 @@ export function setEnglishTranscriptStatus(active) {
 
 export function setChineseTranscriptStatus(active) {
   isChineseTranscriptExist = active;
-  console.log("set Chinese background color", active);
   const element = document.getElementById(transcriptStatusChineseElementId);
   element.style.backgroundColor = active
     ? activeStatusBackgroundColor
@@ -346,11 +419,11 @@ function createTranscriptStatusElement() {
   const container = document.createElement("div");
   container.id = transcriptStatusElementId;
   container.style.height = height;
-  container.style.width = "150px";
+  container.style.width = "200px";
   container.style.backgroundColor = "white";
   container.style.border = "1px solid #94a3b8";
   container.style.display = "grid";
-  container.style.gridTemplateColumns = "1fr 1fr 1fr";
+  container.style.gridTemplateColumns = "1fr 1fr 1fr 1fr";
   container.style.gridTemplateRows = "1fr";
   container.style.alignItems = "center";
   container.style.textAlign = "center";
@@ -363,8 +436,10 @@ function createTranscriptStatusElement() {
   englishDiv.textContent = "English";
   englishDiv.style.lineHeight = height;
   englishDiv.style.height = "100%";
+  englishDiv.style.cursor = "not-allowed";
   // englishDiv.style.backgroundColor = inActiveStatusBackgroundColor;
   englishDiv.style.borderRight = "1px solid #64748b";
+  englishDiv.style.cursor = "not-allowed";
 
   // 创建第二个子 div
   const chineseDiv = document.createElement("div");
@@ -372,6 +447,8 @@ function createTranscriptStatusElement() {
   chineseDiv.textContent = "中文";
   chineseDiv.style.lineHeight = height;
   chineseDiv.style.height = "100%";
+  chineseDiv.style.cursor = "not-allowed";
+  chineseDiv.style.borderRight = "1px solid #64748b";
   // chineseDiv.style.backgroundColor = inActiveStatusBackgroundColor;
 
   // 创建第三个 div
@@ -379,26 +456,27 @@ function createTranscriptStatusElement() {
   automationDiv.textContent = "Auto";
   automationDiv.style.lineHeight = height;
   automationDiv.style.height = "100%";
+  automationDiv.style.borderRight = "1px solid #64748b";
+  automationDiv.style.cursor = "pointer";
+
+  // 创建第四个 div
+  const addVideoDiv = document.createElement("div");
+  addVideoDiv.textContent = "Add";
+  addVideoDiv.style.lineHeight = height;
+  addVideoDiv.style.height = "100%";
+  addVideoDiv.style.cursor = "pointer";
+  addVideoDiv.addEventListener("click", onClickStylishReaderIcon);
 
   // 将子 div 添加到父容器
   container.appendChild(englishDiv);
   container.appendChild(chineseDiv);
   container.appendChild(automationDiv);
+  container.appendChild(addVideoDiv);
 
   automationDiv.addEventListener("click", selectChineseTranscriptAutomatically);
 
   // 将容器添加到parent中
   parentNode.appendChild(container);
-  console.log("isEnglishTranscriptExist", isEnglishTranscriptExist);
-  console.log("isChineseTranscriptExist", isChineseTranscriptExist);
-  if (!isEnglishTranscriptExist) {
-    setEnglishTranscriptStatus(false);
-  } else {
-    setEnglishTranscriptStatus(true);
-  }
-  if (!isChineseTranscriptExist) {
-    setChineseTranscriptStatus(false);
-  } else {
-    setEnglishTranscriptStatus(true);
-  }
+  setChineseTranscriptStatus(isChineseTranscriptExist);
+  setEnglishTranscriptStatus(isEnglishTranscriptExist);
 }
