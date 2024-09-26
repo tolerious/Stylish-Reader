@@ -158,8 +158,6 @@ function processResponse(details) {
     let responseBody = data.join("");
     try {
       let json = JSON.parse(responseBody);
-      console.log("Response JSON data: ", json);
-      console.log(`Subtitles url: ${details.url}`);
       notifyContentScript({ type: "youtube", url: details.url, data: json });
       // 在这里处理 JSON 数据
       data.forEach((d) => {
