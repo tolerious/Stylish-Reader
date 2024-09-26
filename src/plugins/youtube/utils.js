@@ -254,8 +254,6 @@ async function createYoutubeMiddlewareToShadowDom() {
 
   // 添加到页面上
   document.body.appendChild(shadowRoot);
-
-  // eval(vueScript.textContent);
 }
 
 async function autoSelectChineseSubtitle() {
