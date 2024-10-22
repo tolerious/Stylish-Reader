@@ -2,3 +2,4 @@ packages:
   - "webPage/*"
   - "pages/*"
   - "plugins/entryPoint"
+  - "popup"
