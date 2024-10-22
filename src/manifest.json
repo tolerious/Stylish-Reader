@@ -21,7 +21,8 @@
   "web_accessible_resources": [
     "assets/stylish-reader-48.png",
     "assets/right-arrow.png",
-    "assets/cancel-button.png"
+    "assets/cancel-button.png",
+    "popup/dist/*"
   ],
   "permissions": [
     "activeTab",
@@ -38,6 +39,6 @@
       "96": "icons/stylish-reader-48.png"
     },
     "default_title": "Stylish Reader",
-    "default_popup":"popup/dist/index.html"
+    "default_popup": "popup/dist/index.html"
   }
 }
