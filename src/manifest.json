@@ -38,6 +38,6 @@
       "96": "icons/stylish-reader-48.png"
     },
     "default_title": "Stylish Reader",
-    "default_popup":"popup/popup.html"
+    "default_popup":"popup/dist/index.html"
   }
 }
