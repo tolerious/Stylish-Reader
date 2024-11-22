@@ -38,16 +38,6 @@ async function notifyClickEvent(type = "show", message = "default") {
   });
 }
 
-// 处理 content script 发来的消息
-function handleResponse(message) {
-  console.log(message);
-}
-
-// 处理错误
-function handleError(error) {
-  console.log(`Error: ${error}`);
-}
-
 // 扩展图标被点击
 async function extensionIconClicked(tab, clickEvent) {}
 
