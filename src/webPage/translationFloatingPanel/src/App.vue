@@ -227,7 +227,9 @@ function convertStringToLowerCaseAndRemoveSpecialCharacter(s: string) {
     .replace(/"/g, '')
     .replace(/\(/g, '')
     .replace(/\)/g, '')
-    .replace(/:/g, '');
+    .replace(/:/g, '')
+    .replace(/'/g, '')
+    .replace(/!/g, '');
 }
 </script>
 
