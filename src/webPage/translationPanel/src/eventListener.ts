@@ -92,24 +92,18 @@ export function addEventListener() {
     google.addEventListener("click", () => goToGoogleTranslate());
   }
 
-  const playButton = shadow?.querySelector("#play-audio");
-  if (playButton instanceof HTMLElement) {
-    playButton.addEventListener("click", () =>
-      getAudioStream(localStorage.getItem("currentWord")!)
-    );
-  }
+  const playButton = shadow?.querySelector("#play-audio") as HTMLElement;
+  playButton.addEventListener("click", () =>
+    getAudioStream(localStorage.getItem("currentWord")!)
+  );
 
-  const likeIcon = shadow?.querySelector("#like-icon");
-  if (likeIcon instanceof HTMLElement) {
-    likeIcon.addEventListener("click", () => {
-      deleteWord();
-    });
-  }
+  const likeIcon = shadow?.querySelector("#like-icon") as HTMLElement;
+  likeIcon.addEventListener("click", () => {
+    deleteWord();
+  });
 
-  const unLikeIcon = shadow?.querySelector("#unlike-icon");
-  if (unLikeIcon instanceof HTMLElement) {
-    unLikeIcon.addEventListener("click", () => {
-      favourWord();
-    });
-  }
+  const unLikeIcon = shadow?.querySelector("#unlike-icon") as HTMLElement;
+  unLikeIcon.addEventListener("click", () => {
+    favourWord();
+  });
 }

@@ -13,12 +13,9 @@ export function playAudio(data: any) {
     "stylish-reader-translation-panel-shadow-root"
   )?.shadowRoot;
   if (shadow) {
-    const audio = shadow.querySelector("#audioPlayer");
-    if (audio instanceof HTMLElement) {
-      audio.setAttribute("src", data);
-      // @ts-ignore
-      audio.play();
-    }
+    const audio = shadow.querySelector("#audioPlayer") as HTMLAudioElement;
+    audio.setAttribute("src", data);
+    audio.play();
   }
 }
 
@@ -27,10 +24,8 @@ export function hideUnLikeIcon() {
     "stylish-reader-translation-panel-shadow-root"
   )?.shadowRoot;
   if (shadow) {
-    const icon = shadow.querySelector("#unlike-icon");
-    if (icon instanceof HTMLElement) {
-      icon.style.display = "none";
-    }
+    const icon = shadow.querySelector("#unlike-icon") as HTMLElement;
+    icon.style.display = "none";
   }
 }
 export function showLikeIcon() {
@@ -47,10 +42,8 @@ export function hideLikeIcon() {
     "stylish-reader-translation-panel-shadow-root"
   )?.shadowRoot;
   if (shadow) {
-    const icon = shadow.querySelector("#like-icon");
-    if (icon instanceof HTMLElement) {
-      icon.style.display = "none";
-    }
+    const icon = shadow.querySelector("#like-icon") as HTMLElement;
+    icon.style.display = "none";
   }
 }
 
@@ -72,10 +65,10 @@ export function clearTranslationContainerContent() {
     "stylish-reader-translation-panel-shadow-root"
   )?.shadowRoot;
   if (shadow) {
-    const translationContainer = shadow.querySelector("#translation-container");
-    if (translationContainer instanceof HTMLElement) {
-      translationContainer.replaceChildren();
-    }
+    const translationContainer = shadow.querySelector(
+      "#translation-container"
+    ) as HTMLElement;
+    translationContainer.replaceChildren();
   }
 }
 
@@ -86,14 +79,14 @@ export function generateTranslationContent(translations: []) {
     "stylish-reader-translation-panel-shadow-root"
   )?.shadowRoot;
   if (shadow) {
-    const translationContainer = shadow.querySelector("#translation-container");
-    if (translationContainer instanceof HTMLElement) {
-      translations.forEach((translation: { pos: string; zh: string }) => {
-        translationContainer.appendChild(
-          generateTranslationItem(translation.pos, translation.zh)
-        );
-      });
-    }
+    const translationContainer = shadow.querySelector(
+      "#translation-container"
+    ) as HTMLElement;
+    translations.forEach((translation: { pos: string; zh: string }) => {
+      translationContainer.appendChild(
+        generateTranslationItem(translation.pos, translation.zh)
+      );
+    });
   }
 }
 
@@ -102,9 +95,7 @@ export function setPhoneticContent(content: string) {
     "stylish-reader-translation-panel-shadow-root"
   )?.shadowRoot;
   if (shadow) {
-    const phonetic = shadow.querySelector("#phonetic");
-    if (phonetic instanceof HTMLElement) {
-      phonetic.textContent = content;
-    }
+    const phonetic = shadow.querySelector("#phonetic") as HTMLElement;
+    phonetic.textContent = content;
   }
 }
