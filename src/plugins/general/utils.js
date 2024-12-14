@@ -525,7 +525,7 @@ async function createTranslationFloatingPanelToShadowDom(x = 0, y = 0) {
   const styleElement = document.createElement("style");
   styleElement.setAttribute("type", "text/css");
   const cssCode = await injectCssToShadowDom(
-    "assets/css/stylish-reader-translation-panel-index.css"
+    "assets/css/translation-panel-index.css"
   );
   styleElement.appendChild(document.createTextNode(cssCode));
 
@@ -533,9 +533,7 @@ async function createTranslationFloatingPanelToShadowDom(x = 0, y = 0) {
   shadow.appendChild(mountPoint);
 
   // 在shadow dom中添加脚本挂载点
-  const jsCode = await injectJsToShadowDom(
-    "assets/js/stylish-reader-translation-panel.js"
-  );
+  const jsCode = await injectJsToShadowDom("assets/js/translation-panel.js");
   vueScript.textContent = jsCode;
   shadow.appendChild(vueScript);
 
@@ -546,6 +544,7 @@ async function createTranslationFloatingPanelToShadowDom(x = 0, y = 0) {
   document.body.appendChild(shadowRoot);
 
   eval(vueScript.textContent);
+  return Promise.resolve();
 }
 
 function checkIfTranslationFloatingPanelExist() {
