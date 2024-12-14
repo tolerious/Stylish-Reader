@@ -1,0 +1,19 @@
+{
+  "name": "translation-panel",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build --mode development && cp -r ./dist/translation-panel.js ../../assets/js && cp -r ./dist/translation-panel-index.css ../../assets/css",
+    "release": "tsc && vite build --mode production && cp -r ./dist/translation-panel.js ../../assets/js && cp -r ./dist/translation-panel-index.css ../../assets/css",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.16",
+    "typescript": "~5.6.2",
+    "vite": "^6.0.1"
+  }
+}

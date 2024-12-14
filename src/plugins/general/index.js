@@ -14,8 +14,8 @@ export async function initializeGeneralWebSite() {
   listenEventFromBackgroundScript();
   listenEventFromOfficialWebsite();
   await injectTranslationFloatingPanelToShadowDom();
-  await injectPhraseFloatingPanelToShadowDom();
   customizeGeneralEvent();
   await createAndSetDefaultGroupForCurrentPage();
   goThroughDomAndGenerateCustomElement(await getWordList());
+  // await injectPhraseFloatingPanelToShadowDom();
 }
