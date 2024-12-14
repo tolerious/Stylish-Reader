@@ -543,7 +543,7 @@ async function createTranslationFloatingPanelToShadowDom(x = 0, y = 0) {
   // 添加到页面上
   document.body.appendChild(shadowRoot);
 
-  eval(vueScript.textContent);
+  // eval(vueScript.textContent);
   return Promise.resolve();
 }
 
