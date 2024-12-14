@@ -53,19 +53,25 @@ export function convertStringToLowerCaseAndRemoveSpecialCharacter(s: string) {
 
 export function goToLangManWebsite() {
   const word = localStorage.getItem("currentWord")!;
-  window.open(`https://www.ldoceonline.com/dictionary/${word}`);
+  if (word) {
+    window.open(`https://www.ldoceonline.com/dictionary/${word}`);
+  }
 }
 
 export function goToCambridgeWebsite() {
   const word = localStorage.getItem("currentWord")!;
-  window.open(`https://dictionary.cambridge.org/dictionary/english/${word}`);
+  if (word) {
+    window.open(`https://dictionary.cambridge.org/dictionary/english/${word}`);
+  }
 }
 
 export function goToGoogleTranslate() {
   const word = localStorage.getItem("currentWord")!;
-  window.open(
-    `https://translate.google.com/?sl=auto&tl=zh-CN&text=${word}&op=translate`
-  );
+  if (word) {
+    window.open(
+      `https://translate.google.com/?sl=auto&tl=zh-CN&text=${word}&op=translate`
+    );
+  }
 }
 
 export async function searchWord(word: string) {
