@@ -67,7 +67,8 @@ export function goToCambridgeWebsite() {
 
 export function goToGoogleTranslate() {
   const word = localStorage.getItem("currentWord")!;
-  if (word) {
+  const domain = window.location.hostname;
+  if (word && !domain.includes("www.shine.cn")) {
     window.open(
       `https://translate.google.com/?sl=auto&tl=zh-CN&text=${word}&op=translate`
     );
