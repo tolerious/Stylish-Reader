@@ -11,16 +11,15 @@ import {
   favourWord,
   getAudioStream,
   getTranslationFromYouDao,
-  goToCambridgeWebsite,
-  goToGoogleTranslate,
-  goToLangManWebsite,
   searchWord,
 } from "./utils";
 
 export function addEventListener() {
-  document.addEventListener("generalScriptEvent", async (e: Event) => {
+  console.log("......");
+  window.addEventListener("generalScriptEvent", async (e: Event) => {
     const ee = e as CustomEvent;
     const data = JSON.parse(ee.detail);
+    console.log(data);
     switch (data.type) {
       case "group-id":
         localStorage.setItem("groupId", data.groupId);
@@ -79,17 +78,39 @@ export function addEventListener() {
 
   const langMan = shadow?.querySelector("#goToLangManWebsite");
   if (langMan) {
-    langMan.addEventListener("click", () => goToLangManWebsite());
+    langMan.addEventListener("click", function () {
+      const word = localStorage.getItem("currentWord")!;
+      if (word) {
+        window.open(`https://www.ldoceonline.com/dictionary/${word}`);
+      }
+    });
   }
 
   const cambridge = shadow?.querySelector("#goToCambridgeWebsite");
   if (cambridge) {
-    cambridge.addEventListener("click", () => goToCambridgeWebsite());
+    cambridge.addEventListener("click", function () {
+      const word = localStorage.getItem("currentWord")!;
+      if (word) {
+        window.open(
+          `https://dictionary.cambridge.org/dictionary/english/${word}`
+        );
+      }
+    });
   }
 
   const google = shadow?.querySelector("#goToGoogleTranslate");
   if (google) {
-    google.addEventListener("click", () => goToGoogleTranslate());
+    google.addEventListener("click", function () {
+      console.log("go to google...");
+      const word = localStorage.getItem("currentWord")!;
+      // @ts-ignore
+      // const domain = window.location.hostname;
+      if (word) {
+        window.open(
+          `https://translate.google.com/?sl=auto&tl=zh-CN&text=${word}&op=translate`
+        );
+      }
+    });
   }
 
   const playButton = shadow?.querySelector("#play-audio") as HTMLElement;

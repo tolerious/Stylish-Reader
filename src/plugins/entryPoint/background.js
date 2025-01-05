@@ -25,46 +25,9 @@ async function notifyContentScript(messageObject) {
   browser.tabs.sendMessage(tabId, messageObject);
 }
 
-// 通知 content script 扩展图标被点击
-async function notifyClickEvent(type = "show", message = "default") {
-  const tabId = await getCurrentTabId();
-  const url = await getCurrentTabUrl();
-
-  browser.tabs.sendMessage(tabId, {
-    tabId,
-    url,
-    type,
-    message,
-  });
-}
-
 // 扩展图标被点击
 async function extensionIconClicked(tab, clickEvent) {}
 
-function detailsHandler(details) {
-  if (
-    !details.url.includes("subtitles") &&
-    details.tabId > 0 &&
-    !details.url.includes("m3u8")
-  ) {
-    console.log("*************************");
-    console.log("请求 URL: " + details.url);
-    console.log(details);
-    console.log("*************************");
-    tedCurrentUrl = details.url;
-    browser.storage.local.set({ "ted-transcript-url": tedCurrentUrl });
-    if (tedCurrentUrl) {
-      notifyContentScript({ type: "intercept", url: tedCurrentUrl });
-    }
-  }
-}
-
-function tempDetailsHandler(details) {
-  if (details.url.includes("timedtext")) {
-    console.log(details);
-    notifyContentScript({ type: "youtube", url: details.url });
-  }
-}
 browser.browserAction.onClicked.addListener(extensionIconClicked);
 
 browser.tabs.onRemoved.addListener((tabId, removeInfo) => {

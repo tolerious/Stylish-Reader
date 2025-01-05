@@ -41,6 +41,6 @@ mountPoint!.innerHTML = `
     <audio autoplay id="audioPlayer"></audio>
   </div>
 `;
-
+console.log('!!!!!!!!!!!!')
 addEventListener();
 initControl();

@@ -46,33 +46,11 @@ export function convertStringToLowerCaseAndRemoveSpecialCharacter(s: string) {
     .replace(/"/g, "")
     .replace(/\(/g, "")
     .replace(/\)/g, "")
-    .replace(/:/g, "")
+    .replace(/!/g, "")
     .replace(/'/g, "")
-    .replace(/!/g, "");
-}
-
-export function goToLangManWebsite() {
-  const word = localStorage.getItem("currentWord")!;
-  if (word) {
-    window.open(`https://www.ldoceonline.com/dictionary/${word}`);
-  }
-}
-
-export function goToCambridgeWebsite() {
-  const word = localStorage.getItem("currentWord")!;
-  if (word) {
-    window.open(`https://dictionary.cambridge.org/dictionary/english/${word}`);
-  }
-}
-
-export function goToGoogleTranslate() {
-  const word = localStorage.getItem("currentWord")!;
-  const domain = window.location.hostname;
-  if (word && !domain.includes("www.shine.cn")) {
-    window.open(
-      `https://translate.google.com/?sl=auto&tl=zh-CN&text=${word}&op=translate`
-    );
-  }
+    .replace(/’/g, "")
+    .replace(/‘/g, "")
+    .replace(/:/g, "");
 }
 
 export async function searchWord(word: string) {
