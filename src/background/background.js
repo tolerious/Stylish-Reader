@@ -3,8 +3,9 @@
 import {
   getCurrentTabId,
   getCurrentTabUrl,
+  notifyContentScript,
   setLoginToken,
-} from "./utils/background.utils";
+} from "./background.utils";
 
 // TED 网站，当前页面URL
 let tedCurrentUrl = "";
@@ -18,12 +19,6 @@ let loginHasBeenOpened = false;
 // 已经打开的 login page 的 id
 let loginPageTabId = -1;
 console.log("background.js loaded");
-
-// 向 content script 发送消息
-async function notifyContentScript(messageObject) {
-  const tabId = await getCurrentTabId();
-  browser.tabs.sendMessage(tabId, messageObject);
-}
 
 // 通知 content script 扩展图标被点击
 async function notifyClickEvent(type = "show", message = "default") {
@@ -41,30 +36,6 @@ async function notifyClickEvent(type = "show", message = "default") {
 // 扩展图标被点击
 async function extensionIconClicked(tab, clickEvent) {}
 
-function detailsHandler(details) {
-  if (
-    !details.url.includes("subtitles") &&
-    details.tabId > 0 &&
-    !details.url.includes("m3u8")
-  ) {
-    console.log("*************************");
-    console.log("请求 URL: " + details.url);
-    console.log(details);
-    console.log("*************************");
-    tedCurrentUrl = details.url;
-    browser.storage.local.set({ "ted-transcript-url": tedCurrentUrl });
-    if (tedCurrentUrl) {
-      notifyContentScript({ type: "intercept", url: tedCurrentUrl });
-    }
-  }
-}
-
-function tempDetailsHandler(details) {
-  if (details.url.includes("timedtext")) {
-    console.log(details);
-    notifyContentScript({ type: "youtube", url: details.url });
-  }
-}
 browser.browserAction.onClicked.addListener(extensionIconClicked);
 
 browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
@@ -77,7 +48,7 @@ browser.webNavigation.onBeforeNavigate.addListener((details) => {
   isContentScriptReady = false;
 });
 
-// Listen for messages from pages(Mozilla://file pages, not web pages) and content scripts
+// 监听来自content script的消息
 browser.runtime.onMessage.addListener(async (message) => {
   switch (message.type) {
     case "open-login":
@@ -108,6 +79,9 @@ browser.runtime.onMessage.addListener(async (message) => {
       if (tedCurrentUrl) {
         notifyContentScript({ type: "intercept", url: tedCurrentUrl });
       }
+      break;
+    case "http-request":
+      console.log('http-request', message);
       break;
     default:
       break;

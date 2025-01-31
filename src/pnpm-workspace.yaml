@@ -3,3 +3,4 @@ packages:
   - "pages/*"
   - "plugins/entryPoint"
   - "popup"
+  - "background"

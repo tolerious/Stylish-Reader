@@ -7,12 +7,10 @@
     "dev": "vite",
     "build": "run-s build:*",
     "build:content": "vite build --config vite.content.config.js --mode development",
-    "build:background": "vite build --config vite.background.config.js --mode development",
-    "build:copy": "cp ./content/content_script.js ../../ && cp ./background/background_script.js ../../",
+    "build:copy": "cp ./content/content_script.js ../../",
     "release": "run-s release:*",
     "release:content": "vite build --config vite.content.config.js --mode production",
-    "release:background": "vite build --config vite.background.config.js --mode production",
-    "release:copy": "cp ./content/content_script.js ../../ && cp ./background/background_script.js ../../",
+    "release:copy": "cp ./content/content_script.js ../../",
     "preview": "vite preview"
   },
   "devDependencies": {

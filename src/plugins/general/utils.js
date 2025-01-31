@@ -1,5 +1,5 @@
 import { backendServerUrl } from "../entryPoint/constants";
-import { getLoginToken } from "../entryPoint/utils/background.utils";
+import { getLoginToken } from "../../background/background.utils";
 import { stylishReaderMainColor } from "../utils/constants";
 import { checkUserLoginStatus, getCurrentPageUrl } from "../utils/utils";
 import {

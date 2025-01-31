@@ -1,5 +1,13 @@
-import { backendServerUrl, loginTokenKey } from "../constants";
+import {
+  backendServerUrl,
+  loginTokenKey,
+} from "../plugins/entryPoint/constants";
 
+// 向 content script 发送消息
+export async function notifyContentScript(messageObject) {
+  const tabId = await getCurrentTabId();
+  browser.tabs.sendMessage(tabId, messageObject);
+}
 /**
  * Save token to local storage
  * @param {*} token - token to save
