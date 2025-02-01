@@ -55,6 +55,15 @@ export function getCurrentTabUrl() {
   });
 }
 
+// 获取当前标签页的title
+export function getCurrentTabTitle() {
+  return new Promise((resolve) => {
+    browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      resolve(tabs[0].title);
+    });
+  });
+}
+
 // 测试本地token是否有效
 export async function pingPong() {
   const headers = new Headers();
@@ -80,11 +89,70 @@ export async function saveArticle() {
   });
 }
 
-export async function searchWord(word) {
-  console.log("search word get called.");
+function convertStringToLowerCaseAndRemoveSpecialCharacter(s) {
+  return s
+    .trim()
+    .toLowerCase()
+    .replace(/\./g, "")
+    .replace(/,/g, "")
+    .replace(/"/g, "")
+    .replace(/\(/g, "")
+    .replace(/\)/g, "")
+    .replace(/:/g, "")
+    .replace(/'/g, "")
+    .replace(/\?/g, "")
+    .replace(/!/g, "");
+}
+
+export async function getTranslation(word) {
+  console.log("getTranslation get called.");
   const client = new HttpClient();
   const response = await client.post("/translation/content", { word });
   console.log(response);
   return response;
- 
+}
+
+export async function searchWord(word) {
+  const client = new HttpClient();
+  const response = await client.post("/word/search", { en: word });
+  console.log(response);
+  return response;
+}
+
+export async function favourWord(word, groupId) {
+  const client = new HttpClient();
+  const response = await client.post("/word", {
+    en: convertStringToLowerCaseAndRemoveSpecialCharacter(word),
+    groupId,
+  });
+  console.log(response);
+  return response;
+}
+
+/**
+ * 为当前页面创建group，如果词组已经存在，则不创建，如果词组不存在，则创建。
+ * 并且设置默认的group为当前页面的group
+ */
+export async function createAndSetDefaultGroupForCurrentPage() {
+  const g = await createGroup();
+
+  await setDefaultGroup(g.data._id);
+  return g;
+}
+
+async function setDefaultGroup(groupId) {
+  const client = new HttpClient();
+  await client.post("/usersetting", {
+    defaultGroupID: groupId,
+  });
+}
+
+async function createGroup() {
+  const client = new HttpClient();
+  const g = client.post("/wordgroup", {
+    name: await getCurrentTabTitle(),
+    createdSource: "extension",
+    originalPageUrl: await getCurrentTabUrl(),
+  });
+  return g;
 }

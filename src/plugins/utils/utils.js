@@ -218,7 +218,7 @@ export function sendMessageFromContentScriptToBackgroundScript(
   type,
   message = ""
 ) {
-  console.log(type, message);
+  // console.log(type, message);
   browser.runtime.sendMessage({ type, message });
 }
 
@@ -240,9 +240,14 @@ export function listenEventFromBackgroundScript() {
         }
         break;
       case "search-word":
-        console.log(message);
         sendMessageFromGeneralScriptToFloatingPanel({
           type: "search-word-result",
+          message: message.message,
+        });
+        break;
+      case "is-liked":
+        sendMessageFromGeneralScriptToFloatingPanel({
+          type: "is-liked",
           message: message.message,
         });
         break;

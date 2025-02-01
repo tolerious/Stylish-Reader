@@ -12,8 +12,6 @@ import {
   convertStringToLowerCaseAndRemoveSpecialCharacter,
   deleteWord,
   favourWord,
-  getAudioStream,
-  getTranslationFromYouDao,
   goToCambridgeWebsite,
   goToGoogleTranslate,
   goToLangManWebsite,
@@ -23,10 +21,25 @@ import {
 
 export function addEventListener() {
   document.addEventListener("generalScriptEvent", async (e: Event) => {
-    console.log(e);
+    // console.log(e);
     const ee = e as CustomEvent;
     const data = JSON.parse(ee.detail);
     switch (data.type) {
+      case "favour-word-success":
+        showLikeIcon();
+        hideUnLikeIcon();
+        break;
+      case "is-liked":
+        console.log(data);
+        const isLiked = data.message.data.isLiked;
+        if (isLiked) {
+          hideUnLikeIcon();
+          showLikeIcon();
+        } else {
+          showUnLikeIcon();
+          hideLikeIcon();
+        }
+        break;
       case "search-word-result":
         console.log(data);
         setPhoneticContent("");
@@ -57,17 +70,6 @@ export function addEventListener() {
             convertStringToLowerCaseAndRemoveSpecialCharacter(data.word)
           );
           setCurrentWord(localStorage.getItem("currentWord")!);
-          const t = await searchWord(
-            convertStringToLowerCaseAndRemoveSpecialCharacter(data.word)
-          );
-          if (t.data.data.isLiked) {
-            hideUnLikeIcon();
-            showLikeIcon();
-          } else {
-            showUnLikeIcon();
-            hideLikeIcon();
-          }
-          // getAudioStream(localStorage.getItem("currentWord")!);
         }
         // getTranslationFromYouDao(
         //   convertStringToLowerCaseAndRemoveSpecialCharacter(data.word)
@@ -101,16 +103,20 @@ export function addEventListener() {
   const playButton = shadow?.querySelector("#play-audio") as HTMLElement;
   playButton.addEventListener("click", () => {
     sendMessageToGeneralScript({ type: "http-request-from-floating-panel" });
-    getAudioStream(localStorage.getItem("currentWord")!);
   });
 
   const likeIcon = shadow?.querySelector("#like-icon") as HTMLElement;
   likeIcon.addEventListener("click", () => {
     deleteWord();
+    sendMessageToGeneralScript({ type: "delete-word" });
   });
 
   const unLikeIcon = shadow?.querySelector("#unlike-icon") as HTMLElement;
   unLikeIcon.addEventListener("click", () => {
-    favourWord();
+    // favourWord();
+    sendMessageToGeneralScript({
+      type: "favour-word",
+      message: localStorage.getItem("currentWord"),
+    });
   });
 }

@@ -1,10 +1,13 @@
 // background.js
 
 import {
+  createAndSetDefaultGroupForCurrentPage,
+  favourWord,
   getCurrentTabId,
   getCurrentTabUrl,
-  sendMessageFromBackgroundScriptToContentScript,
+  getTranslation,
   searchWord,
+  sendMessageFromBackgroundScriptToContentScript,
   setLoginToken,
 } from "./background.utils";
 
@@ -135,12 +138,29 @@ browser.runtime.onMessage.addListener(async (message) => {
       }
       break;
     case "search-word":
-      console.log("search-word", message);
-      const response = await searchWord(message.message.word);
+      const response = await getTranslation(message.message.word);
+      const searchResponse = await searchWord(message.message.word);
       sendMessageFromBackgroundScriptToContentScript({
         type: "search-word",
         message: response,
       });
+      sendMessageFromBackgroundScriptToContentScript({
+        type: "is-liked",
+        message: searchResponse,
+      });
+      break;
+    case "favour-word":
+      console.log(message);
+      const g = await createAndSetDefaultGroupForCurrentPage();
+      console.log(g);
+      const favourResponse = await favourWord(message.message, g.data._id);
+
+      console.log(favourResponse);
+      if (favourResponse.code === 200) {
+        console.log("收藏单词成功");
+      } else {
+        console.log("收藏单词失败");
+      }
       break;
     default:
       break;

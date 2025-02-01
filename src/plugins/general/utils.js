@@ -593,6 +593,13 @@ function listenEventFromFloatingPanelEvent() {
          */
         console.log("http request from floating panel.");
         break;
+      case "favour-word":
+        sendMessageFromContentScriptToBackgroundScript(
+          "favour-word",
+          detail.message
+        );
+        console.log(detail);
+        break;
       default:
         break;
     }
@@ -694,6 +701,22 @@ export async function createAndSetDefaultGroupForCurrentPage() {
     groupId: g.data._id,
   });
   await setDefaultGroup(g.data._id);
+  return g;
+}
+
+async function setDefaultGroup(groupId) {
+  await fetchWrapper(`${backendServerUrl}/usersetting`, "POST", {
+    defaultGroupID: groupId,
+  });
+}
+
+async function createGroup() {
+  const g = await fetchWrapper(`${backendServerUrl}/wordgroup/`, "POST", {
+    name: document.title,
+    createdSource: "extension",
+    originalPageUrl: getCurrentPageUrl(),
+  });
+  return g;
 }
 
 async function fetchWrapper(url, method = "GET", body = {}) {
@@ -714,19 +737,4 @@ async function fetchWrapper(url, method = "GET", body = {}) {
     const j = await r.json();
     resolve(j);
   });
-}
-
-async function setDefaultGroup(groupId) {
-  await fetchWrapper(`${backendServerUrl}/usersetting`, "POST", {
-    defaultGroupID: groupId,
-  });
-}
-
-async function createGroup() {
-  const g = await fetchWrapper(`${backendServerUrl}/wordgroup/`, "POST", {
-    name: document.title,
-    createdSource: "extension",
-    originalPageUrl: getCurrentPageUrl(),
-  });
-  return g;
 }
