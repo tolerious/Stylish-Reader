@@ -1,20 +1,19 @@
 import { setCurrentWord } from "./condition";
 import {
+  clearTranslationContainerContent,
+  generateTranslationContent,
   hideLikeIcon,
   hideUnLikeIcon,
+  setPhoneticContent,
   showLikeIcon,
   showUnLikeIcon,
 } from "./elementControl";
 import {
   convertStringToLowerCaseAndRemoveSpecialCharacter,
-  deleteWord,
-  favourWord,
-  getAudioStream,
-  getTranslationFromYouDao,
   goToCambridgeWebsite,
   goToGoogleTranslate,
   goToLangManWebsite,
-  searchWord,
+  sendMessageToGeneralScript,
 } from "./utils";
 
 export function addEventListener() {
@@ -22,8 +21,38 @@ export function addEventListener() {
     const ee = e as CustomEvent;
     const data = JSON.parse(ee.detail);
     switch (data.type) {
-      case "group-id":
-        localStorage.setItem("groupId", data.groupId);
+      case "delete-word-success":
+        showUnLikeIcon();
+        hideLikeIcon();
+        sendMessageToGeneralScript({
+          type: "delete-word-success",
+          message: localStorage.getItem("currentWord"),
+        });
+        break;
+      case "favour-word-success":
+        showLikeIcon();
+        hideUnLikeIcon();
+        sendMessageToGeneralScript({
+          type: "save-word",
+        });
+        break;
+      case "is-liked":
+        const isLiked = data.message.data.isLiked;
+        if (isLiked) {
+          hideUnLikeIcon();
+          showLikeIcon();
+        } else {
+          showUnLikeIcon();
+          hideLikeIcon();
+        }
+        break;
+      case "search-word-result":
+        setPhoneticContent("");
+        clearTranslationContainerContent();
+        const phonetic = data.message.data.phonetic;
+        const translationContentList = data.message.data.dicList;
+        setPhoneticContent(phonetic);
+        generateTranslationContent(translationContentList);
         break;
       case "search-word":
         localStorage.setItem("dic", JSON.stringify([]));
@@ -35,38 +64,13 @@ export function addEventListener() {
           hideLikeIcon();
           hideUnLikeIcon();
           setCurrentWord(localStorage.getItem("currentWord")!);
-          getTranslationFromYouDao(
-            convertStringToLowerCaseAndRemoveSpecialCharacter(data.word.trim())
-          );
         } else {
           localStorage.setItem(
             "currentWord",
             convertStringToLowerCaseAndRemoveSpecialCharacter(data.word)
           );
           setCurrentWord(localStorage.getItem("currentWord")!);
-          const t = await searchWord(
-            convertStringToLowerCaseAndRemoveSpecialCharacter(data.word)
-          );
-          if (t.data.data.isLiked) {
-            hideUnLikeIcon();
-            showLikeIcon();
-          } else {
-            showUnLikeIcon();
-            hideLikeIcon();
-          }
-          getAudioStream(localStorage.getItem("currentWord")!);
         }
-        getTranslationFromYouDao(
-          convertStringToLowerCaseAndRemoveSpecialCharacter(data.word)
-        );
-        break;
-      case "play":
-        // if (isPlayAudioIconVisible) {
-
-        // }
-        break;
-      case "token":
-        localStorage.setItem("floatingPanelToken", data.message);
         break;
       default:
         break;
@@ -79,31 +83,48 @@ export function addEventListener() {
 
   const langMan = shadow?.querySelector("#goToLangManWebsite");
   if (langMan) {
-    langMan.addEventListener("click", () => goToLangManWebsite());
+    langMan.addEventListener("click", function () {
+      goToLangManWebsite();
+    });
   }
 
   const cambridge = shadow?.querySelector("#goToCambridgeWebsite");
   if (cambridge) {
-    cambridge.addEventListener("click", () => goToCambridgeWebsite());
+    cambridge.addEventListener("click", function () {
+      goToCambridgeWebsite();
+    });
   }
 
   const google = shadow?.querySelector("#goToGoogleTranslate");
   if (google) {
-    google.addEventListener("click", () => goToGoogleTranslate());
+    google.addEventListener("click", function () {
+      goToGoogleTranslate();
+    });
   }
 
   const playButton = shadow?.querySelector("#play-audio") as HTMLElement;
-  playButton.addEventListener("click", () =>
-    getAudioStream(localStorage.getItem("currentWord")!)
-  );
+  playButton.addEventListener("click", () => {
+    sendMessageToGeneralScript({
+      type: "play-audio-from-floating-panel",
+      message: localStorage.getItem("currentWord"),
+    });
+  });
 
   const likeIcon = shadow?.querySelector("#like-icon") as HTMLElement;
   likeIcon.addEventListener("click", () => {
-    deleteWord();
+    // deleteWord();
+    sendMessageToGeneralScript({
+      type: "delete-word",
+      message: localStorage.getItem("currentWord"),
+    });
   });
 
   const unLikeIcon = shadow?.querySelector("#unlike-icon") as HTMLElement;
   unLikeIcon.addEventListener("click", () => {
-    favourWord();
+    // favourWord();
+    sendMessageToGeneralScript({
+      type: "favour-word",
+      message: localStorage.getItem("currentWord"),
+    });
   });
 }

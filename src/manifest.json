@@ -3,7 +3,7 @@
   "name": "Stylish Reader",
   "description": "Help you learn English better and easier.",
   "developer": { "name": "Toly Feng", "url": "https://stylishreader.com" },
-  "version": "0.0.18",
+  "version": "0.0.20",
   "icons": {
     "48": "icons/stylish-reader-48.png"
   },

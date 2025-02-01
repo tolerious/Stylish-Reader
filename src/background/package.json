@@ -1,0 +1,23 @@
+{
+  "name": "entrypoint",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "run-s build:*",
+    "build:background": "vite build --mode development --config vite.background.config.js --mode development",
+    "build:copy": "cp ./background_output/background_script.js ../",
+    "release": "run-s release:*",
+    "release:background": "vite build --mode production --config vite.background.config.js --mode production",
+    "release:copy": "cp ./background_output/background_script.js ../",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5",
+    "vite": "^5.2.0"
+  },
+  "dependencies": {
+    "axios": "^1.7.2"
+  }
+}

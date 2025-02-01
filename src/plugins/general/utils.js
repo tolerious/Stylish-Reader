@@ -1,10 +1,15 @@
 import { backendServerUrl } from "../entryPoint/constants";
-import { getLoginToken } from "../entryPoint/utils/background.utils";
+import { getLoginToken } from "../../background/background.utils";
 import { stylishReaderMainColor } from "../utils/constants";
-import { checkUserLoginStatus, getCurrentPageUrl } from "../utils/utils";
+import {
+  checkUserLoginStatus,
+  getCurrentPageUrl,
+  sendMessageFromContentScriptToBackgroundScript,
+} from "../utils/utils";
 import {
   clickableWordClassName,
   floatingIconSize,
+  floatingPanelAudioTagId,
   phraseFloatingIconSize,
   phraseFloatingPanelId,
   phraseFloatingPanelShadowRootId,
@@ -54,6 +59,7 @@ export function goThroughDomAndGenerateCustomElement(targetWordList) {
     convertCurrentTextNodeContent(value, targetWordList);
   }
 
+  // 为所有高亮单词添加点击事件
   document.querySelectorAll(`.${clickableWordClassName}`).forEach((e) => {
     e.addEventListener("click", (e) => {
       hideFloatingIcon();
@@ -61,6 +67,14 @@ export function goThroughDomAndGenerateCustomElement(targetWordList) {
         type: "search-word",
         word: e.target.textContent,
       });
+
+      sendMessageFromContentScriptToBackgroundScript("search-word", {
+        word: e.target.textContent,
+      });
+      sendMessageFromContentScriptToBackgroundScript(
+        "play-audio-from-floating-panel",
+        e.target.textContent.toString().trim()
+      );
     });
   });
 }
@@ -168,18 +182,24 @@ function addMouseDownEvent() {
 
     // 点击的是floatingIcon
     if ([stylishReaderFloatingIconId].includes(event.target.id)) {
+      sendMessageFromContentScriptToBackgroundScript("search-word", {
+        word: currentSelectionContent.toString().trim(),
+      });
+      const ww = currentSelectionContent.toString().trim();
+      if (ww.split(" ").length < 2) {
+        sendMessageFromContentScriptToBackgroundScript(
+          "play-audio-from-floating-panel",
+          ww
+        );
+      }
+
       sendMessageFromGeneralScriptToFloatingPanel({
         type: "search-word",
         word: currentSelectionContent.toString().trim(),
       });
+
       showTranslationFloatingPanel();
-      sendMessageFromGeneralScriptToFloatingPanel({
-        type: "play",
-      });
-      sendMessageFromGeneralScriptToFloatingPanel({
-        type: "token",
-        message: await getLoginToken(),
-      });
+
       event.stopPropagation();
       event.preventDefault();
       return;
@@ -193,13 +213,6 @@ function addMouseDownEvent() {
           "word",
           calculateFloatingPanelPosition(event.target)
         );
-        sendMessageFromGeneralScriptToFloatingPanel({
-          type: "token",
-          message: await getLoginToken(),
-        });
-        sendMessageFromGeneralScriptToFloatingPanel({
-          type: "play",
-        });
       }, 500);
       return;
     }
@@ -229,10 +242,6 @@ export function listenEventFromOfficialWebsite() {
  */
 function addSelectionChangeEvent() {
   document.addEventListener("selectionchange", async function () {
-    sendMessageFromGeneralScriptToFloatingPanel({
-      type: "token",
-      message: await getLoginToken(),
-    });
     const selection = window.getSelection();
     const range = selection.getRangeAt(0);
     if (selection.toString().trim()) {
@@ -266,7 +275,7 @@ function createFloatingIcon(x, y) {
   div.style.width = floatingIconSize.width + "px";
   div.style.borderRadius = "5px";
   div.style.cursor = "pointer";
-  div.style.zIndex = 9998;
+  div.style.zIndex = 9999;
   div.style.border = "2px solid " + stylishReaderMainColor;
   div.style.backgroundColor = "white";
   div.style.backgroundImage =
@@ -532,10 +541,14 @@ async function createTranslationFloatingPanelToShadowDom(x = 0, y = 0) {
   // 在shadow dom中添加挂载点
   shadow.appendChild(mountPoint);
 
-  // 在shadow dom中添加脚本挂载点
-  const jsCode = await injectJsToShadowDom("assets/js/translation-panel.js");
-  vueScript.textContent = jsCode;
-  shadow.appendChild(vueScript);
+  // // 在shadow dom中添加脚本挂载点
+  // const jsCode = await injectJsToShadowDom("assets/js/translation-panel.js");
+  // vueScript.textContent = jsCode;
+  // shadow.appendChild(vueScript);
+
+  const script = document.createElement("script");
+  script.src = browser.runtime.getURL("assets/js/translation-panel.js");
+  shadow.appendChild(script);
 
   // 在shadow dom中添加样式挂载点
   shadow.appendChild(styleElement);
@@ -574,14 +587,22 @@ export function listenEventFromPhraseFloatingPanelEvent() {
   });
 }
 
+// 接收来自floating panel的事件
 function listenEventFromFloatingPanelEvent() {
   document.addEventListener("floatingPanelEvent", async (event) => {
     const detail = JSON.parse(event.detail);
     switch (detail.type) {
       case "get-translation-done":
         break;
-      case "remove-word":
+      case "delete-word-success":
         removeUnMarkedWord(detail.message);
+
+        break;
+      case "delete-word":
+        sendMessageFromContentScriptToBackgroundScript(
+          "delete-word",
+          detail.message
+        );
         break;
       case "save-word":
         goThroughDomAndGenerateCustomElement(await getWordList());
@@ -589,13 +610,28 @@ function listenEventFromFloatingPanelEvent() {
       case "go-through-content":
         goThroughDomAndGenerateCustomElement(await getWordList());
         break;
+      case "play-audio-from-floating-panel":
+        /**
+         * detail对象结构为: {type:'',url:'',method:'',body:''}
+         */
+        sendMessageFromContentScriptToBackgroundScript(
+          "play-audio-from-floating-panel",
+          detail.message
+        );
+        break;
+      case "favour-word":
+        sendMessageFromContentScriptToBackgroundScript(
+          "favour-word",
+          detail.message
+        );
+        break;
       default:
         break;
     }
   });
 }
 
-function sendMessageFromGeneralScriptToFloatingPanel(message) {
+export function sendMessageFromGeneralScriptToFloatingPanel(message) {
   const event = new CustomEvent("generalScriptEvent", {
     detail: JSON.stringify(message),
     bubbles: true,
@@ -675,7 +711,7 @@ function convertStringToLowerCaseAndRemoveSpecialCharacter(s) {
     .replaceAll("!", "")
     .replaceAll("'", "")
     .replaceAll(":", "")
-    .replaceAll("?","")
+    .replaceAll("?", "");
 }
 
 /**
@@ -684,15 +720,28 @@ function convertStringToLowerCaseAndRemoveSpecialCharacter(s) {
  */
 export async function createAndSetDefaultGroupForCurrentPage() {
   const g = await createGroup();
-  sendMessageFromGeneralScriptToFloatingPanel({
-    type: "group-id",
-    groupId: g.data._id,
-  });
+
   sendMessageFromGeneralScriptToPhraseFloatingPanelShadowDom({
     type: "group-id",
     groupId: g.data._id,
   });
   await setDefaultGroup(g.data._id);
+  return g;
+}
+
+async function setDefaultGroup(groupId) {
+  await fetchWrapper(`${backendServerUrl}/usersetting`, "POST", {
+    defaultGroupID: groupId,
+  });
+}
+
+async function createGroup() {
+  const g = await fetchWrapper(`${backendServerUrl}/wordgroup/`, "POST", {
+    name: document.title,
+    createdSource: "extension",
+    originalPageUrl: getCurrentPageUrl(),
+  });
+  return g;
 }
 
 async function fetchWrapper(url, method = "GET", body = {}) {
@@ -715,17 +764,27 @@ async function fetchWrapper(url, method = "GET", body = {}) {
   });
 }
 
-async function setDefaultGroup(groupId) {
-  await fetchWrapper(`${backendServerUrl}/usersetting`, "POST", {
-    defaultGroupID: groupId,
-  });
+export function createAudioTagForFloatingPanel() {
+  const element = document.getElementById(floatingPanelAudioTagId);
+  if (!element) {
+    // 创建 audio 元素
+    const audio = document.createElement("audio");
+
+    // 设置初始属性
+    audio.controls = true; // 显示播放控件
+    audio.autoplay = false; // 不自动播放
+    audio.preload = "auto"; // 预加载音频
+    audio.style.display = "none"; // 不显示
+    audio.id = floatingPanelAudioTagId;
+
+    // 将 audio 元素添加到页面中
+    document.body.appendChild(audio);
+  }
 }
 
-async function createGroup() {
-  const g = await fetchWrapper(`${backendServerUrl}/wordgroup/`, "POST", {
-    name: document.title,
-    createdSource: "extension",
-    originalPageUrl: getCurrentPageUrl(),
-  });
-  return g;
+export function playAudioFromFloatingPanel(response) {
+  const audio = document.getElementById(floatingPanelAudioTagId);
+  const u = URL.createObjectURL(response);
+  audio.src = u;
+  audio.play();
 }

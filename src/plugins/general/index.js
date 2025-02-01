@@ -1,6 +1,7 @@
 import { listenEventFromBackgroundScript, logger } from "../utils/utils";
 import {
   createAndSetDefaultGroupForCurrentPage,
+  createAudioTagForFloatingPanel,
   customizeGeneralEvent,
   getWordList,
   goThroughDomAndGenerateCustomElement,
@@ -17,5 +18,6 @@ export async function initializeGeneralWebSite() {
   customizeGeneralEvent();
   await createAndSetDefaultGroupForCurrentPage();
   goThroughDomAndGenerateCustomElement(await getWordList());
+  createAudioTagForFloatingPanel();
   // await injectPhraseFloatingPanelToShadowDom();
 }

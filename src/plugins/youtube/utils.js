@@ -1,4 +1,4 @@
-import { getLoginToken } from "../entryPoint/utils/background.utils";
+import { getLoginToken } from "../../background/background.utils";
 import { logger } from "../utils/utils";
 import {
   activeStatusBackgroundColor,
