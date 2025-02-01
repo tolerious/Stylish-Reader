@@ -1,7 +1,10 @@
 import { setCurrentWord } from "./condition";
 import {
+  clearTranslationContainerContent,
+  generateTranslationContent,
   hideLikeIcon,
   hideUnLikeIcon,
+  setPhoneticContent,
   showLikeIcon,
   showUnLikeIcon,
 } from "./elementControl";
@@ -15,15 +18,24 @@ import {
   goToGoogleTranslate,
   goToLangManWebsite,
   searchWord,
+  sendMessageToGeneralScript,
 } from "./utils";
 
 export function addEventListener() {
   document.addEventListener("generalScriptEvent", async (e: Event) => {
+    console.log(e);
     const ee = e as CustomEvent;
     const data = JSON.parse(ee.detail);
     switch (data.type) {
-      case "group-id":
-        localStorage.setItem("groupId", data.groupId);
+      case "search-word-result":
+        console.log(data);
+        setPhoneticContent("");
+        clearTranslationContainerContent();
+        const phonetic = data.message.data.phonetic;
+        const translationContentList = data.message.data.dicList;
+        setPhoneticContent(phonetic);
+
+        generateTranslationContent(translationContentList);
         break;
       case "search-word":
         localStorage.setItem("dic", JSON.stringify([]));
@@ -35,9 +47,10 @@ export function addEventListener() {
           hideLikeIcon();
           hideUnLikeIcon();
           setCurrentWord(localStorage.getItem("currentWord")!);
-          getTranslationFromYouDao(
-            convertStringToLowerCaseAndRemoveSpecialCharacter(data.word.trim())
-          );
+
+          // getTranslationFromYouDao(
+          //   convertStringToLowerCaseAndRemoveSpecialCharacter(data.word.trim())
+          // );
         } else {
           localStorage.setItem(
             "currentWord",
@@ -54,20 +67,13 @@ export function addEventListener() {
             showUnLikeIcon();
             hideLikeIcon();
           }
-          getAudioStream(localStorage.getItem("currentWord")!);
+          // getAudioStream(localStorage.getItem("currentWord")!);
         }
-        getTranslationFromYouDao(
-          convertStringToLowerCaseAndRemoveSpecialCharacter(data.word)
-        );
+        // getTranslationFromYouDao(
+        //   convertStringToLowerCaseAndRemoveSpecialCharacter(data.word)
+        // );
         break;
-      case "play":
-        // if (isPlayAudioIconVisible) {
 
-        // }
-        break;
-      case "token":
-        localStorage.setItem("floatingPanelToken", data.message);
-        break;
       default:
         break;
     }
@@ -93,9 +99,10 @@ export function addEventListener() {
   }
 
   const playButton = shadow?.querySelector("#play-audio") as HTMLElement;
-  playButton.addEventListener("click", () =>
-    getAudioStream(localStorage.getItem("currentWord")!)
-  );
+  playButton.addEventListener("click", () => {
+    sendMessageToGeneralScript({ type: "http-request-from-floating-panel" });
+    getAudioStream(localStorage.getItem("currentWord")!);
+  });
 
   const likeIcon = shadow?.querySelector("#like-icon") as HTMLElement;
   likeIcon.addEventListener("click", () => {

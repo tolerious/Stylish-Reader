@@ -26,6 +26,7 @@ export async function getAudioStream(word: string) {
 }
 
 export async function getTranslationFromYouDao(word: string) {
+  console.log("youdao...");
   setPhoneticContent("");
   clearTranslationContainerContent();
   const client = new FetchWrapper(baseUrl);
@@ -81,7 +82,7 @@ export async function searchWord(word: string) {
   return t;
 }
 
-function sendMessageToGeneralScript(message: any) {
+export function sendMessageToGeneralScript(message: any) {
   const event = new CustomEvent("floatingPanelEvent", {
     detail: JSON.stringify(message),
   });

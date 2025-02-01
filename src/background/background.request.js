@@ -1,7 +1,9 @@
 import axios from "axios";
+import { baseUrl } from "./constants";
+import { getLoginToken } from "./background.utils";
 
 class HttpClient {
-  constructor(baseURL, timeout = 10000) {
+  constructor(baseURL = baseUrl, timeout = 10000) {
     // 创建 axios 实例
     this.instance = axios.create({
       baseURL, // 基础 URL
@@ -10,9 +12,11 @@ class HttpClient {
 
     // 请求拦截器
     this.instance.interceptors.request.use(
-      (config) => {
+      async (config) => {
         // 在发送请求之前可以做一些处理，比如添加 token
         // config.headers.Authorization = `Bearer ${yourToken}`;
+        const token = await getLoginToken();
+        config.headers.Authorization = `Bearer ${token}`;
         return config;
       },
       (error) => {
@@ -81,4 +85,4 @@ class HttpClient {
 // const baseURL = "https://api.example.com"; // 替换为你的 API 地址
 // const httpClient = new HttpClient(baseURL);
 
-export default httpClient;
+export default HttpClient;

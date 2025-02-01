@@ -1,6 +1,7 @@
 // 此处存放工具函数供所有plugin使用
 
 import { backendServerUrl, loginTokenKey } from "../entryPoint/constants";
+import { sendMessageFromGeneralScriptToFloatingPanel } from "../general/utils";
 import { developmentEnvironment } from "../ted/constants";
 import { fetchTranscript, sendMessageToBackground } from "../ted/utils";
 import {
@@ -208,13 +209,22 @@ export function isBBCLearningEnglishWebSite() {
   return window.location.href.includes("bbc.co.uk/learningenglish");
 }
 
+/**
+ * 从content脚本发送消息到background脚本
+ * @param {*} type 类型
+ * @param {*} message 消息
+ */
 export function sendMessageFromContentScriptToBackgroundScript(
   type,
   message = ""
 ) {
+  console.log(type, message);
   browser.runtime.sendMessage({ type, message });
 }
 
+/**
+ * 监听从background脚本发送过来的消息
+ */
 export function listenEventFromBackgroundScript() {
   browser.runtime.onMessage.addListener((message) => {
     switch (message.type) {
@@ -228,6 +238,13 @@ export function listenEventFromBackgroundScript() {
           setEnglishTranscriptStatus(false);
           setChineseTranscriptStatus(false);
         }
+        break;
+      case "search-word":
+        console.log(message);
+        sendMessageFromGeneralScriptToFloatingPanel({
+          type: "search-word-result",
+          message: message.message,
+        });
         break;
       default:
         break;

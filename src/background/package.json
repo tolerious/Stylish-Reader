@@ -6,10 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "run-s build:*",
-    "build:background": "vite build --config vite.background.config.js --mode development",
+    "build:background": "vite build --mode development --config vite.background.config.js --mode development",
     "build:copy": "cp ./background_output/background_script.js ../",
     "release": "run-s release:*",
-    "release:background": "vite build --config vite.background.config.js --mode production",
+    "release:background": "vite build --mode production --config vite.background.config.js --mode production",
     "release:copy": "cp ./background_output/background_script.js ../",
     "preview": "vite preview"
   },

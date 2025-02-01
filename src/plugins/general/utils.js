@@ -1,7 +1,11 @@
 import { backendServerUrl } from "../entryPoint/constants";
 import { getLoginToken } from "../../background/background.utils";
 import { stylishReaderMainColor } from "../utils/constants";
-import { checkUserLoginStatus, getCurrentPageUrl } from "../utils/utils";
+import {
+  checkUserLoginStatus,
+  getCurrentPageUrl,
+  sendMessageFromContentScriptToBackgroundScript,
+} from "../utils/utils";
 import {
   clickableWordClassName,
   floatingIconSize,
@@ -59,6 +63,9 @@ export function goThroughDomAndGenerateCustomElement(targetWordList) {
       hideFloatingIcon();
       sendMessageFromGeneralScriptToFloatingPanel({
         type: "search-word",
+        word: e.target.textContent,
+      });
+      sendMessageFromContentScriptToBackgroundScript("search-word", {
         word: e.target.textContent,
       });
     });
@@ -168,18 +175,16 @@ function addMouseDownEvent() {
 
     // 点击的是floatingIcon
     if ([stylishReaderFloatingIconId].includes(event.target.id)) {
+      sendMessageFromContentScriptToBackgroundScript("search-word", {
+        word: currentSelectionContent.toString().trim(),
+      });
+
       sendMessageFromGeneralScriptToFloatingPanel({
         type: "search-word",
         word: currentSelectionContent.toString().trim(),
       });
       showTranslationFloatingPanel();
-      sendMessageFromGeneralScriptToFloatingPanel({
-        type: "play",
-      });
-      sendMessageFromGeneralScriptToFloatingPanel({
-        type: "token",
-        message: await getLoginToken(),
-      });
+
       event.stopPropagation();
       event.preventDefault();
       return;
@@ -193,13 +198,6 @@ function addMouseDownEvent() {
           "word",
           calculateFloatingPanelPosition(event.target)
         );
-        sendMessageFromGeneralScriptToFloatingPanel({
-          type: "token",
-          message: await getLoginToken(),
-        });
-        sendMessageFromGeneralScriptToFloatingPanel({
-          type: "play",
-        });
       }, 500);
       return;
     }
@@ -229,10 +227,6 @@ export function listenEventFromOfficialWebsite() {
  */
 function addSelectionChangeEvent() {
   document.addEventListener("selectionchange", async function () {
-    sendMessageFromGeneralScriptToFloatingPanel({
-      type: "token",
-      message: await getLoginToken(),
-    });
     const selection = window.getSelection();
     const range = selection.getRangeAt(0);
     if (selection.toString().trim()) {
@@ -532,10 +526,14 @@ async function createTranslationFloatingPanelToShadowDom(x = 0, y = 0) {
   // 在shadow dom中添加挂载点
   shadow.appendChild(mountPoint);
 
-  // 在shadow dom中添加脚本挂载点
-  const jsCode = await injectJsToShadowDom("assets/js/translation-panel.js");
-  vueScript.textContent = jsCode;
-  shadow.appendChild(vueScript);
+  // // 在shadow dom中添加脚本挂载点
+  // const jsCode = await injectJsToShadowDom("assets/js/translation-panel.js");
+  // vueScript.textContent = jsCode;
+  // shadow.appendChild(vueScript);
+
+  const script = document.createElement("script");
+  script.src = browser.runtime.getURL("assets/js/translation-panel.js");
+  shadow.appendChild(script);
 
   // 在shadow dom中添加样式挂载点
   shadow.appendChild(styleElement);
@@ -589,13 +587,19 @@ function listenEventFromFloatingPanelEvent() {
       case "go-through-content":
         goThroughDomAndGenerateCustomElement(await getWordList());
         break;
+      case "http-request-from-floating-panel":
+        /**
+         * detail对象结构为: {type:'',url:'',method:'',body:''}
+         */
+        console.log("http request from floating panel.");
+        break;
       default:
         break;
     }
   });
 }
 
-function sendMessageFromGeneralScriptToFloatingPanel(message) {
+export function sendMessageFromGeneralScriptToFloatingPanel(message) {
   const event = new CustomEvent("generalScriptEvent", {
     detail: JSON.stringify(message),
     bubbles: true,
@@ -675,7 +679,7 @@ function convertStringToLowerCaseAndRemoveSpecialCharacter(s) {
     .replaceAll("!", "")
     .replaceAll("'", "")
     .replaceAll(":", "")
-    .replaceAll("?","")
+    .replaceAll("?", "");
 }
 
 /**
@@ -684,10 +688,7 @@ function convertStringToLowerCaseAndRemoveSpecialCharacter(s) {
  */
 export async function createAndSetDefaultGroupForCurrentPage() {
   const g = await createGroup();
-  sendMessageFromGeneralScriptToFloatingPanel({
-    type: "group-id",
-    groupId: g.data._id,
-  });
+
   sendMessageFromGeneralScriptToPhraseFloatingPanelShadowDom({
     type: "group-id",
     groupId: g.data._id,

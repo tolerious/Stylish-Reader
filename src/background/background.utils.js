@@ -2,9 +2,12 @@ import {
   backendServerUrl,
   loginTokenKey,
 } from "../plugins/entryPoint/constants";
+import HttpClient from "./background.request";
 
 // 向 content script 发送消息
-export async function notifyContentScript(messageObject) {
+export async function sendMessageFromBackgroundScriptToContentScript(
+  messageObject
+) {
   const tabId = await getCurrentTabId();
   browser.tabs.sendMessage(tabId, messageObject);
 }
@@ -75,4 +78,13 @@ export async function saveArticle() {
     headers: headers,
     body: JSON.stringify({ link: await getCurrentTabUrl() }),
   });
+}
+
+export async function searchWord(word) {
+  console.log("search word get called.");
+  const client = new HttpClient();
+  const response = await client.post("/translation/content", { word });
+  console.log(response);
+  return response;
+ 
 }

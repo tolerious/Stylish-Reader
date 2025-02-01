@@ -3,7 +3,8 @@
 import {
   getCurrentTabId,
   getCurrentTabUrl,
-  notifyContentScript,
+  sendMessageFromBackgroundScriptToContentScript,
+  searchWord,
   setLoginToken,
 } from "./background.utils";
 
@@ -48,51 +49,11 @@ browser.webNavigation.onBeforeNavigate.addListener((details) => {
   isContentScriptReady = false;
 });
 
-// 监听来自content script的消息
-browser.runtime.onMessage.addListener(async (message) => {
-  switch (message.type) {
-    case "open-login":
-      if (!loginHasBeenOpened) {
-        loginHasBeenOpened = true;
-        const result = await browser.tabs.create({
-          url: "loginPage/index.html",
-        });
-        loginPageTabId = result.id;
-      }
-      break;
-    case "login-success":
-      await setLoginToken(message.data.data.token);
-      browser.tabs.remove(await getCurrentTabId());
-      // 登陆成功后刷新所有tab
-      browser.tabs
-        .query({})
-        .then((tabs) => {
-          for (let tab of tabs) {
-            browser.tabs.reload(tab.id);
-          }
-        })
-        .catch((error) => {
-          console.error(`Error: ${error}`);
-        });
-      break;
-    case "tedContentScriptLoaded":
-      if (tedCurrentUrl) {
-        notifyContentScript({ type: "intercept", url: tedCurrentUrl });
-      }
-      break;
-    case "http-request":
-      console.log('http-request', message);
-      break;
-    default:
-      break;
-  }
-});
-
 // 监听tab的url是否发生变化，发生变化了就通知content script
 browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   // 检查URL是否改变
   if (changeInfo.url) {
-    notifyContentScript({ type: "urlChanged" });
+    sendMessageFromBackgroundScriptToContentScript({ type: "urlChanged" });
   }
 });
 
@@ -122,7 +83,11 @@ function processResponse(details) {
     let responseBody = data.join("");
     try {
       let json = JSON.parse(responseBody);
-      notifyContentScript({ type: "youtube", url: details.url, data: json });
+      sendMessageFromBackgroundScriptToContentScript({
+        type: "youtube",
+        url: details.url,
+        data: json,
+      });
       // 在这里处理 JSON 数据
       data.forEach((d) => {
         filter.write(encoder.encode(d));
@@ -133,3 +98,51 @@ function processResponse(details) {
     filter.disconnect();
   };
 }
+
+// 监听来自content script的消息
+browser.runtime.onMessage.addListener(async (message) => {
+  switch (message.type) {
+    case "open-login":
+      if (!loginHasBeenOpened) {
+        loginHasBeenOpened = true;
+        const result = await browser.tabs.create({
+          url: "loginPage/index.html",
+        });
+        loginPageTabId = result.id;
+      }
+      break;
+    case "login-success":
+      await setLoginToken(message.data.data.token);
+      browser.tabs.remove(await getCurrentTabId());
+      // 登陆成功后刷新所有tab
+      browser.tabs
+        .query({})
+        .then((tabs) => {
+          for (let tab of tabs) {
+            browser.tabs.reload(tab.id);
+          }
+        })
+        .catch((error) => {
+          console.error(`Error: ${error}`);
+        });
+      break;
+    case "tedContentScriptLoaded":
+      if (tedCurrentUrl) {
+        sendMessageFromBackgroundScriptToContentScript({
+          type: "intercept",
+          url: tedCurrentUrl,
+        });
+      }
+      break;
+    case "search-word":
+      console.log("search-word", message);
+      const response = await searchWord(message.message.word);
+      sendMessageFromBackgroundScriptToContentScript({
+        type: "search-word",
+        message: response,
+      });
+      break;
+    default:
+      break;
+  }
+});
