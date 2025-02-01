@@ -2,6 +2,7 @@
 
 import {
   createAndSetDefaultGroupForCurrentPage,
+  deleteWord,
   favourWord,
   getCurrentTabId,
   getCurrentTabUrl,
@@ -165,6 +166,9 @@ browser.runtime.onMessage.addListener(async (message) => {
         console.log("收藏单词失败");
       }
       break;
+      case 'delete-word':
+        deleteWord(message.message);
+        break;
     default:
       break;
   }

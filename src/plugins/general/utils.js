@@ -579,8 +579,15 @@ function listenEventFromFloatingPanelEvent() {
     switch (detail.type) {
       case "get-translation-done":
         break;
-      case "remove-word":
+      case "delete-word-success":
         removeUnMarkedWord(detail.message);
+
+        break;
+      case "delete-word":
+        sendMessageFromContentScriptToBackgroundScript(
+          "delete-word",
+          detail.message
+        );
         break;
       case "save-word":
         goThroughDomAndGenerateCustomElement(await getWordList());

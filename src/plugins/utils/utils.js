@@ -256,6 +256,11 @@ export function listenEventFromBackgroundScript() {
           type: "favour-word-success",
         });
         break;
+      case "delete-word-success":
+        sendMessageFromGeneralScriptToFloatingPanel({
+          type: "delete-word-success",
+        });
+        break;
       default:
         break;
     }

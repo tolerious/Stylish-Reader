@@ -25,6 +25,10 @@ export function addEventListener() {
     const ee = e as CustomEvent;
     const data = JSON.parse(ee.detail);
     switch (data.type) {
+      case "delete-word-success":
+        showUnLikeIcon();
+        hideLikeIcon();
+        break;
       case "favour-word-success":
         showLikeIcon();
         hideUnLikeIcon();
@@ -107,8 +111,11 @@ export function addEventListener() {
 
   const likeIcon = shadow?.querySelector("#like-icon") as HTMLElement;
   likeIcon.addEventListener("click", () => {
-    deleteWord();
-    sendMessageToGeneralScript({ type: "delete-word" });
+    // deleteWord();
+    sendMessageToGeneralScript({
+      type: "delete-word",
+      message: localStorage.getItem("currentWord"),
+    });
   });
 
   const unLikeIcon = shadow?.querySelector("#unlike-icon") as HTMLElement;

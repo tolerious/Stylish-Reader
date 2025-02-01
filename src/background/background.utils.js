@@ -108,14 +108,12 @@ export async function getTranslation(word) {
   console.log("getTranslation get called.");
   const client = new HttpClient();
   const response = await client.post("/translation/content", { word });
-  console.log(response);
   return response;
 }
 
 export async function searchWord(word) {
   const client = new HttpClient();
   const response = await client.post("/word/search", { en: word });
-  console.log(response);
   return response;
 }
 
@@ -125,7 +123,6 @@ export async function favourWord(word, groupId) {
     en: convertStringToLowerCaseAndRemoveSpecialCharacter(word),
     groupId,
   });
-  console.log(response);
   return response;
 }
 
@@ -155,4 +152,28 @@ async function createGroup() {
     originalPageUrl: await getCurrentTabUrl(),
   });
   return g;
+}
+
+export async function deleteWord(word) {
+  const client = new HttpClient();
+  const d = await client.post("/word/word/id", {
+    en: convertStringToLowerCaseAndRemoveSpecialCharacter(word),
+  });
+
+  const wordId = d.data._id;
+
+  const g = await createAndSetDefaultGroupForCurrentPage();
+  const t = await client.post("/word/delete", {
+    id: wordId,
+    groupId: g.data._id,
+  });
+
+  if (t.code === 200) {
+    sendMessageFromBackgroundScriptToContentScript({
+      type: "delete-word-success",
+    });
+    console.log("删除单词成功");
+  } else {
+    console.log("删除单词失败");
+  }
 }
