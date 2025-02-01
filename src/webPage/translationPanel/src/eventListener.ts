@@ -95,17 +95,23 @@ export function addEventListener() {
 
   const langMan = shadow?.querySelector("#goToLangManWebsite");
   if (langMan) {
-    langMan.addEventListener("click", () => goToLangManWebsite());
+    langMan.addEventListener("click", function () {
+      goToLangManWebsite();
+    });
   }
 
   const cambridge = shadow?.querySelector("#goToCambridgeWebsite");
   if (cambridge) {
-    cambridge.addEventListener("click", () => goToCambridgeWebsite());
+    cambridge.addEventListener("click", function () {
+      goToCambridgeWebsite();
+    });
   }
 
   const google = shadow?.querySelector("#goToGoogleTranslate");
   if (google) {
-    google.addEventListener("click", () => goToGoogleTranslate());
+    google.addEventListener("click", function () {
+      goToGoogleTranslate();
+    });
   }
 
   const playButton = shadow?.querySelector("#play-audio") as HTMLElement;
