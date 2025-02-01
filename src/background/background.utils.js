@@ -89,7 +89,7 @@ export async function saveArticle() {
   });
 }
 
-function convertStringToLowerCaseAndRemoveSpecialCharacter(s) {
+export function convertStringToLowerCaseAndRemoveSpecialCharacter(s) {
   return s
     .trim()
     .toLowerCase()

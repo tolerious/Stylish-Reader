@@ -1,6 +1,7 @@
 // background.js
 
 import {
+  convertStringToLowerCaseAndRemoveSpecialCharacter,
   createAndSetDefaultGroupForCurrentPage,
   deleteWord,
   favourWord,
@@ -140,7 +141,9 @@ browser.runtime.onMessage.addListener(async (message) => {
       break;
     case "search-word":
       const response = await getTranslation(message.message.word);
-      const searchResponse = await searchWord(message.message.word);
+      const searchResponse = await searchWord(
+        convertStringToLowerCaseAndRemoveSpecialCharacter(message.message.word)
+      );
       sendMessageFromBackgroundScriptToContentScript({
         type: "search-word",
         message: response,
@@ -166,9 +169,9 @@ browser.runtime.onMessage.addListener(async (message) => {
         console.log("收藏单词失败");
       }
       break;
-      case 'delete-word':
-        deleteWord(message.message);
-        break;
+    case "delete-word":
+      deleteWord(message.message);
+      break;
     default:
       break;
   }
