@@ -10,12 +10,9 @@ import {
 } from "./elementControl";
 import {
   convertStringToLowerCaseAndRemoveSpecialCharacter,
-  deleteWord,
-  favourWord,
   goToCambridgeWebsite,
   goToGoogleTranslate,
   goToLangManWebsite,
-  searchWord,
   sendMessageToGeneralScript,
 } from "./utils";
 

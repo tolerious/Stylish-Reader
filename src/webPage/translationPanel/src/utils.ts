@@ -26,7 +26,6 @@ export async function getAudioStream(word: string) {
 }
 
 export async function getTranslationFromYouDao(word: string) {
-  console.log("youdao...");
   setPhoneticContent("");
   clearTranslationContainerContent();
   const client = new FetchWrapper(baseUrl);
