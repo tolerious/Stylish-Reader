@@ -753,17 +753,22 @@ async function fetchWrapper(url, method = "GET", body = {}) {
 }
 
 export function createAudioTagForFloatingPanel() {
-  // 创建 audio 元素
-  const audio = document.createElement("audio");
+  const element = document.getElementById(floatingPanelAudioTagId);
+  console.log(element);
+  if (!element) {
+    // 创建 audio 元素
+    const audio = document.createElement("audio");
 
-  // 设置初始属性
-  audio.controls = true; // 显示播放控件
-  audio.autoplay = false; // 不自动播放
-  audio.preload = "auto"; // 预加载音频
-  audio.id = floatingPanelAudioTagId;
+    // 设置初始属性
+    audio.controls = true; // 显示播放控件
+    audio.autoplay = false; // 不自动播放
+    audio.preload = "auto"; // 预加载音频
+    audio.style.display = "none"; // 不显示
+    audio.id = floatingPanelAudioTagId;
 
-  // 将 audio 元素添加到页面中
-  document.body.appendChild(audio);
+    // 将 audio 元素添加到页面中
+    document.body.appendChild(audio);
+  }
 }
 
 export function playAudioFromFloatingPanel(response) {
