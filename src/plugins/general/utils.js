@@ -185,11 +185,13 @@ function addMouseDownEvent() {
       sendMessageFromContentScriptToBackgroundScript("search-word", {
         word: currentSelectionContent.toString().trim(),
       });
-
-      sendMessageFromContentScriptToBackgroundScript(
-        "play-audio-from-floating-panel",
-        currentSelectionContent.toString().trim()
-      );
+      const ww = currentSelectionContent.toString().trim();
+      if (ww.split(" ").length < 2) {
+        sendMessageFromContentScriptToBackgroundScript(
+          "play-audio-from-floating-panel",
+          ww
+        );
+      }
 
       sendMessageFromGeneralScriptToFloatingPanel({
         type: "search-word",
@@ -273,7 +275,7 @@ function createFloatingIcon(x, y) {
   div.style.width = floatingIconSize.width + "px";
   div.style.borderRadius = "5px";
   div.style.cursor = "pointer";
-  div.style.zIndex = 9998;
+  div.style.zIndex = 9999;
   div.style.border = "2px solid " + stylishReaderMainColor;
   div.style.backgroundColor = "white";
   div.style.backgroundImage =
