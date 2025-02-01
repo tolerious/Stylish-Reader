@@ -25,10 +25,17 @@ export function addEventListener() {
       case "delete-word-success":
         showUnLikeIcon();
         hideLikeIcon();
+        sendMessageToGeneralScript({
+          type: "delete-word-success",
+          message: localStorage.getItem("currentWord"),
+        });
         break;
       case "favour-word-success":
         showLikeIcon();
         hideUnLikeIcon();
+        sendMessageToGeneralScript({
+          type: "save-word",
+        });
         break;
       case "is-liked":
         console.log(data);
