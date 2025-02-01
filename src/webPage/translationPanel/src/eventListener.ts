@@ -18,7 +18,6 @@ import {
 
 export function addEventListener() {
   document.addEventListener("generalScriptEvent", async (e: Event) => {
-    // console.log(e);
     const ee = e as CustomEvent;
     const data = JSON.parse(ee.detail);
     switch (data.type) {
@@ -55,7 +54,6 @@ export function addEventListener() {
         const phonetic = data.message.data.phonetic;
         const translationContentList = data.message.data.dicList;
         setPhoneticContent(phonetic);
-
         generateTranslationContent(translationContentList);
         break;
       case "search-word":
@@ -68,10 +66,6 @@ export function addEventListener() {
           hideLikeIcon();
           hideUnLikeIcon();
           setCurrentWord(localStorage.getItem("currentWord")!);
-
-          // getTranslationFromYouDao(
-          //   convertStringToLowerCaseAndRemoveSpecialCharacter(data.word.trim())
-          // );
         } else {
           localStorage.setItem(
             "currentWord",
@@ -79,11 +73,7 @@ export function addEventListener() {
           );
           setCurrentWord(localStorage.getItem("currentWord")!);
         }
-        // getTranslationFromYouDao(
-        //   convertStringToLowerCaseAndRemoveSpecialCharacter(data.word)
-        // );
         break;
-
       default:
         break;
     }
@@ -116,7 +106,10 @@ export function addEventListener() {
 
   const playButton = shadow?.querySelector("#play-audio") as HTMLElement;
   playButton.addEventListener("click", () => {
-    sendMessageToGeneralScript({ type: "http-request-from-floating-panel" });
+    sendMessageToGeneralScript({
+      type: "play-audio-from-floating-panel",
+      message: localStorage.getItem("currentWord"),
+    });
   });
 
   const likeIcon = shadow?.querySelector("#like-icon") as HTMLElement;

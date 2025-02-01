@@ -1,7 +1,7 @@
 // 此处存放工具函数供所有plugin使用
 
 import { backendServerUrl, loginTokenKey } from "../entryPoint/constants";
-import { sendMessageFromGeneralScriptToFloatingPanel } from "../general/utils";
+import { playAudioFromFloatingPanel, sendMessageFromGeneralScriptToFloatingPanel } from "../general/utils";
 import { developmentEnvironment } from "../ted/constants";
 import { fetchTranscript, sendMessageToBackground } from "../ted/utils";
 import {
@@ -260,6 +260,11 @@ export function listenEventFromBackgroundScript() {
         sendMessageFromGeneralScriptToFloatingPanel({
           type: "delete-word-success",
         });
+        break;
+      case "play-audio-from-floating-panel":
+        console.log('...')
+        console.log(message);
+        playAudioFromFloatingPanel(message.message);
         break;
       default:
         break;

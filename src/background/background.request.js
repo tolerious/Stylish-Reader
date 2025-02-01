@@ -14,7 +14,6 @@ class HttpClient {
     this.instance.interceptors.request.use(
       async (config) => {
         // 在发送请求之前可以做一些处理，比如添加 token
-        // config.headers.Authorization = `Bearer ${yourToken}`;
         const token = await getLoginToken();
         config.headers.Authorization = `Bearer ${token}`;
         return config;
@@ -78,6 +77,35 @@ class HttpClient {
    */
   delete(url, config = {}) {
     return this.instance.delete(url, config);
+  }
+
+  /**
+   * 获取 Blob 数据
+   * @param {string} url 请求地址
+   * @param {object} params 请求参数
+   * @param {object} config 请求配置
+   * @returns {Promise<Blob>}
+   */
+  getBlob(url, params = {}, config = {}) {
+    return this.instance.get(url, {
+      params,
+      ...config,
+      responseType: "blob", // 指定响应类型为 Blob
+    });
+  }
+
+  /**
+   * 发送 POST 请求并获取 Blob 数据
+   * @param {string} url 请求地址
+   * @param {object} data 请求体数据
+   * @param {object} config 请求配置
+   * @returns {Promise<Blob>}
+   */
+  postBlob(url, data = {}, config = {}) {
+    return this.instance.post(url, data, {
+      ...config,
+      responseType: "blob", // 指定响应类型为 Blob
+    });
   }
 }
 

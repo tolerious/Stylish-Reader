@@ -25,3 +25,6 @@ export const translationPanelSize = {
   width: 500,
   height: 200,
 };
+
+export const floatingPanelAudioTagId =
+  "stylish-reader-floating-panel-audio-tag";

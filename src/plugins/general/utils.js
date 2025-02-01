@@ -9,6 +9,7 @@ import {
 import {
   clickableWordClassName,
   floatingIconSize,
+  floatingPanelAudioTagId,
   phraseFloatingIconSize,
   phraseFloatingPanelId,
   phraseFloatingPanelShadowRootId,
@@ -595,11 +596,15 @@ function listenEventFromFloatingPanelEvent() {
       case "go-through-content":
         goThroughDomAndGenerateCustomElement(await getWordList());
         break;
-      case "http-request-from-floating-panel":
+      case "play-audio-from-floating-panel":
         /**
          * detail对象结构为: {type:'',url:'',method:'',body:''}
          */
         console.log("http request from floating panel.");
+        sendMessageFromContentScriptToBackgroundScript(
+          "play-audio-from-floating-panel",
+          detail.message
+        );
         break;
       case "favour-word":
         sendMessageFromContentScriptToBackgroundScript(
@@ -745,4 +750,25 @@ async function fetchWrapper(url, method = "GET", body = {}) {
     const j = await r.json();
     resolve(j);
   });
+}
+
+export function createAudioTagForFloatingPanel() {
+  // 创建 audio 元素
+  const audio = document.createElement("audio");
+
+  // 设置初始属性
+  audio.controls = true; // 显示播放控件
+  audio.autoplay = false; // 不自动播放
+  audio.preload = "auto"; // 预加载音频
+  audio.id = floatingPanelAudioTagId;
+
+  // 将 audio 元素添加到页面中
+  document.body.appendChild(audio);
+}
+
+export function playAudioFromFloatingPanel(response) {
+  const audio = document.getElementById(floatingPanelAudioTagId);
+  const u = URL.createObjectURL(response);
+  audio.src = u;
+  audio.play();
 }

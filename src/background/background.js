@@ -5,6 +5,7 @@ import {
   createAndSetDefaultGroupForCurrentPage,
   deleteWord,
   favourWord,
+  getAudioContent,
   getCurrentTabId,
   getCurrentTabUrl,
   getTranslation,
@@ -171,6 +172,14 @@ browser.runtime.onMessage.addListener(async (message) => {
       break;
     case "delete-word":
       deleteWord(message.message);
+      break;
+
+    case "play-audio-from-floating-panel":
+      const t = await getAudioContent(message.message);
+      sendMessageFromBackgroundScriptToContentScript({
+        type: "play-audio-from-floating-panel",
+        message: t,
+      });
       break;
     default:
       break;
