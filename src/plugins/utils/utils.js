@@ -262,8 +262,6 @@ export function listenEventFromBackgroundScript() {
         });
         break;
       case "play-audio-from-floating-panel":
-        console.log('...')
-        console.log(message);
         playAudioFromFloatingPanel(message.message);
         break;
       default:

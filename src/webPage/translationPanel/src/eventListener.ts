@@ -37,7 +37,6 @@ export function addEventListener() {
         });
         break;
       case "is-liked":
-        console.log(data);
         const isLiked = data.message.data.isLiked;
         if (isLiked) {
           hideUnLikeIcon();
@@ -48,7 +47,6 @@ export function addEventListener() {
         }
         break;
       case "search-word-result":
-        console.log(data);
         setPhoneticContent("");
         clearTranslationContainerContent();
         const phonetic = data.message.data.phonetic;

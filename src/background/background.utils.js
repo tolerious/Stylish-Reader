@@ -105,7 +105,6 @@ export function convertStringToLowerCaseAndRemoveSpecialCharacter(s) {
 }
 
 export async function getTranslation(word) {
-  console.log("getTranslation get called.");
   const client = new HttpClient();
   const response = await client.post("/translation/content", { word });
   return response;
@@ -181,17 +180,5 @@ export async function deleteWord(word) {
 export async function getAudioContent(word) {
   const client = new HttpClient();
   const response = await client.postBlob("/youdao", { word });
-  console.log(response);
   return response;
-  // const client = new FetchWrapper(baseUrl);
-  // const response = await client.post(
-  //   "/youdao",
-  //   { word },
-  //   undefined,
-  //   undefined,
-  //   "blob"
-  // );
-  // const audioBlob = response.data;
-  // const u = URL.createObjectURL(audioBlob);
-  // playAudio(u);
 }

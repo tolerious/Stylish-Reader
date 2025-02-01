@@ -59,6 +59,7 @@ export function goThroughDomAndGenerateCustomElement(targetWordList) {
     convertCurrentTextNodeContent(value, targetWordList);
   }
 
+  // 为所有高亮单词添加点击事件
   document.querySelectorAll(`.${clickableWordClassName}`).forEach((e) => {
     e.addEventListener("click", (e) => {
       hideFloatingIcon();
@@ -66,9 +67,14 @@ export function goThroughDomAndGenerateCustomElement(targetWordList) {
         type: "search-word",
         word: e.target.textContent,
       });
+
       sendMessageFromContentScriptToBackgroundScript("search-word", {
         word: e.target.textContent,
       });
+      sendMessageFromContentScriptToBackgroundScript(
+        "play-audio-from-floating-panel",
+        e.target.textContent.toString().trim()
+      );
     });
   });
 }
@@ -180,10 +186,16 @@ function addMouseDownEvent() {
         word: currentSelectionContent.toString().trim(),
       });
 
+      sendMessageFromContentScriptToBackgroundScript(
+        "play-audio-from-floating-panel",
+        currentSelectionContent.toString().trim()
+      );
+
       sendMessageFromGeneralScriptToFloatingPanel({
         type: "search-word",
         word: currentSelectionContent.toString().trim(),
       });
+
       showTranslationFloatingPanel();
 
       event.stopPropagation();
@@ -600,7 +612,6 @@ function listenEventFromFloatingPanelEvent() {
         /**
          * detail对象结构为: {type:'',url:'',method:'',body:''}
          */
-        console.log("http request from floating panel.");
         sendMessageFromContentScriptToBackgroundScript(
           "play-audio-from-floating-panel",
           detail.message
@@ -611,7 +622,6 @@ function listenEventFromFloatingPanelEvent() {
           "favour-word",
           detail.message
         );
-        console.log(detail);
         break;
       default:
         break;
@@ -754,7 +764,6 @@ async function fetchWrapper(url, method = "GET", body = {}) {
 
 export function createAudioTagForFloatingPanel() {
   const element = document.getElementById(floatingPanelAudioTagId);
-  console.log(element);
   if (!element) {
     // 创建 audio 元素
     const audio = document.createElement("audio");

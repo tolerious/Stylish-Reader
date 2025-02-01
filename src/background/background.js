@@ -155,12 +155,9 @@ browser.runtime.onMessage.addListener(async (message) => {
       });
       break;
     case "favour-word":
-      console.log(message);
       const g = await createAndSetDefaultGroupForCurrentPage();
-      console.log(g);
       const favourResponse = await favourWord(message.message, g.data._id);
 
-      console.log(favourResponse);
       if (favourResponse.code === 200) {
         console.log("收藏单词成功");
         sendMessageFromBackgroundScriptToContentScript({
