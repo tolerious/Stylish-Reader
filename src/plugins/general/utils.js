@@ -572,6 +572,7 @@ export function listenEventFromPhraseFloatingPanelEvent() {
   });
 }
 
+// 接收来自floating panel的事件
 function listenEventFromFloatingPanelEvent() {
   document.addEventListener("floatingPanelEvent", async (event) => {
     const detail = JSON.parse(event.detail);

@@ -158,6 +158,9 @@ browser.runtime.onMessage.addListener(async (message) => {
       console.log(favourResponse);
       if (favourResponse.code === 200) {
         console.log("收藏单词成功");
+        sendMessageFromBackgroundScriptToContentScript({
+          type: "favour-word-success",
+        });
       } else {
         console.log("收藏单词失败");
       }

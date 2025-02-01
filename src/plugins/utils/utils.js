@@ -251,6 +251,11 @@ export function listenEventFromBackgroundScript() {
           message: message.message,
         });
         break;
+      case "favour-word-success":
+        sendMessageFromGeneralScriptToFloatingPanel({
+          type: "favour-word-success",
+        });
+        break;
       default:
         break;
     }
