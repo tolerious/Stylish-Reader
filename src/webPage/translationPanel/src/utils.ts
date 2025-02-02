@@ -37,7 +37,7 @@ export function goToGoogleTranslate() {
 }
 
 export function goToReviewWordWebsite() {
-  window.open(`https://app.stylishreader.com/enter`);
+  window.open(`https://app.stylishreader.com/today`);
 }
 
 export function sendMessageToGeneralScript(message: any) {
