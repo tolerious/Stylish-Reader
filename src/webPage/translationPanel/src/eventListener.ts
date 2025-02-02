@@ -13,6 +13,7 @@ import {
   goToCambridgeWebsite,
   goToGoogleTranslate,
   goToLangManWebsite,
+  goToReviewWordWebsite,
   sendMessageToGeneralScript,
 } from "./utils";
 
@@ -99,6 +100,13 @@ export function addEventListener() {
   if (google) {
     google.addEventListener("click", function () {
       goToGoogleTranslate();
+    });
+  }
+
+  const reviewWord = shadow?.querySelector("#reviewWord");
+  if (reviewWord) {
+    reviewWord.addEventListener("click", function () {
+      goToReviewWordWebsite();
     });
   }
 

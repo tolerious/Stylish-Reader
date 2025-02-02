@@ -30,6 +30,7 @@ mountPoint!.innerHTML = `
       <span class="cursor-pointer underline" id="goToLangManWebsite">🔗朗文词典</span>
       <span class="cursor-pointer underline" id="goToCambridgeWebsite">🔗剑桥词典</span>
       <span class="cursor-pointer underline" id="goToGoogleTranslate">🔗Google翻译</span>
+      <span class="cursor-pointer underline text-cyan-500" id="reviewWord">🔗单词复习</span>
     </div>
     <div id="translation-container">
       <div class="flex flex-row flex-nowrap" v-for="item in dic" :key="item.pos">

@@ -36,6 +36,10 @@ export function goToGoogleTranslate() {
   }
 }
 
+export function goToReviewWordWebsite() {
+  window.open(`https://app.stylishreader.com/enter`);
+}
+
 export function sendMessageToGeneralScript(message: any) {
   const event = new CustomEvent("floatingPanelEvent", {
     detail: JSON.stringify(message),
