@@ -13,10 +13,7 @@ import {
   goToCambridgeWebsite,
   goToGoogleTranslate,
   goToLangManWebsite,
-<<<<<<< HEAD
   goToReviewWordWebsite,
-=======
->>>>>>> bf3261b0cc8503851d2f1ae53ac5118597aad20d
   sendMessageToGeneralScript,
 } from "./utils";
 
