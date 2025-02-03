@@ -11,8 +11,8 @@ const mountPoint =
   document.getElementById("stylish-reader-translation-panel");
 
 mountPoint!.innerHTML = `
-    <div class="container mx-auto bg-white px-1 py-1 text-[16px]">
-    <div class="flex columns-2 flex-row">
+    <div class="text-black container mx-auto bg-white px-1 py-1 text-[16px]">
+    <div class="flex columns-2 flex-row text-black">
       <div class="basis-4/5 flex-col text-[18px]" id="current-word"></div>
       <div class="flex grow cursor-pointer select-none flex-row justify-around" id="mark-word">
    
@@ -20,7 +20,7 @@ mountPoint!.innerHTML = `
     <span id="unlike-icon">🤍</span>
       </div>
     </div>
-    <div class="my-2 flex cursor-pointer flex-row space-x-2">
+    <div class="my-2 flex cursor-pointer flex-row space-x-2 text-black">
       <div>
         <span id="phonetic">&nbsp;</span>
       </div>
@@ -33,7 +33,7 @@ mountPoint!.innerHTML = `
       <span class="cursor-pointer underline text-cyan-500" id="reviewWord">🔗单词复习</span>
     </div>
     <div id="translation-container">
-      <div class="flex flex-row flex-nowrap" v-for="item in dic" :key="item.pos">
+      <div class="flex flex-row flex-nowrap text-black" v-for="item in dic" :key="item.pos">
         <div>{{ item.pos }}</div>
         <div>{{ item.zh }}</div>
       </div>
