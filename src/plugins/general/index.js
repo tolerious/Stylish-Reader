@@ -8,6 +8,7 @@ import {
   goThroughDomAndGenerateCustomElement,
   injectTranslationFloatingPanelToShadowDom,
   listenEventFromOfficialWebsite,
+  removeAllClickableWordEventListener,
 } from "./utils";
 
 export async function initializeGeneralWebSite() {
@@ -23,6 +24,7 @@ export async function initializeGeneralWebSite() {
   // await injectPhraseFloatingPanelToShadowDom();
   setInterval(async () => {
     console.log("Go through...");
+    removeAllClickableWordEventListener();
     goThroughDomAndGenerateCustomElement(await getWordList());
   }, 5000);
 }

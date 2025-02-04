@@ -79,6 +79,12 @@ export function goThroughDomAndGenerateCustomElement(targetWordList) {
   });
 }
 
+export function removeAllClickableWordEventListener() {
+  document.querySelectorAll(`.${clickableWordClassName}`).forEach((e) => {
+    e.removeEventListener("click");
+  });
+}
+
 function removeUnMarkedWord(word) {
   const markedNodeList = document.querySelectorAll(
     `.${clickableWordClassName}`
