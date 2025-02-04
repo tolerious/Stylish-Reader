@@ -122,7 +122,8 @@ function convertCurrentTextNodeContent(textNode, targetWordList) {
       // 这段文本不包含目标单词
       const stt = s + " ";
       if (indexList.indexOf(index) > -1) {
-        const spanElement = document.createElement("span");
+        // const spanElement = document.createElement("span");
+        const spanElement = document.createElement("stylish-reader-span");
         spanElement.textContent = stt;
         spanElement.style.color = stylishReaderMainColor;
         spanElement.classList = [clickableWordClassName];
@@ -137,7 +138,8 @@ function convertCurrentTextNodeContent(textNode, targetWordList) {
      * FIXME: 这里再最外层添加了一个span元素，是有一些问题的，因为增加了一个原本dom中不存在的元素
      * 有可能会改变原有dom的样式，这里最好是插入一个自定义的dom元素，这样不会改变原有dom的结构。
      */
-    const temporaryDivElement = document.createElement("span");
+    // const temporaryDivElement = document.createElement("span");
+    const temporaryDivElement = document.createElement("stylish-reader-span");
     newNodeList.forEach((node) => {
       temporaryDivElement.append(node);
     });
