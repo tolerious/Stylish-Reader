@@ -23,7 +23,6 @@ export async function initializeGeneralWebSite() {
   createAudioTagForFloatingPanel();
   // await injectPhraseFloatingPanelToShadowDom();
   setInterval(async () => {
-    console.log("Go through...");
     removeAllClickableWordEventListener();
     goThroughDomAndGenerateCustomElement(await getWordList());
   }, 5000);
