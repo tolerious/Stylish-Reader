@@ -1,5 +1,5 @@
-import { backendServerUrl } from "../entryPoint/constants";
 import { getLoginToken } from "../../background/background.utils";
+import { backendServerUrl } from "../entryPoint/constants";
 import { stylishReaderMainColor } from "../utils/constants";
 import {
   checkUserLoginStatus,
@@ -61,27 +61,23 @@ export function goThroughDomAndGenerateCustomElement(targetWordList) {
 
   // 为所有高亮单词添加点击事件
   document.querySelectorAll(`.${clickableWordClassName}`).forEach((e) => {
-    e.addEventListener("click", (e) => {
+    const newElement = e.cloneNode(true);
+    e.parentNode.replaceChild(newElement, e);
+    newElement.addEventListener("click", (e1) => {
       hideFloatingIcon();
       sendMessageFromGeneralScriptToFloatingPanel({
         type: "search-word",
-        word: e.target.textContent,
+        word: e1.target.textContent,
       });
 
       sendMessageFromContentScriptToBackgroundScript("search-word", {
-        word: e.target.textContent,
+        word: e1.target.textContent,
       });
       sendMessageFromContentScriptToBackgroundScript(
         "play-audio-from-floating-panel",
-        e.target.textContent.toString().trim()
+        e1.target.textContent.toString().trim()
       );
     });
-  });
-}
-
-export function removeAllClickableWordEventListener() {
-  document.querySelectorAll(`.${clickableWordClassName}`).forEach((e) => {
-    e.removeEventListener("click");
   });
 }
 
@@ -140,17 +136,18 @@ function convertCurrentTextNodeContent(textNode, targetWordList) {
         newNodeList.push(textNode);
       }
     });
-    /**
-     * FIXME: 这里再最外层添加了一个span元素，是有一些问题的，因为增加了一个原本dom中不存在的元素
-     * 有可能会改变原有dom的样式，这里最好是插入一个自定义的dom元素，这样不会改变原有dom的结构。
-     */
-    // const temporaryDivElement = document.createElement("span");
-    const temporaryDivElement = document.createElement("stylish-reader-span");
+
+    const temporaryCustomSpanElement = document.createElement(
+      "stylish-reader-span"
+    );
     newNodeList.forEach((node) => {
-      temporaryDivElement.append(node);
+      temporaryCustomSpanElement.append(node);
     });
     if (!currentTextNodeParentNode.classList.contains(clickableWordClassName)) {
-      currentTextNodeParentNode.replaceChild(temporaryDivElement, textNode);
+      currentTextNodeParentNode.replaceChild(
+        temporaryCustomSpanElement,
+        textNode
+      );
     }
   }
 }
@@ -313,7 +310,6 @@ function hideFloatingIcon() {
 function calculateFloatingPanelPosition(targetElement) {
   const x = targetElement.getBoundingClientRect().left;
   const y = targetElement.getBoundingClientRect().top;
-  showTranslationFloatingPanelTemporary();
   const floatingPanel = document.getElementById(
     translationFloatingPanelShadowRootId
   );
@@ -359,7 +355,6 @@ export async function showTranslationFloatingPanel(
   );
   translationPanel.style.display = "block";
   if (source === "selection") {
-    showTranslationFloatingPanelTemporary();
     let x = gSelectionPosition.x;
     let y = gSelectionPosition.y;
     translationPanel.style.top = y + "px";

@@ -8,7 +8,6 @@ import {
   goThroughDomAndGenerateCustomElement,
   injectTranslationFloatingPanelToShadowDom,
   listenEventFromOfficialWebsite,
-  removeAllClickableWordEventListener,
 } from "./utils";
 
 export async function initializeGeneralWebSite() {
@@ -23,7 +22,6 @@ export async function initializeGeneralWebSite() {
   createAudioTagForFloatingPanel();
   // await injectPhraseFloatingPanelToShadowDom();
   setInterval(async () => {
-    removeAllClickableWordEventListener();
     goThroughDomAndGenerateCustomElement(await getWordList());
   }, 5000);
 }
