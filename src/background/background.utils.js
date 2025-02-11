@@ -100,6 +100,7 @@ export function convertStringToLowerCaseAndRemoveSpecialCharacter(s) {
     .replace(/\)/g, "")
     .replace(/:/g, "")
     .replace(/'/g, "")
+    .replace(/’/g, "")
     .replace(/\?/g, "")
     .replace(/!/g, "");
 }

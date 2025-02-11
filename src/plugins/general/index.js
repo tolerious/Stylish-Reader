@@ -1,16 +1,17 @@
 import { listenEventFromBackgroundScript, logger } from "../utils/utils";
+import { StylishReaderSpan } from "./stylishReaderSpan";
 import {
   createAndSetDefaultGroupForCurrentPage,
   createAudioTagForFloatingPanel,
   customizeGeneralEvent,
   getWordList,
   goThroughDomAndGenerateCustomElement,
-  injectPhraseFloatingPanelToShadowDom,
   injectTranslationFloatingPanelToShadowDom,
   listenEventFromOfficialWebsite,
 } from "./utils";
 
 export async function initializeGeneralWebSite() {
+  customElements.define("stylish-reader-span", StylishReaderSpan);
   logger("initializeGeneralWebSite");
   listenEventFromBackgroundScript();
   listenEventFromOfficialWebsite();
@@ -20,4 +21,7 @@ export async function initializeGeneralWebSite() {
   goThroughDomAndGenerateCustomElement(await getWordList());
   createAudioTagForFloatingPanel();
   // await injectPhraseFloatingPanelToShadowDom();
+  setInterval(async () => {
+    goThroughDomAndGenerateCustomElement(await getWordList());
+  }, 5000);
 }
