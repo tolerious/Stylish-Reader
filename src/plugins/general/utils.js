@@ -714,6 +714,8 @@ function convertStringToLowerCaseAndRemoveSpecialCharacter(s) {
     .replaceAll("!", "")
     .replaceAll("'", "")
     .replaceAll(":", "")
+    .replaceAll("’", "")
+    .replaceAll("'", "")
     .replaceAll("?", "");
 }
 
