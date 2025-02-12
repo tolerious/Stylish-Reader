@@ -3,5 +3,6 @@ packages:
   - "pages/*"
   - "plugins/entryPoint"
   - "plugins/nytimes"
+  - "plugins/guardian"
   - "popup"
   - "background"

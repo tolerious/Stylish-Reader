@@ -200,6 +200,10 @@ function fetchTextData(url, code) {
   });
 }
 
+export function isGuardianWebSite() {
+  return window.location.hostname.includes("theguardian.com");
+}
+
 export function isNYTimesWebSite() {
   return window.location.hostname.includes("nytimes.com");
 }
