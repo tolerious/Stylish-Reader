@@ -178,6 +178,10 @@ browser.runtime.onMessage.addListener(async (message) => {
         message: t,
       });
       break;
+
+    case "generate-questions":
+      console.log("generate-questions");
+      break;
     default:
       break;
   }
