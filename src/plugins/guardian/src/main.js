@@ -1,3 +1,12 @@
+import {
+  logger,
+  sendMessageFromContentScriptToBackgroundScript,
+} from "../../utils/utils";
+
+let isHeadLineReady = false;
+let isStandFirstReady = false;
+let isContentReady = false;
+
 export function initializeGuardian() {
   console.log("The guardian plugin initialized");
   console.log("HeadLine: ", getHeadLine());
@@ -5,11 +14,23 @@ export function initializeGuardian() {
   console.log("Content: ", getContent());
 
   console.log("Is ready to read?", isReadyToRead());
+  saveTheGuardianArticle();
 }
 
-let isHeadLineReady = false;
-let isStandFirstReady = false;
-let isContentReady = false;
+function saveTheGuardianArticle() {
+  const headline = getHeadLine();
+  const standfirst = getStandFirst();
+  const content = getContent();
+  if (isReadyToRead()) {
+    sendMessageFromContentScriptToBackgroundScript("save-guardian-article", {
+      headline,
+      standfirst,
+      content,
+    });
+  } else {
+    logger("非文章页面");
+  }
+}
 
 function isReadyToRead() {
   return isHeadLineReady && isStandFirstReady && isContentReady;

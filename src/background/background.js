@@ -171,16 +171,20 @@ browser.runtime.onMessage.addListener(async (message) => {
       deleteWord(message.message);
       break;
 
-    case "play-audio-from-floating-panel":
+    case "play-audio-from-floating-panel": {
       const t = await getAudioContent(message.message);
       sendMessageFromBackgroundScriptToContentScript({
         type: "play-audio-from-floating-panel",
         message: t,
       });
       break;
+    }
 
     case "generate-questions":
       console.log("generate-questions");
+      break;
+    case "save-guardian-article":
+      console.log("Save guardian article.");
       break;
     default:
       break;
