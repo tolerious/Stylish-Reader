@@ -1,7 +1,10 @@
 // 此处存放工具函数供所有plugin使用
 
 import { backendServerUrl, loginTokenKey } from "../entryPoint/constants";
-import { playAudioFromFloatingPanel, sendMessageFromGeneralScriptToFloatingPanel } from "../general/utils";
+import {
+  playAudioFromFloatingPanel,
+  sendMessageFromGeneralScriptToFloatingPanel,
+} from "../general/utils";
 import { developmentEnvironment } from "../ted/constants";
 import { fetchTranscript, sendMessageToBackground } from "../ted/utils";
 import {
@@ -195,6 +198,10 @@ function fetchTextData(url, code) {
         reject(error);
       });
   });
+}
+
+export function isNYTimesWebSite() {
+  return window.location.hostname.includes("nytimes.com");
 }
 
 export function isYouTubeWebSite() {

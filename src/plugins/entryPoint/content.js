@@ -1,9 +1,11 @@
+import { initializeNYTimes } from "nytimes";
 import { initializeBBC } from "../bbcLearningEnglish";
 import { initializeGeneralWebSite } from "../general";
 import { initializeTed } from "../ted";
 import {
   checkUserLoginStatus,
   isBBCLearningEnglishWebSite,
+  isNYTimesWebSite,
   isTedWebSite,
   isYouTubeWebSite,
 } from "../utils/utils";
@@ -27,5 +29,10 @@ checkUserLoginStatus().then(() => {
   // 插件 Youtube
   if (isYouTubeWebSite()) {
     initializeYoutube();
+  }
+
+  // 插件 NYTimes
+  if (isNYTimesWebSite()) {
+    initializeNYTimes();
   }
 });
