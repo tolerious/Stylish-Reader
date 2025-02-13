@@ -183,3 +183,19 @@ export async function getAudioContent(word) {
   const response = await client.postBlob("/youdao", { word });
   return response;
 }
+
+// #region The Guardian
+export async function saveTheGuardianArticle(article) {
+  const group = await createGroup();
+  const client = new HttpClient();
+  const { headline, standfirst, content } = article;
+  const response = await client.post("/article/guardian", {
+    content,
+    title: headline,
+    summary: standfirst,
+    groupId: group.data._id,
+    originalUrl: await getCurrentTabUrl(),
+  });
+  return response;
+}
+// #endregion

@@ -33,7 +33,7 @@ function saveTheGuardianArticle() {
 }
 
 function isReadyToRead() {
-  return isHeadLineReady && isStandFirstReady && isContentReady;
+  return isHeadLineReady && isContentReady;
 }
 
 function getHeadLineFromHeader() {
@@ -80,7 +80,8 @@ function getHeadLine() {
     }
   } else {
     isHeadLineReady = true;
-    return nodeList[0].innerText;
+    const headerNode = nodeList[0].querySelector("h1");
+    return headerNode.innerText;
   }
 }
 
@@ -112,9 +113,15 @@ function getContent() {
     console.log("There is no body");
   } else {
     const mainContent = nodeList[0].querySelector("#maincontent");
-    if (mainContent) {
+    // 仅仅搜索mainContent还不够，里面还会包括广告，newsletter订阅等信息
+    const pNodeList = mainContent.querySelectorAll("p");
+    const contentArray = [];
+    pNodeList.forEach((p) => {
+      contentArray.push(p.innerText);
+    });
+    if (contentArray.length > 0) {
       isContentReady = true;
-      return mainContent.innerText;
+      return contentArray.join("\n");
     } else {
       isContentReady = false;
       return "";

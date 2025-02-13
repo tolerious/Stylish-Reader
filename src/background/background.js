@@ -9,6 +9,7 @@ import {
   getCurrentTabId,
   getCurrentTabUrl,
   getTranslation,
+  saveTheGuardianArticle,
   searchWord,
   sendMessageFromBackgroundScriptToContentScript,
   setLoginToken,
@@ -185,6 +186,8 @@ browser.runtime.onMessage.addListener(async (message) => {
       break;
     case "save-guardian-article":
       console.log("Save guardian article.");
+      const r = await saveTheGuardianArticle(message.message);
+      console.log(r);
       break;
     default:
       break;
