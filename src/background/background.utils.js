@@ -198,4 +198,21 @@ export async function saveTheGuardianArticle(article) {
   });
   return response;
 }
+
+export async function getGuardianArticle(id) {
+  const client = new HttpClient();
+  const response = client.get(`/article/guardian/${id}`);
+  return response;
+}
+
+export async function generateQuestionAnswers(id) {
+  const client = new HttpClient();
+  const article = await getGuardianArticle(id);
+  console.log(article);
+  const response = await client.post("/deepseek", {
+    content: article.data.content,
+  });
+  console.log(response);
+  // return response;
+}
 // #endregion

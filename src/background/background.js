@@ -5,6 +5,7 @@ import {
   createAndSetDefaultGroupForCurrentPage,
   deleteWord,
   favourWord,
+  generateQuestionAnswers,
   getAudioContent,
   getCurrentTabId,
   getCurrentTabUrl,
@@ -183,11 +184,16 @@ browser.runtime.onMessage.addListener(async (message) => {
 
     case "generate-questions":
       console.log("generate-questions");
+      // const t = await browser.storage.local.get("guardian-article-id");
+      // console.log(t);
+      // await generateQuestionAnswers(t["guardian-article-id"]);
       break;
     case "save-guardian-article":
-      console.log("Save guardian article.");
+      console.log("Save guardian article...");
+      await browser.storage.local.set({ "guardian-article-id": "" });
       const r = await saveTheGuardianArticle(message.message);
       console.log(r);
+      await browser.storage.local.set({ "guardian-article-id": r._id });
       break;
     default:
       break;
