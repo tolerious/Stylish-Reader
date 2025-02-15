@@ -1,9 +1,13 @@
+import { initializeNYTimes } from "nytimes";
 import { initializeBBC } from "../bbcLearningEnglish";
 import { initializeGeneralWebSite } from "../general";
+import { initializeGuardian } from "../guardian/src/main";
 import { initializeTed } from "../ted";
 import {
   checkUserLoginStatus,
   isBBCLearningEnglishWebSite,
+  isGuardianWebSite,
+  isNYTimesWebSite,
   isTedWebSite,
   isYouTubeWebSite,
 } from "../utils/utils";
@@ -27,5 +31,15 @@ checkUserLoginStatus().then(() => {
   // 插件 Youtube
   if (isYouTubeWebSite()) {
     initializeYoutube();
+  }
+
+  // 插件 NYTimes
+  if (isNYTimesWebSite()) {
+    initializeNYTimes();
+  }
+
+  // 插件 The Guardian
+  if (isGuardianWebSite()) {
+    initializeGuardian();
   }
 });

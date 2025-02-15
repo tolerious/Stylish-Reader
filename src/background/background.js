@@ -5,10 +5,12 @@ import {
   createAndSetDefaultGroupForCurrentPage,
   deleteWord,
   favourWord,
+  generateQuestionAnswers,
   getAudioContent,
   getCurrentTabId,
   getCurrentTabUrl,
   getTranslation,
+  saveTheGuardianArticle,
   searchWord,
   sendMessageFromBackgroundScriptToContentScript,
   setLoginToken,
@@ -171,12 +173,27 @@ browser.runtime.onMessage.addListener(async (message) => {
       deleteWord(message.message);
       break;
 
-    case "play-audio-from-floating-panel":
+    case "play-audio-from-floating-panel": {
       const t = await getAudioContent(message.message);
       sendMessageFromBackgroundScriptToContentScript({
         type: "play-audio-from-floating-panel",
         message: t,
       });
+      break;
+    }
+
+    case "generate-questions":
+      console.log("generate-questions");
+      // const t = await browser.storage.local.get("guardian-article-id");
+      // console.log(t);
+      // await generateQuestionAnswers(t["guardian-article-id"]);
+      break;
+    case "save-guardian-article":
+      console.log("Save guardian article...");
+      await browser.storage.local.set({ "guardian-article-id": "" });
+      const r = await saveTheGuardianArticle(message.message);
+      console.log(r);
+      await browser.storage.local.set({ "guardian-article-id": r._id });
       break;
     default:
       break;

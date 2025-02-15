@@ -3,7 +3,7 @@ import { baseUrl } from "./constants";
 import { getLoginToken } from "./background.utils";
 
 class HttpClient {
-  constructor(baseURL = baseUrl, timeout = 10000) {
+  constructor(baseURL = baseUrl, timeout = 3000000) {
     // 创建 axios 实例
     this.instance = axios.create({
       baseURL, // 基础 URL
