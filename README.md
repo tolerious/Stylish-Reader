@@ -29,3 +29,7 @@ For more features, you could have a look at the [official website.](https://styl
 
 You can see the real-time bilingual live subtitles while watching TED videos.
 ![alt text](assets/image-1.png)
+
+### Youtube video review
+
+You can save the YouTube video to your account and see the real-time bilingual live subtitles later.
