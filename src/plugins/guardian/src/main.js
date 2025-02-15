@@ -121,7 +121,7 @@ function getContent() {
     });
     if (contentArray.length > 0) {
       isContentReady = true;
-      return contentArray.join("\n");
+      return contentArray;
     } else {
       isContentReady = false;
       return "";
