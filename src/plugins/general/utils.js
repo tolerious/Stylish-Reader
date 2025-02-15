@@ -45,6 +45,11 @@ export function goThroughDomAndGenerateCustomElement(targetWordList) {
   let index = 0;
   // 找到所有符合要求的#text节点，并保存在Map中
   while (node) {
+
+    /**
+     * 找到当前node的父亲元素并排除script,HTML标签，这里排除HTML标签是因为HTML会包含所有文档元素，这不是我们想要的
+     * 且排除node的文本内容是空元素的
+     *  */
     if (
       !["SCRIPT", "HTML"].includes(node.parentNode.nodeName) &&
       node.textContent.trim() !== ""
@@ -100,10 +105,11 @@ function removeUnMarkedWord(word) {
 }
 
 function convertCurrentTextNodeContent(textNode, targetWordList) {
-  // 判断并找出当前文本节点中包含的目标单词
+  // 判断并找出当前文本节点中包含的目标单词，这里为什么要替换所有的\n,\t? 经过测试，替换了以后会改变一些文档结构
+  // const textContent = textNode.textContent
+  //   .replaceAll("\n", " ")
+  //   .replaceAll("\t", " ");
   const textContent = textNode.textContent
-    .replaceAll("\n", " ")
-    .replaceAll("\t", " ");
   const targetWordSet = new Set(targetWordList);
   const splittedTextContentStringList = textContent.split(" ");
   // 存放的是目标单词在splittedTextContentStringList中的索引
