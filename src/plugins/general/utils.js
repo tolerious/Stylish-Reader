@@ -45,7 +45,6 @@ export function goThroughDomAndGenerateCustomElement(targetWordList) {
   let index = 0;
   // 找到所有符合要求的#text节点，并保存在Map中
   while (node) {
-
     /**
      * 找到当前node的父亲元素并排除script,HTML标签，这里排除HTML标签是因为HTML会包含所有文档元素，这不是我们想要的
      * 且排除node的文本内容是空元素的
@@ -105,16 +104,26 @@ function removeUnMarkedWord(word) {
 }
 
 function convertCurrentTextNodeContent(textNode, targetWordList) {
-  // 判断并找出当前文本节点中包含的目标单词，这里为什么要替换所有的\n,\t? 经过测试，替换了以后会改变一些文档结构
-  // const textContent = textNode.textContent
-  //   .replaceAll("\n", " ")
-  //   .replaceAll("\t", " ");
-  const textContent = textNode.textContent
+  const textContent = textNode.textContent;
   const targetWordSet = new Set(targetWordList);
   const splittedTextContentStringList = textContent.split(" ");
   // 存放的是目标单词在splittedTextContentStringList中的索引
   const indexList = [];
-  splittedTextContentStringList.filter((s, index) => {
+  // 这个splittedTextContentStringList里面可能会包含类似如下的字符串
+  // "highlighting,\nindentation,",没有把这个字符串正确的拆分成两个字符串，所以在处理前
+  // 需要进一步遍历splittedTextContentStringList，构建新的数组把这种字符串拆分成两个字符串
+  let latestSplittedTextContentStringList = [];
+  splittedTextContentStringList.forEach((item) => {
+    if (item.includes("\n") || item.includes("\t")) {
+      const tempList = splitWithWhitespace(item);
+      tempList.forEach((s) => {
+        latestSplittedTextContentStringList.push(s);
+      });
+    } else {
+      latestSplittedTextContentStringList.push(item);
+    }
+  });
+  latestSplittedTextContentStringList.filter((s, index) => {
     if (
       targetWordSet.has(convertStringToLowerCaseAndRemoveSpecialCharacter(s))
     ) {
@@ -126,7 +135,7 @@ function convertCurrentTextNodeContent(textNode, targetWordList) {
   const newNodeList = [];
   // 遍历indexList，重新构造#text节点
   if (indexList.length > 0) {
-    splittedTextContentStringList.forEach((s, index) => {
+    latestSplittedTextContentStringList.forEach((s, index) => {
       // 这段文本不包含目标单词
       const stt = s + " ";
       if (indexList.indexOf(index) > -1) {
@@ -156,6 +165,12 @@ function convertCurrentTextNodeContent(textNode, targetWordList) {
       );
     }
   }
+}
+
+function splitWithWhitespace(str) {
+  return str
+    .split(/(\n|\t|\s+)/)
+    .filter((item) => item.trim() || item === "\n" || item === "\t");
 }
 
 export function customizeGeneralEvent() {
