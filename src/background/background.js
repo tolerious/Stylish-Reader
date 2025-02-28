@@ -13,7 +13,7 @@ import {
   saveTheGuardianArticle,
   searchWord,
   sendMessageFromBackgroundScriptToContentScript,
-  setLoginToken,
+  setLoginToken
 } from "./background.utils";
 
 // TED 网站，当前页面URL
