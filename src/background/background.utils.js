@@ -216,3 +216,13 @@ export async function generateQuestionAnswers(id) {
   // return response;
 }
 // #endregion
+
+export async function getTranslationFromBaidu(message) {
+  const client = new HttpClient();
+  const { content, classId } = message;
+  const response = await client.post("/baidu", {
+    content,
+  });
+
+  return { response, classId };
+}
