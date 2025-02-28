@@ -5,15 +5,15 @@ import {
   createAndSetDefaultGroupForCurrentPage,
   deleteWord,
   favourWord,
-  generateQuestionAnswers,
   getAudioContent,
   getCurrentTabId,
   getCurrentTabUrl,
   getTranslation,
+  getTranslationFromBaidu,
   saveTheGuardianArticle,
   searchWord,
   sendMessageFromBackgroundScriptToContentScript,
-  setLoginToken,
+  setLoginToken
 } from "./background.utils";
 
 // TED 网站，当前页面URL
@@ -187,6 +187,20 @@ browser.runtime.onMessage.addListener(async (message) => {
       // const t = await browser.storage.local.get("guardian-article-id");
       // console.log(t);
       // await generateQuestionAnswers(t["guardian-article-id"]);
+      break;
+    case "translate-paragraph":
+      sendMessageFromBackgroundScriptToContentScript({
+        type: "translate-paragraph",
+      });
+      break;
+    case "translate-paragraph-from-content":
+      console.log(message.message);
+      const result = await getTranslationFromBaidu(message.message);
+      console.log(result);
+      sendMessageFromBackgroundScriptToContentScript({
+        type: "translation-result",
+        message: result,
+      });
       break;
     case "save-guardian-article":
       console.log("Save guardian article...");

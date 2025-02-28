@@ -18,6 +18,7 @@ import {
   translationFloatingPanelId,
   translationFloatingPanelShadowRootId,
   translationPanelSize,
+  translationParagraphClassName,
 } from "./constants";
 
 let currentSelectionContent = "";
@@ -83,6 +84,61 @@ export function goThroughDomAndGenerateCustomElement(targetWordList) {
       );
     });
   });
+}
+
+let isTranslationParagraphOn = false;
+let translationParagraphList = [];
+export async function addTranslationParagraph() {
+  if (!isTranslationParagraphOn) {
+    const paragraphNodeList = document.querySelectorAll("p");
+    const headerNodeList = document.querySelectorAll("h1,h2,h3");
+    const nodeList = [...headerNodeList, ...paragraphNodeList];
+    for (let index = 0; index < nodeList.length; index++) {
+      let node = nodeList[index];
+      const parent = node.parentNode;
+      const newNode = document.createElement("span");
+      // 调翻译API
+      translationParagraphList.push({
+        content: node.textContent,
+        classId: translationParagraphClassName + `-${index}`,
+      });
+      sendMessageFromContentScriptToBackgroundScript(
+        "translate-paragraph-from-content",
+        {
+          content: node.textContent,
+          classId: translationParagraphClassName + `-${index}`,
+        }
+      );
+      newNode.textContent = node.textContent;
+      newNode.classList.add(translationParagraphClassName + `-${index}`);
+      newNode.classList.add(translationParagraphClassName);
+      newNode.style.color = "oklch(0.704 0.04 256.788)";
+      if (parent.childNodes.length > 1) {
+        const sibling = node.nextSibling;
+        parent.insertBefore(newNode, sibling);
+      } else {
+        parent.appendChild(newNode);
+      }
+      await waitForSeconds(1000);
+    }
+    isTranslationParagraphOn = true;
+  } else {
+    const nodeList = document.querySelectorAll(
+      `.${translationParagraphClassName}`
+    );
+    nodeList.forEach((node) => {
+      node.remove();
+    });
+    isTranslationParagraphOn = false;
+  }
+}
+
+export function addTranslationContentBelowParagraph(
+  classId,
+  translationContent
+) {
+  const domElement = document.querySelector(`.${classId}`);
+  domElement.textContent = translationContent;
 }
 
 function removeUnMarkedWord(word) {
@@ -813,4 +869,8 @@ export function playAudioFromFloatingPanel(response) {
   const u = URL.createObjectURL(response);
   audio.src = u;
   audio.play();
+}
+
+export function waitForSeconds(number) {
+  return new Promise((resolve) => setTimeout(resolve, number));
 }

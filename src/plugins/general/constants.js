@@ -12,6 +12,9 @@ export const phraseFloatingPanelId = "stylish-reader-phrase-panel";
 
 export const clickableWordClassName = "stylish-reader-clickable-word";
 
+export const translationParagraphClassName =
+  "stylish-reader-translation-paragraph";
+
 export const phraseFloatingIconSize = { height: 40, width: 40 };
 
 export const phraseFloatingPanelSize = { height: 440, width: 260 };

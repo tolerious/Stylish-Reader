@@ -2,6 +2,8 @@
 
 import { backendServerUrl, loginTokenKey } from "../entryPoint/constants";
 import {
+  addTranslationContentBelowParagraph,
+  addTranslationParagraph,
   playAudioFromFloatingPanel,
   sendMessageFromGeneralScriptToFloatingPanel,
 } from "../general/utils";
@@ -237,7 +239,7 @@ export function sendMessageFromContentScriptToBackgroundScript(
  * 监听从background脚本发送过来的消息
  */
 export function listenEventFromBackgroundScript() {
-  browser.runtime.onMessage.addListener((message) => {
+  browser.runtime.onMessage.addListener(async (message) => {
     switch (message.type) {
       case "youtube":
         if (isYouTubeWebSite) {
@@ -274,6 +276,16 @@ export function listenEventFromBackgroundScript() {
         break;
       case "play-audio-from-floating-panel":
         playAudioFromFloatingPanel(message.message);
+        break;
+      case "translate-paragraph":
+        await addTranslationParagraph();
+        break;
+      case "translation-result":
+        const { classId, response } = message.message;
+        addTranslationContentBelowParagraph(
+          classId,
+          response.data.trans_result[0].dst
+        );
         break;
       default:
         break;
