@@ -219,9 +219,10 @@ export async function generateQuestionAnswers(id) {
 
 export async function getTranslationFromBaidu(message) {
   const client = new HttpClient();
-  const { content, classId } = message;
+  const { content, classId, field } = message;
   const response = await client.post("/baidu", {
     content,
+    field,
   });
 
   return { response, classId };
